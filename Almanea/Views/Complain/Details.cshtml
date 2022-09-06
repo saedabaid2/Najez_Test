@@ -1,0 +1,220 @@
+﻿
+@{
+    ViewBag.Title = Translation.ComplainDetails;
+}
+
+@model vm_Order
+
+@using Almanea.Models;
+@using Almanea.BusinessLogic;
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">          
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.SellerName, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.SellerName, new { @class = "form-control", @placeholder = Translation.ReqSellerName, @readonly = "readonly" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.SellerName, "", new { @class = "valid-text" })
+                    </div>
+
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.SellerContact, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.SellerContact, new { @class = "form-control numOnly", @placeholder = Translation.ReqSellerContact, @readonly = "readonly" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.SellerContact, "", new { @class = "valid-text" })
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.InvoiceNo, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.InvoiceNo, new { @class = "form-control", @placeholder = Translation.ReqInvoiceNo, @readonly = "readonly" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.InvoiceNo, "", new { @class = "valid-text" })
+                    </div>
+                </div>
+                <hr class="thick" />
+
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.CustomerName, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.CustomerName, new { @class = "form-control", @placeholder = Translation.ReqCustomerName, @readonly = "readonly" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.CustomerName, "", new { @class = "valid-text" })
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.LocationId, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.Location, new { @class = "form-control",  @readonly = "readonly" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.LocationId, "", new { @class = "valid-text" })
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.CustomerContact, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.CustomerContact, new { @class = "form-control numOnly", @placeholder = Translation.ReqCustomerContact, @readonly = "readonly" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.CustomerContact, "", new { @class = "valid-text" })
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.InstallDate, new { @class = "bmd-label-floating required" })
+                            @{
+                                string txtInstallDate = "";
+                                if (Model.PreferDate == 1)
+                                {
+                                    txtInstallDate = Translation.PreferAsap;
+                                }
+                                else if (Model.PreferDate == 2)
+                                {
+                                    txtInstallDate = @Model.InstallDate;
+                                }
+
+                                <input type="text" class="form-control" value="@txtInstallDate" readonly />
+                            }
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.PrefferTime, new { @class = "bmd-label-floating required" })
+                            @{
+                                string txtInstallTime = "";
+                                if (Model.PrefferTime == 1)
+                                {
+                                    txtInstallTime = Translation.MorningTime;
+                                }
+                                else if (Model.PrefferTime == 2)
+                                {
+                                    txtInstallTime = @Translation.EveningTime;
+                                }
+                                else
+                                {
+                                    txtInstallTime = Model.PreferTiming;
+                                }
+                                <input type="text" class="form-control" value="@txtInstallTime" readonly />
+                            }
+                        </div>
+                    </div>
+                </div>
+                <hr class="thick" />
+                @{
+                    decimal total_Service = 0;
+                    decimal total_Vat = 0;
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="table-responsive">
+                                <table class="table align-items-center table-flush table-bordered" id="dtServices">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th width="25%">@Translation.Services</th>
+                                            <th width="25%">@Translation.ItemCount</th>
+                                            <th width="25%">@Translation.UnitPrice</th>
+                                            <th width="15%">@Translation.Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in (List<vm_OrderServices>)ViewBag.Services)
+                                        {
+                                            if (item.IsActive)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @item.ServiceName
+                                                        <input type="hidden" id="hfService" value="@item.ServiceId" />
+                                                    </td>
+                                                    <td>
+                                                        @item.Quantity
+                                                        <input type="hidden" id="hfQuantity" value="@item.Quantity" />
+                                                    </td>
+                                                    <td>
+                                                        @(item.Price)
+                                                    </td>
+                                                    <td>
+                                                        @(item.Price * item.Quantity)
+                                                        @{
+                                                            total_Service += (item.Price * item.Quantity);
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            &nbsp;
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group" style="text-align:right;">
+                                @Translation.Vat&nbsp;(@ViewBag.Vat%)
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group">
+                                @if (ViewBag.Vat != null)
+                                {
+                                    var totalVat = (total_Service * (Convert.ToDecimal(ViewBag.Vat) / 100)).ToString("#.##");
+                                    Model.Vat = Convert.ToDecimal(totalVat);
+                                    total_Vat = Convert.ToDecimal(totalVat);
+                                }
+                                @Html.TextBoxFor(m => m.Vat, new { @class = "form-control", @readonly = "true", @value = total_Vat })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            &nbsp;
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group" style="text-align:right;">
+                                @Translation.Total
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group">
+                                @{
+                                    var totalAmount = (total_Vat + total_Service).ToString("#.##");
+                                    Model.TotalAmount = Convert.ToDecimal(totalAmount);
+                                }
+                                @Html.TextBoxFor(m => m.TotalAmount, new { @class = "form-control", @readonly = "true", @value = totalAmount })
+                            </div>
+                        </div>
+                    </div>
+                }
+                <hr />
+                @Html.Partial("_ComplainDetails", (vm_ComplainResponse)ViewBag.Complain)
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+
+    <script>
+        function SubmitComplain(status) {
+            $.post("@Url.Action("UpdateComplain")", {
+                'Id': @ViewBag.Id,
+                'Response': $('#Response').val(),
+                'StatusId': status
+            }, function (response) {
+                if (response.StatusId > 0) {
+                    //Success Message
+                    successPopup("@Translation.success_Update");
+
+                    setTimeout(function () { window.location = '@Url.Action("Complain")'; }, 3000);
+                }
+            });
+        }
+    </script>
+}

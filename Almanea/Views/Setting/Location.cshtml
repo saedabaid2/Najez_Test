@@ -1,0 +1,237 @@
+﻿@model vm_Locations
+@{
+    ViewBag.Title = Translation.Location;
+    var dd = "";
+}
+
+@using Almanea.Models;
+
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                @using (Ajax.BeginForm("AddEditLocation", "Setting", null,
+                   new AjaxOptions
+                   {
+                       HttpMethod = "POST",
+                       OnSuccess = "onSuccess",
+                       OnBegin = "onBegin",
+                       OnComplete = "onComplete",
+                       OnFailure = "onComplete",
+                   }, new { id = "frmAdd" }))
+                {
+
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-5 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.LocationNameEN, new { @class = "bmd-label-floating required" })
+                                @Html.TextBoxFor(m => m.LocationNameEN, new { @class = "form-control", @placeholder = Translation.ReqLocation })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.LocationNameEN, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-6 col-md-5 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.LocationNameAR, new { @class = "bmd-label-floating required" })
+                                @Html.TextBoxFor(m => m.LocationNameAR, new { @class = "form-control", @placeholder = Translation.ReqLocation })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.LocationNameAR, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(@Translation.Direction, new { @class = "bmd-label-floating required" })
+                                @Html.DropDownListFor(m => m.DirectionId, new SelectList(Model.DirectionList, "Id", "DirectionName"), @Translation.SelectDirection, new { @class = "form-control select2 direction" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.DirectionId, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12" style="padding-top: 34px;">
+                            <input type="submit" class="btn btn-primary pull-right" value="@Translation.AddNew" />
+                        </div>
+                    </div>
+                }
+            </div>
+
+
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dataTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="25%">@Translation.LocationEN</th>
+                            <th width="25%">@Translation.LocationAR</th>
+                            <th width="25%">@Translation.Direction</th>
+                            <th width="15%">@Translation.Status</th>
+                            <th width="15%">@Translation.Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+            async: true;
+            //List
+            BindDataTable();
+        });
+
+        var oTable;
+        function BindDataTable(response) {
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+                    "bAutoWidth": false,
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("GetLocations")",
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+                    },
+                    // data: response,
+                    "aoColumns": [
+                         {
+                            "mData": "LocationNameEN",
+                            "render": function (vals, type, full, meta) {
+                                return '<input type="text" class="form-control" id="LocationNameEN" value="' + vals +'" />';
+                            },
+                        },
+                        {
+                            "mData": "LocationNameAR",
+                            "render": function (vals, type, full, meta) {
+                                return '<input type="text" class="form-control" id="LocationNameAR" value="' + vals + '" />';
+                            },
+                        },
+                        {
+                            "mData": "Direction",
+                            "render": function (vals, type, full, meta) {
+                                var check = '';
+                                var html = "";
+                                if (vals === true) { check = 'checked'; }
+                               
+                                $.each(full.DirectionList, function (index, value) {
+                                    if (full.DirectionId == value.Id) {
+                                        html += `<option value='` + value.Id + `' selected >` + value.DirectionName + `</option>`;
+                                    }
+                                    else {
+                                        html += `<option value='` + value.Id + `'>` + value.DirectionName + `</option>`;
+                                    }
+                                });
+                                return `<div>
+                                            <div class="form-group">
+                                                <select class="form-control select2 direction" Id="Direction">
+                                                    <option value = ''>@Translation.SelectDirection</option>`
+                                                    + html +
+                                                `</select>
+                                            </div>
+                                        </div> ` ;
+                             },
+                            "orderable": false
+                        },
+                        {
+                            "mData": "Status",
+                            "render": function (vals, type, full, meta) {
+                                   var check='';
+                                if (vals === true) { check = 'checked'; }
+                                        return '<div class="custom-control custom-checkbox">' +
+                                            '<input type="checkbox" id="Status_' + full.LocationId +'" name="Status" class="custom-control-input" value="' + vals + '" '+ check +' />'+
+                                            '<label class="custom-control-label" for="Status_' + full.LocationId +'">@Translation.IsActive</label>' +
+                                        '</div>';
+                             },
+                            "orderable": false
+                        },
+
+                        {
+                            "mData": "LocationId",
+                            "render": function (vals, type, full, meta) {
+                                return '<a href="javascript:void(0)" onclick="Update(this)" class="btn btn-sm btn-primary">@Translation.Update</a>';
+                            },
+                            "orderable": false
+                        },
+                    ],
+                    "order": [[0, "desc"]],
+                    "fnInitComplete": function (oSettings, json) {
+
+                    },
+                    "fnDrawCallback": function (oSettings) {
+
+                    },
+                    "fnCreatedRow": function (nRow, aData, iDataIndex) {
+                        $(nRow).attr('id', 'tr' + aData.LocationId); // or whatever you choose to set as the id
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                        "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                        "emptyTable": false,
+                        "sEmptyTable": "@Translation.NoMatchingRecords",
+                    },
+                });
+            }
+        }
+
+        var Reset = function () {
+            $('#divSearch').find('input[type=text]').val('');
+            $('#divSearch').find('select').val('0');
+            BindDataTable();
+        }
+    </script>
+
+    <script>
+        //call add sucess view
+        function onSuccess(response) {
+            if (response.StatusId > 0) {
+                successPopup("@Translation.success_AddLocation");
+
+                setTimeout(function () { window.location = window.location.href; }, 3000);
+            }
+        }
+
+        function Update(button) {
+            onBegin();
+            //Determine the reference of the Row using the Button.
+            var row = $(button).closest("TR");
+
+            $.post('@Url.Action("AddEditLocation")', {
+                LocationId: parseInt(row.attr("id").substring(2)),
+                LocationNameEN: row.find('#LocationNameEN').val(),
+                LocationNameAR: row.find('#LocationNameAR').val(),
+                Status: row.find('input[name="Status"]').is(":checked"),
+                DirectionId: parseInt(row.find("#Direction option:selected").val()),
+            }, function (response) {
+                if (response.StatusId > 0) {
+                    successPopup("@Translation.success_Update");
+                }
+                else {
+                    warningPopup(response.Message);
+                }
+                onComplete();
+            });
+        };
+    </script>
+
+}
+
+

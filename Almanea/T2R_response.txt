@@ -1,0 +1,81 @@
+from normal{"contextInfo":{"conversation":{"id":"Zizepldy1hmszf7+DurjEza+X+I=","label":null,"labels":[],"owner":null,"team":null},"originator":null}
+,"direction":"received","from":{"jid":"966548437253@whatsapp.eazy.im","locale":null,"name":"ali","picture":null},
+
+"message":{"body":"Hi",
+
+"id":"13f2cf6b98e6ca020b6d54d2790c6a28fefcce3e","type":"text"},
+
+"timestamp":1633599255,"to":"966114439999@whatsapp.eazy.im",
+
+"type":"message",
+
+"version":2}
+
+
+from normal{"contextInfo":{"conversation":{"id":"Zizepldy1hmszf7+DurjEza+X+I=","label":null,"labels":[],"owner":null,"team":null},
+"originator":null},"direction":"received","from":{"jid":"966548437253@whatsapp.eazy.im","locale":null,"name":"ali","picture":null},
+"message":{"body":"Hi","id":"13f2cf6b98e6ca020b6d54d2790c6a28fefcce3e","type":"text"},
+
+"timestamp":1633599255,"to":"966114439999@whatsapp.eazy.im","type":"message","version":2}
+
+
+from normal{"contextInfo":{"conversation":{"id":"Zizepldy1hmszf7+DurjEza+X+I=","label":null,"labels":[],"owner":null,"team":null},"originator":null},
+
+"direction":"received","from":{"jid":"966548437253@whatsapp.eazy.im","locale":null,"name":"ali","picture":null},
+
+"message":{"body":"Hi","id":"4a5248bfb59bfda32ff8c39c1fa25213ceba583e","type":"text"},
+
+"timestamp":1633604461,"to":"966114439999@whatsapp.eazy.im","type":"message","version":2}
+
+
+from normal{"contextInfo":{"conversation":{"id":"Zizepldy1hmszf7+DurjEza+X+I=","label":null,"labels":[],"owner":"iqbal@bab.com.sa","team":null},
+"originator":null},"direction":"received","from":{"jid":"966548437253@whatsapp.eazy.im","locale":null,"name":"ali","picture":null},
+"message":{"body":"Hey there","id":"46cbbb5cb668ce6f6d7bcc80f7f6a79dbc969d6f","type":"text"},
+"timestamp":1633604641,"to":"966114439999@whatsapp.eazy.im","type":"message","version":2}
+
+
+
+from normal{"contextInfo":{"conversation":{"id":"Zizepldy1hmszf7+DurjEza+X+I=","label":null,"labels":[],
+"owner":"iqbal@bab.com.sa","team":null},"originator":"iqbal@bab.com.sa"},"direction":"sent","from":"966114439999@whatsapp.eazy.im",
+"message":{"body":"عميلنا العزيز،\n\nنفيدك بأنه تم استلام طلبك لإلغاء رقمك:966548437253.\nولأننا دائمًا نسعى لرضاك، حاولنا التواصل معك لإكمال الإجراءات الخاصة بطلبك.\nنحن بانتظار اتصالك على الرقم: 0114439999 ، خلال ساعات العمل التالية:\n\nالسبت إلى الخميس: من الساعة 11:00 صباحًا وحتى الساعة 05:00 مساءً\nومن الساعة 08:00 مساءً وحتى الساعة 01:00 صباحًا\nالجمعة: من الساعة 08:00 مساءً وحتى الساعة 01:00 صباحًا\n\nيومك سعيد\n\nDear Customer\n\nWe have received your line cancellation request for your number: 966548437253.\nBecause you are a valued customer, we tried to reach you to complete your request.\n\nWe are waiting for you to call us back at: 0114439999\nDuring the working hours:\nSaturday to Thursday: from 11:00 a.m. to 05:00 p.m.\nfrom 08:00 p.m. to 01:00 a.m.\nFriday: from 08:00 p.m. to 01:00 a.m.\n\nHave a great day!","id":"a0d7eb9e86d47a761c869e87bbd1c0bc9f06c4c2","type":"text"},
+"timestamp":1633606888,"to":{"jid":"966548437253@whatsapp.eazy.im","locale":null,"name":"ali","picture":null},"type":"message","version":2}
+
+
+from normal{"contextInfo":{"conversation":{"id":"Zizepldy1hmszf7+DurjEza+X+I=","label":null,"labels":[],"owner":"iqbal@bab.com.sa","team":null},
+"originator":null},
+"direction":"received","from":{"jid":"966548437253@whatsapp.eazy.im","locale":null,"name":"ali","picture":null},
+"message":{"body":"Hello","id":"af88a9b7edea3f8a80b8f55d28ae756f5209b320","type":"text"},
+"timestamp":1633614278,"to":"966114439999@whatsapp.eazy.im","type":"message","version":2}
+
+from normal{"contextInfo":{"conversation":{"id":"Zizepldy1hmszf7+DurjEza+X+I=","label":null,"labels":[],"owner":"iqbal@bab.com.sa","team":null},"originator":null},
+"direction":"sent","from":"966114439999@whatsapp.eazy.im",
+"message":{"hydratedTemplate":{"body":"عميلنا العزيز،\n\nشكرًا لتواصلك معنا، نسعد بخدمتك عند تواصلك معنا على الرقم: 0114439999.\n\nخلال ساعات العمل التالية:\nالأحد إلى الخميس: من الساعة 09:00 صباحًا وحتى الساعة 07:00 مساءً\nالجمعة: من الساعة 1:00 مساءً وحتى الساعة 09:00 مساءً\nالسبت: من الساعة 11:00 صباحًا وحتى الساعة 7:00 مساءً\n\nيومك سعيد\n\nDear Customer,\n\nThank you for reaching out, we would be glad to help by call us at 0114439999.\n\nDuring the working hours:\nSunday to Thursday: From 09:00 A.M. to 07:00 P.M.\nFriday: From 1:00 P.M. to 09:00 P.M.\nSaturday: From 11:00 A.M. to 7:00 P.M.\n\nHave a great day!","buttons":[{"phoneNumber":"+966114439999","text":"اتصل بنا / Call Us","type":"PHONE_NUMBER"}],"footer":null,"header":null},"id":"2ace4fea74a507ade83dbec0971da111604dcff4","template":{"components":[],"language":{"policy":"deterministic","code":"ar"},"name":"phase2_retention_bil3","namespace":"a4657566_db2e_4850_8541_00ca48637bf0"},"type":"template"},
+"timestamp":1633614278,"to":{"jid":"966548437253@whatsapp.eazy.im","locale":null,"name":"ali","picture":null},"type":"message","version":2}
+
+tenplate messagse
+
+from normal{"contextInfo":{"conversation":{"id":"iTVbIGhEkEQlGFOEdiIk7MJKV3s=","label":null,"labels":[]
+,"owner":null,"team":null},"originator":null},"direction":"sent","from":"966114439999@whatsapp.eazy.im",
+"message":{"hydratedTemplate":{"body":"عميلنا العزيز،\n\nشكرًا لتواصلك معنا، نسعد بخدمتك عند تواصلك معنا على الرقم: 0114439999.\n\nخلال ساعات العمل التالية:\nالأحد إلى الخميس: من الساعة 09:00 صباحًا وحتى الساعة 07:00 مساءً\nالجمعة: من الساعة 1:00 مساءً وحتى الساعة 09:00 مساءً\nالسبت: من الساعة 11:00 صباحًا وحتى الساعة 7:00 مساءً\n\nيومك سعيد\n\nDear Customer,\n\nThank you for reaching out, we would be glad to help by call us at 0114439999.\n\nDuring the working hours:\nSunday to Thursday: From 09:00 A.M. to 07:00 P.M.\nFriday: From 1:00 P.M. to 09:00 P.M.\nSaturday: From 11:00 A.M. to 7:00 P.M.\n\nHave a great day!","buttons":[{"phoneNumber":"+966114439999","text":"اتصل بنا / Call Us","type":"PHONE_NUMBER"}],"footer":null,"header":null},"id":"0fc4e9ddc11b8c00d130338f0ea71450ce6a904d","template":{"components":[],"language":{"policy":"deterministic","code":"ar"},"name":"phase2_retention_bil3","namespace":"a4657566_db2e_4850_8541_00ca48637bf0"},"type":"template"},"timestamp":1633614524,"to":{"jid":"966550002826@whatsapp.eazy.im","locale":null,"name":"حمود نعيم حمود البلوي","picture":null},
+"type":"message","version":2}
+
+text from
+
+from normal{"contextInfo":{"conversation":{"id":"Zizepldy1hmszf7+DurjEza+X+I=","label":null,"labels":[],"owner":"iqbal@bab.com.sa","team":null},"originator":"iqbal@bab.com.sa"},
+"direction":"sent","from":"966114439999@whatsapp.eazy.im","message":{"body":"hey ali","id":"a9d46879e543b3a4316abadb951dbc85001eefd9","type":"text"},"timestamp":1633614818,
+"to":{"jid":"966548437253@whatsapp.eazy.im","locale":null,"name":"ali","picture":null},"type":"message","version":2}
+
+أواجه مشاكل في إعادة تشغيل خدمتك 😐
+
+ممكن نبدأ نحجز تذكرة دعم
+
+
+ead9471c-47e4-4d0d-b280-0307d55fe85f
+ead9471c-47e4-4d0d-b280-0307d55fe85f
+ead9471c-47e4-4d0d-b280-0307d55fe85f
+
+eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlYWQ5NDcxYy00N2U0LTRkMGQtYjI4MC0wMzA3ZDU1ZmU4NWYiLCJpYXQiOjE2MzM3NzMxNTUsImlzcyI6IjQwMTFmYzg5LTBkZjMtNGFjMC1iYTE2LWU0ODMzNjViZmE3YSJ9.Ikedtyswz8MGnn1S3VExzPf-w9q9b3L_AdkQDMKrWug
+
+https://bcrw.apple.com/sms:open?service=iMessage&recipient=urn:biz:ead9471c-47e4-4d0d-b280-0307d55fe85f
+
+https://cmd.tyntec.com/main/conversations/ead9471c-47e4-4d0d-b280-0307d55fe85f@apple.eazy.im/23e24b0c-2b81-4d11-9bcf-b5479e65b1e8@apple.eazy.im

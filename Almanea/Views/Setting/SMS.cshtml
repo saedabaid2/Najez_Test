@@ -1,0 +1,74 @@
+﻿
+@{
+    /**/
+
+    ViewBag.Title = Translation.SMS;
+}
+
+@using Almanea.Models
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dataTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="20%">@Translation.SMSKey</th>
+                            <th width="35%">@Translation.SmsEN</th>
+                            <th width="35%">@Translation.SmsAR</th>
+                            <th width="10%"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.Data != null)
+                        {
+                            foreach (var item in (List<vm_SMS>)ViewBag.Data)
+                            {
+                                <tr id="tr@(item.Id)">
+                                    <td>@item.KeyName</td>
+                                    <td>
+                                        <textarea class="form-control" id="txtEN">@item.SMSTextEN</textarea>
+                                    </td>
+                                    <td>
+                                        <textarea class="form-control" id="txtAR">@item.SMSTextAR</textarea>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0)" onclick="Update(this)" class="btn btn-sm btn-primary">@Translation.Update</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        function Update(button) {
+            $('.loader-wrapper').show();
+            //Determine the reference of the Row using the Button.
+            var row = $(button).closest("TR");
+
+            $.post('@Url.Action("EditSMS")', {
+                Id: parseInt(row.attr("id").substring(2)),
+                SMSTextEN: row.find('#txtEN').val(),
+                SMSTextAR: row.find('#txtAR').val(),
+            }, function (response) {
+                    if (response && response.StatusId > 0) {
+                               successPopup("@Translation.success_Update");
+                }
+                else {
+                        warningPopup("@Translation.EnterAllDetails");
+
+                }
+                $('.loader-wrapper').hide();
+            });
+        };
+    </script>
+}

@@ -1,0 +1,61 @@
+﻿
+@using Almanea.BusinessLogic;
+
+<!--Invoice Table-->
+<div class="table-responsive">
+    <table class="table align-items-center table-flush" id="dataTable">
+        <thead class="thead-light">
+            <tr>                
+                <th width="12%">@Translation.OrderNo</th>
+                <th width="12%">@Translation.OrderDate</th>
+                <th width="15%">@Translation.Customer</th>
+                <th width="20%">@Translation.Services</th>
+                <th width="12%">@Translation.SubTotal</th>
+                <th width="8%">@Translation.Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+<!--End Invoice Table-->
+<!--Invoice Footer-->
+<div class="row">
+    <div class="col-xs-6">
+        <div class="tag-box tag-box-v3">
+            <ul class="list-unstyled btminfo">
+                <li><strong>Period of Time:</strong> 1st May 2020 – 10th May 2020</li>
+                <li><strong>Total Finished Orders:</strong> 30</li>
+                <li><strong>Subtotal:</strong> 91655 SAR</li>
+                <li><strong>10% of Subtotal:</strong> 9165.5 SAR</li>
+            </ul>
+        </div>
+
+    </div>
+    <div class="col-xs-6 text-right">
+        <ul class="list-unstyled invoice-total-info">
+            <li><strong>Sub - Total Amount:</strong> 87072 SAR</li>
+            <!--<li><strong>Discount:</strong> 14.8%</li>-->
+            <li><strong>VAT ($6):</strong> 4582 SAR</li>
+            <li><strong>Grand Total:</strong> 91655 SAR</li>
+        </ul>
+
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <p style="font:16px;"><b>As per contract 10% of every order amount will be charged.</b></p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box-bdr">
+            <ul class="list-unstyled btminfo" style="text-align:center; font:16px;">
+                <li><strong>Due Amount:</strong> <b>9165.5 SAR (ONE THOUSAND AND FIFTY RIYALS ONLY)</b> </li>
+
+            </ul>
+
+        </div>
+    </div>
+</div>
+<!--End Invoice Footer-->

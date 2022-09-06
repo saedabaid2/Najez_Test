@@ -1,0 +1,221 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+@using Almanea.Models
+@using Almanea.BusinessLogic
+
+@model vm_Complain
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <!-- ============================================ -->
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <!-- Google Fonts
+        ============================================ -->
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    @{
+        var culture = System.Threading.Thread.CurrentThread.CurrentUICulture.Name.ToLowerInvariant();
+
+        //Arabic
+        if (culture.Equals("ar"))
+        {
+            <link href="~/vendor/bootstrap/css/rtl/bootstrap.css" rel="stylesheet" type="text/css">
+            <link href="/vendor/ruang-admin.css" rel="stylesheet">
+            <link href="~/Content/Site-rtl.css" rel="stylesheet" />
+        }
+        else
+        {
+            <link href="~/vendor/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css">
+            <link href="/vendor/ruang-admin.css" rel="stylesheet">
+            <link href="~/Content/Site.css" rel="stylesheet" />
+        }
+    }
+
+    @*<link href="/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+        @Scripts.Render("~/bundles/modernizr")*@
+</head>
+<body class="bg-gradient-login">
+    <div id="container-login">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-12 col-md-9">
+                <div class="card shadow-sm my-5">
+                    <div class="card-body p-0">
+                        <div class="text-center">
+                            <img src="~/Content/Light-Icon.png" style="max-height: 120px" class="img-profile" />
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 ml-4 mt-5">
+                                @using (Ajax.BeginForm("AddComplain", "Complain", null,
+                                       new AjaxOptions
+                                       {
+                                           HttpMethod = "POST",
+                                           OnSuccess = "onSuccess",
+                                           OnBegin = "onBegin",
+                                           OnComplete = "onComplete"
+                                       }, new { id = "frmAdd", @autocomplete = "off" }))
+                                {
+                                    @Html.AntiForgeryToken()
+
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.CategoryId, new { @class = "bmd-label-floating" })
+                                                @Html.DropDownListFor(model => model.CategoryId, ViewBag.Category as List<SelectListItem>, Translation.Select, new { @class = "form-control" })
+                                            </div>
+                                            @Html.ValidationMessageFor(m => m.CategoryId, "", new { @class = "valid-text" })
+                                        </div>
+                                        @*<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.Subject, new { @class = "bmd-label-floating required" })
+                                                @Html.TextBoxFor(m => m.Subject, new { @class = "form-control" })
+                                            </div>
+                                            @Html.ValidationMessageFor(m => m.Subject, "", new { @class = "valid-text" })
+                                        </div>*@
+                                        <div class="col-lg-5 col-md-6 col-sm-6 col-xs-12">
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.Complain, new { @class = "bmd-label-floating required" })
+                                                @Html.TextAreaFor(m => m.Complain, new { @class = "form-control", @style = "resize:none;" })
+                                            </div>
+                                            @Html.ValidationMessageFor(m => m.Complain, "", new { @class = "valid-text" })
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                            @Html.HiddenFor(m => m.OrderId)
+                                            @Html.Hidden("ComplainBy", (byte)1)
+                                        </div>
+                                    </div>
+                                    <p style="vertical-align: bottom">
+                                        <input type="submit" value="@Translation.Submit" class="btn btn-primary" onclick="confirm('@Translation.confirm_Complain')" />
+                                    </p>
+                                }
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table align-items-center table-flush" id="dataTable">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th width="20%">@Translation.ComplainId</th>
+                                            <th width="30%">@Translation.ComplainCategory</th>
+                                            <th width="30%">@Translation.Complain</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/unobtrusiveajax")
+
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/ruang-admin.js"></script>
+
+    <script src="~/Scripts/DataTables/jquery.dataTables.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.bootstrap4.min.js"></script>
+
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.4.0/bootbox.min.js"></script>
+    <script src="~/Scripts/Custom.js"></script>
+
+    <script>
+        function onSuccess(response) {
+            if (response.StatusId > 0) {
+                $('#frmAdd').find('input[type=text]').val('');;
+                $('#frmAdd').find('#Complain').val('');;
+
+                BindDataTable();
+
+                successPopup("@Translation.success_Complain");
+            }
+        }
+    </script>
+
+    <script>
+
+        $(document).ready(function () {
+            async: true;
+            //List
+            BindDataTable();
+
+            ChangeCulture('@ViewBag.Lang')
+        });
+
+        var oTable;
+        function BindDataTable(response) {
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+                    "bAutoWidth": false,
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("GetComplain")",
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+                        aoData.push(
+                            { "name": "OrderId", "value": @Model.OrderId },
+                        );
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+                    },
+                    // data: response,
+                    "aoColumns": [
+                        { "mData": "ComplainId" },
+                        { "mData": "Category", "orderable": false },
+                        //{ "mData": "ComplainId", },
+                        //{ "mData": "AddedOn", },
+                        //{ "mData": "CloseDate", },
+                        //{ "mData": "Comments", "orderable": false },
+                         {
+                            "mData": "Id",
+                            "render": function (Id, type, full, meta) {
+                                return '<a href="@Url.Action("ComplainDetail")?Id=' + Id + '&OrderId=@ViewBag.OrderId" title="@Translation.View" data-toggle="tooltip">@Translation.Complain</a>';
+                            },
+                            "orderable": false
+                        },
+                    ],
+                    "order": [[0, "desc"]],
+                    "fnInitComplete": function (oSettings, json) {
+                    },
+                    "fnDrawCallback": function (oSettings) {
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                        "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                        "emptyTable": false,
+                        "sEmptyTable": "@Translation.NoMatchingRecords",
+                    },
+                });
+            }
+
+        }
+
+    </script>
+</body>
+</html>

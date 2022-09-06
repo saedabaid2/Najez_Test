@@ -1,0 +1,244 @@
+﻿@model vm_Services
+
+@{
+    ViewBag.Title = Translation.Services + " " + Translation.Edit;
+    var UserGroupTypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+    var UserId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserId]);
+    var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupId]);
+    var ActtypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+}
+
+
+@using Almanea.Models;
+@using Almanea.BusinessLogic;
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                @using (Html.BeginForm("UpdateService", "Setting", FormMethod.Post, new { id = "frmAdd" }))
+                {
+
+                    @Html.AntiForgeryToken()
+
+                <div class="row">
+                    @Html.HiddenFor(m => m.EncryptId)
+
+                    <div class="col-lg-4 col-md-2 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @*<input type="hidden" name="CategoryId" id="CategoryId" />*@
+                            @Html.Label(Translation.CategoryName, new { @class = "bmd-label-floating required" })
+                            @*@Html.DropDownListFor(model => model.CategoryId, new SelectList(ViewBag.CategoryId, "Value", "Text"), Translation.Select, new { @class = "form-control selectpicker" })*@
+
+                            @*  @Html.DropDownListFor(m => m.CategoryId, cls_DropDowns.GetCategoryList(Model.CategoryId), Translation.Select, new { @class = "form-control select2" })*@
+                            <select id="sCategoryId" class="form-control select2">
+                                <option value="">@Translation.Select</option>
+                                @foreach (var item in new SelectList(ViewBag.CategoryIds, "Value", "Text"))
+                                {
+                                    if (Convert.ToInt32(item.Value) == ViewBag.CategoryId)
+                                    {
+                                        <option value="@item.Value" selected>@item.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+
+                                }
+                            </select>
+                            @Html.HiddenFor(m => m.CategoryId)
+                        </div>
+                        @Html.ValidationMessageFor(m => m.CategoryId, "", new { @class = "valid-text" })
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.ServiceNameEN, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.ServiceNameEN, new { @class = "form-control", @placeholder = Translation.ReqService })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.ServiceNameEN, "", new { @class = "valid-text" })
+                    </div>
+
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.ServiceNameAR, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.ServiceNameAR, new { @class = "form-control", @placeholder = Translation.ReqService })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.ServiceNameAR, "", new { @class = "valid-text" })
+                    </div>
+                    <div class="col-lg-4 col-md-2 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.UnitPrice, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.UnitPrice, new { @class = "form-control currencyOnly", @placeholder = Translation.ReqUnitPrice })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.UnitPrice, "", new { @class = "valid-text" })
+                    </div>
+
+                    <div class="col-lg-4 col-md-2 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <input type="hidden" name="ServiceProviderId" id="ServiceProviderId" />
+                            @Html.LabelFor(m => m.ServiceProviderId, new { @class = "bmd-label-floating required" })
+                            <select class="form-control select2" multiple="multiple" id="serviceprovider">
+                                <optgroup label="Select All">
+                                    @foreach (var item in cls_DropDowns.GetProviderList(Model.ServiceId))
+                                    {
+                                        if (@item.Selected)
+                                        {
+                                            <option value="@item.Value" selected="selected">@item.Text</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                    }
+                                </optgroup>
+                            </select>
+                        </div>
+                        @Html.ValidationMessageFor(m => m.ServiceProviderId, "", new { @class = "valid-text" })
+                    </div>
+
+                    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12">
+                        <div class="form-group" style="padding-top: 40px; padding-left: 0px;">
+                            <div class="custom-control  custom-checkbox">
+                                @if (Model.Status == true)
+                                {
+                                    @Html.CheckBoxFor(x => x.Status, new { @checked = "checked" })
+                                }
+                                else
+                                {
+                                    @Html.CheckBoxFor(x => x.Status, new { })
+                                }
+
+                                @*<input type="checkbox" id="Status_ @Model.ServiceId +'" name="Status" readonly class="custom-control-input" value="@Model.Status" />*@
+                                <label for="Status_+ @Model.ServiceId +'">@Translation.IsActive</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12">
+                        <div class="form-group" style="padding-top: 40px;">
+                            <div class="custom-control  custom-checkbox">
+                                @if (Model.Status == true)
+                                {
+                                    @Html.CheckBoxFor(x => x.IsDisplay, new { @checked = "checked" })
+                                }
+                                else
+                                {
+                                    @Html.CheckBoxFor(x => x.IsDisplay, new { })
+                                }
+
+                                @*<input type="checkbox" id="Status_ @Model.ServiceId +'" name="Status" readonly class="custom-control-input" value="@Model.Status" />*@
+                                <label for="IsDisplay_+ @Model.ServiceId +'">@Translation.IsDisplay</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12" style="margin-top: 50px;">
+                        <input type="submit" class="btn btn-primary pull-right" onclick="getSelectValue();" value="@Translation.Update" />
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+            $("#CategoryId").val($("#sCategoryId").val);
+        });
+
+        $(function () {
+            $("#sCategoryId").change(function () {
+           
+                var selectedValue = $(this).val();
+                $("#CategoryId").val(selectedValue);
+            });
+        });
+        function getSelectValue() {
+            $("#SupplierId").val($("#supplier").val());
+            $("#ServiceProviderId").val($("#serviceprovider").val());
+
+        };
+
+        RunSelect2();
+
+        function RunSelect2() {
+            $('#supplier').select2({
+                allowClear: true,
+                closeOnSelect: false,
+            }).on('select2:open', function () {
+
+                setTimeout(function () {
+                    $(".select2-results__option .select2-results__group").bind("click", selectAllclickHandler_supplier);
+                }, 0);
+            });
+
+            $('#serviceprovider').select2({
+                allowClear: true,
+                closeOnSelect: false,
+            }).on('select2:open', function () {
+
+                setTimeout(function () {
+                    $(".select2-results__option .select2-results__group").bind("click", selectAllclickHandler_serviceprovider);
+                }, 0);
+            });
+
+            $('#supplier_update').select2({
+                allowClear: true,
+                closeOnSelect: false,
+            }).on('select2:open', function () {
+
+                setTimeout(function () {
+                    $(".select2-results__option .select2-results__group").bind("click", selectAllclickHandler_supplier_update);
+                }, 0);
+            });
+
+            $('#serviceprovider_update').select2({
+                allowClear: true,
+                closeOnSelect: false,
+            }).on('select2:open', function () {
+
+                setTimeout(function () {
+                    $(".select2-results__option .select2-results__group").bind("click", selectAllclickHandler_serviceprovider_update);
+                }, 0);
+            });
+        };
+
+        var selectAllclickHandler_supplier = function () {
+            $(".select2-results__option .select2-results__group").unbind("click", selectAllclickHandler_supplier);
+            $('#supplier').select2('destroy').find('option').prop('selected', 'selected').end();
+            RunSelect2();
+        };
+
+        var selectAllclickHandler_serviceprovider = function () {
+            $(".select2-results__option .select2-results__group").unbind("click", selectAllclickHandler_serviceprovider);
+            $('#serviceprovider').select2('destroy').find('option').prop('selected', 'selected').end();
+            RunSelect2();
+        };
+
+        var selectAllclickHandler_supplier_update = function () {
+            $(".select2-results__option .select2-results__group").unbind("click", selectAllclickHandler_supplier_update);
+            $('#supplier_update').select2('destroy').find('option').prop('selected', 'selected').end();
+            RunSelect2();
+        };
+
+        var selectAllclickHandler_serviceprovider_update = function () {
+            $(".select2-results__option .select2-results__group").unbind("click", selectAllclickHandler_serviceprovider_update);
+            $('#serviceprovider_update').select2('destroy').find('option').prop('selected', 'selected').end();
+            RunSelect2();
+        };
+
+
+        $('#supplier').change(function () {
+            var arr = $(this).val();
+            console.log(arr)
+        })
+
+
+    </script>
+
+}

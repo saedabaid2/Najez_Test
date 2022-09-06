@@ -1,0 +1,42 @@
+﻿
+@model Almanea.Models.vm_FileAttach
+
+
+@using (Ajax.BeginForm("FileAttach2", "Provider", null,
+                                  new AjaxOptions
+                                  {
+                                      HttpMethod = "POST",
+                                      OnSuccess = "onFinish",
+                                      OnBegin = "onBegin",
+                                      OnComplete = "onComplete"
+                                  }, new { id = "frmFile" }))
+{
+    @Html.AntiForgeryToken()
+
+<div class="row">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        @*<div class="form-group">
+                @Html.LabelFor(m => m.CustomerSignOff, new { @class = "bmd-label-floating" })
+                <div id="fileUpload" class="dropzone"></div>
+                @Html.HiddenFor(m => m.CustomerSignOff)
+            </div>*@
+        <div class="form-group">
+            @Html.LabelFor(m => m.InvoiceImage, new { @class = "bmd-label-floating" })
+            <div id="fileUpload" class="dropzone"></div>
+            @Html.HiddenFor(m => m.InvoiceImage)
+            <input type="hidden" id="InvoiceImg" name="InvoiceImg">
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Comments, new { @class = "bmd-label-floating" })
+            @Html.TextAreaFor(m => m.Comments, new { @class = "form-control", @style = "resize:none;" })
+        </div>
+    </div>
+    @Html.HiddenFor(m => m.OrderId)
+</div>
+    <p class="mg-t-15">
+        <input type="submit" class="btn btn-primary pull-right" value="@Translation.Submit" />
+    </p>
+}
+@*onclick="SetImage()"*@

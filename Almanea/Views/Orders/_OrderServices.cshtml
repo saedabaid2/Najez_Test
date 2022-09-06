@@ -1,0 +1,178 @@
+﻿
+@using Almanea.BusinessLogic
+@using Almanea.Models
+
+<div class="row" id="frmService">
+    <div class="col-lg-6 col-md-6">
+        <label class="bmd-label-floating required">@Translation.Categories</label>
+        <div class="input-group">
+            <select id="sAddCategory" class="form-control select2">
+                <option value="">@Translation.Select</option>
+                @foreach (var item in cls_DropDowns.GetCategoryList())
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+        <label class="bmd-label-floating required">@Translation.Services</label>
+        <div class="input-group">
+            <select id="sAddService" class="form-control select2">
+                @*<option value="">@Translation.Select</option>
+                @foreach (var item in cls_DropDowns.GetService())
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }*@
+            </select>
+        </div>
+    </div>
+    @*<div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+        <label class="bmd-label-floating required">@Translation.Unit</label>
+        <div class="input-group">
+            <select id="sUnit" class="form-control select2">
+                <option value="">@Translation.Select</option>
+                @foreach (var item in cls_DropDowns.GetUnit())
+                {
+                    <option value="@item.Unit">@item.Unit</option>
+                }
+            </select>
+        </div>
+    </div>*@
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+        <label class="bmd-label-floating required">@Translation.ItemCount</label>
+        <div class="input-group">
+            <input type="text" class="numOnly form-control-danger" id="sAddCount" style="width: 60%" />
+            &nbsp;
+            <div class="input-group-append">
+                <input type="button" value="+" class="btn btn-outline-primary" id="btnAddService" />
+            </div>
+        </div>
+        <div class="form-group">
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+        <div class="form-group">
+
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="table-responsive">
+            <table class="table align-items-center table-flush table-bordered" id="dtServices">
+                <thead class="thead-light">
+                    <tr>
+                        <th width="25%">@Translation.Services</th>
+                        @*<th width="25%">Unit</th>*@
+                        <th width="25%">@Translation.ItemCount</th>
+                        <th width="20%">@Translation.UnitPrice</th>
+                        <th width="20%">@Translation.Total</th>
+                        <th width="10%"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.Services != null)
+                    {
+                        foreach (var item in (List<vm_OrderServices>)ViewBag.Services)
+                        {
+                            <tr id="@("tr_" + item.OrderServiceId)">
+                                <td>
+                                    @item.ServiceName
+                                    <input type="hidden" id="hfService" value="@item.ServiceId" />
+                                </td>
+                                <!--<td>-->
+                                    @*@item.Quantity*@
+                                    @*<input type="text" id="hfUnit" class="form-control numOnly unit" value="@item.Unit" />*@
+                                    @*<select id="hfUnit" class="form-control select2">
+                                        <option value="">@Translation.Select</option>
+                                        @foreach (var em in cls_DropDowns.GetUnit())
+                                        {
+                                            if (em.Unit == item.Unit)
+                                            {
+                                                <option value="@em.Unit" selected>@em.Unit</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@em.Unit">@em.Unit</option>
+                                            }
+
+                                        }
+                                    </select>*@
+                                <!--</td>-->
+                                <td>
+                                    @*@item.Quantity*@
+                                    <input type="text" id="hfQuantity" class="form-control numOnly quantity" value="@item.Quantity" />
+                                </td>
+                                <td>
+                                    @item.Price
+                                </td>
+                                <td>
+
+                                    @(item.Price * item.Quantity)
+                                </td>
+                                <td>
+                                    <input type="button" class="btn btn-danger deleteService" value="X" />
+
+                                    <input type="hidden" id="hfPrice" value="@(item.Price * item.Quantity)" />
+                                    <input type="hidden" id="hfServicePrice" value="@item.Price" />
+                                    <input type="hidden" id="hfActive" value="@item.IsActive" />
+                                    <input type="hidden" id="hfQuantity" value="@item.Quantity" />
+                                    @{
+                                        var total_Service = item.Price * item.Quantity;
+
+                                        var totalVat = (total_Service * (Convert.ToDecimal(ViewBag.Vat) / 100)).ToString("#.##");
+
+                                        <input type="hidden" id="hfVat" value="@totalVat" />
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+
+    $("#sAddCategory").change(function () {
+        $.getJSON('/Orders/GetServices?cat=' + $("#sAddCategory").val(), function (result) {
+            var ddl = $('#sAddService'); 
+            var s = '';
+            ddl.empty();
+            debugger;
+            for (var i = 0; i < result.result.length; i++) {
+               
+                s += '<option value="' + result.result[i].Value + '">' + result.result[i].Text + '</option>';
+               }
+                $("#sAddService").html(s);
+              
+
+        });
+    });
+    
+        @*$.ajax({
+                type: "POST",
+                url: '@Url.Action("GetServices")',
+                 data: JSON.stringify({ StartDate: StartDate, EndDate: EndDate}),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                 success: function (response) {
+                     debugger;
+                     if (response.Data) {
+
+                         if (response.Data.LabourList)
+                         {
+                             ReloadDataTable();
+                             loadWorkersUtilizationTable(response.Data.LabourList);// Redraw the DataTable
+                         }
+                     }
+                },
+                 error: function () {
+                }
+            });*@
+
+   
+</script>

@@ -1,0 +1,77 @@
+﻿@model IEnumerable<Almanea.tblTeamCapacityCalculation>
+
+@{
+    ViewBag.Title = Translation.TeamCapacity;// "Team Capacity";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <p style="padding-top: 1%; padding-left: 2%;">
+                <a href="@Url.Action("Create")" class="btn btn-secondary float-left">@Translation.Create</a>
+
+            </p>
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dataTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="15%">@Translation.InstallDate</th>
+                            <th width="10%">@Translation.DailyCapacity</th>
+                            <th width="11%">@Translation.ConsumedCapacity</th>
+                            <th width="10%">@Translation.CurrentCapacity</th>
+                            <th width="10%">@Translation.CapacityPercentage</th>
+                            <th width="10%">@Translation.Updatedate</th>
+                            <th width="10%">@Translation.SellerName</th>
+                            <th width="13%">@Translation.CompanyNameEN</th>
+                            @*<th width="20%">@Translation.Action</th>*@
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.InstallDate)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DailyCapacity)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ConsumedCapacity)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CurrentCapacity)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CapcityPercentage)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Updatedate)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.tblOrder.SellerName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.tblUserGroupCompany.CompanyNameEN)
+                                </td>
+                                @*<td>
+                                    @Html.ActionLink(Translation.Edit, "Edit", new { id = item.Id }) |
+                                    @Html.ActionLink(Translation.Details, "Details", new { id = item.Id }) |
+                                    @Html.ActionLink(Translation.Delete, "Delete", new { id = item.Id })
+                                </td>*@
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        async: true;
+        $('#dataTable').DataTable();
+    });
+</script>

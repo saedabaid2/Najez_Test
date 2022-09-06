@@ -1,0 +1,534 @@
+﻿@model vm_Services
+
+@{
+    ViewBag.Title = Translation.Services;
+    var UserGroupTypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+    var UserId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserId]);
+    var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupId]);
+    var ActtypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+    var culture = System.Threading.Thread.CurrentThread.CurrentUICulture.Name.ToLowerInvariant();
+
+}
+
+
+@using Almanea.Models;
+@using Almanea.BusinessLogic;
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                @using (Ajax.BeginForm("AddEditService", "Setting", null,
+new AjaxOptions
+{
+HttpMethod = "POST",
+OnSuccess = "onSuccess",
+OnBegin = "onBegin",
+OnComplete = "onComplete",
+OnFailure = "onComplete",
+}, new { id = "frmAdd" }))
+                {
+
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+
+                        <div class="col-lg-4 col-md-2 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @*<input type="hidden" name="CategoryId" id="CategoryId" />*@
+                                @Html.LabelFor(m => m.CategoryId, new { @class = "bmd-label-floating required" })
+
+                                @Html.DropDownListFor(m => m.CategoryId, cls_DropDowns.GetCategoryList(UserGroupId, UserGroupTypeId, ActtypeId), Translation.Select, new { @class = "form-control select2" })
+
+                                @Html.ValidationMessageFor(m => m.CategoryId, "", new { @class = "valid-text" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(Translation.ServiceNameEN, new { @class = "bmd-label-floating required" })
+
+                                @Html.TextBoxFor(m => m.ServiceNameEN, new { @class = "form-control", @placeholder = Translation.ServiceNameEN })
+
+                                @Html.ValidationMessageFor(m => m.ServiceNameEN, "", new { @class = "valid-text" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(Translation.ServiceNameAR, new { @class = "bmd-label-floating required" })
+                                @Html.TextBoxFor(m => m.ServiceNameAR, new { @class = "form-control", @placeholder = Translation.ServiceNameAR })
+
+                                @Html.ValidationMessageFor(m => m.ServiceNameAR, "", new { @class = "valid-text" })
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-2 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.UnitPrice, new { @class = "bmd-label-floating required" })
+                                @Html.TextBoxFor(m => m.UnitPrice, new { @class = "form-control currencyOnly", @placeholder = Translation.ReqUnitPrice })
+
+                                @Html.ValidationMessageFor(m => m.UnitPrice, "", new { @class = "valid-text" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-2 col-sm-6 col-xs-12">
+
+                            <div class="form-group">
+                                <input type="hidden" name="ServiceProviderId" id="ServiceProviderId" />
+                                @Html.LabelFor(m => m.ServiceProviderId, new { @class = "bmd-label-floating required" })
+                                <select class="form-control select2" multiple="multiple" id="serviceprovider">
+                                    <optgroup label="Select All">
+                                        @foreach (var item in cls_DropDowns.GetProviderList(UserGroupTypeId, ActtypeId, UserId))
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                    </optgroup>
+                                </select>
+
+                                @Html.ValidationMessageFor(m => m.ServiceProviderId, "", new { @class = "valid-text" })
+                            </div>
+
+                        </div>
+                        <div class="col-lg-4 col-md-2 col-sm-6 col-xs-12">
+
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-8">
+                            <div class="form-group" style="padding-top: 40px; padding-left: 0px;">
+                                <div class="custom-control  custom-checkbox">
+                                    @Html.CheckBoxFor(m => m.IsDisplay, new { @checked = "checked" })
+                                    <label for="checkbox_id">@Translation.IsDisplay</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12" style="padding-top:30px;">
+                            <input type="submit" class="btn btn-primary pull-right" onclick="getSelectValue();" value="@Translation.AddNew" />
+                        </div>
+                    </div>
+                }
+            </div>
+
+
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dataTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="25%">@Translation.Categories</th>
+                            @{
+                                if (culture == "en")
+                                {
+                                    <th width="25%">@Translation.ServiceEN</th>
+                                }
+                                else
+                                {
+                                    <th width="25%">@Translation.ServiceEN</th>
+                                }
+                            }
+                            <th width="10%">@Translation.UnitPrice</th>
+                            @*<th width="25%">@Translation.Supplier</th>*@
+                            <th width="25%">@Translation.ServiceProvider</th>
+                            <th width="10%">@Translation.IsDisplay</th>
+                            <th width="10%">@Translation.Status</th>
+                            <th width="10%">@Translation.Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+
+            var table = $('#example').DataTable({
+                scrollY: 200,
+                initComplete: function () {
+                    count = 0;
+                    this.api().columns().every(function () {
+                        var title = this.header();
+                        //replace spaces with dashes
+                        title = $(title).html().replace(/[\W]/g, '-');
+                        var column = this;
+                        var select = $('<select id="' + title + '" class="select2" ></select>')
+                            .appendTo($(column.footer()).empty())
+                            .on('change', function () {
+                                //Get the "text" property from each selected data
+                                //regex escape the value and store in array
+                                var data = $.map($(this).select2('data'), function (value, key) {
+                                    return value.text ? '^' + $.fn.dataTable.util.escapeRegex(value.text) + '$' : null;
+                                });
+
+                                //if no data selected use ""
+                                if (data.length === 0) {
+                                    data = [""];
+                                }
+
+                                //join array into string with regex or (|)
+                                var val = data.join('|');
+
+                                //search for the option(s) selected
+                                column
+                                    .search(val ? val : '', true, false)
+                                    .draw();
+                            });
+
+                        column.data().unique().sort().each(function (d, j) {
+                            select.append('<option value="' + d + '">' + d + '</option>');
+                        });
+
+                        //use column title as selector and placeholder
+                        $('#' + title).select2({
+                            multiple: true,
+                            closeOnSelect: false,
+                            placeholder: "Select a " + title
+                        });
+
+                        //initially clear select otherwise first option is selected
+                        $('.select2').val(null).trigger('change');
+                    });
+                }
+            });
+        });
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
+            async: true;
+            //List
+            BindDataTable();
+        });
+
+        var oTable;
+        function BindDataTable(response) {
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+                    "bAutoWidth": false,
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("GetServices")",
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+                    },
+                    "aoColumns": [
+                        {
+                            "mData": "CategoryName",
+                            //"render": function (vals, type, full, meta) {
+                            //    return '<input type="text" class="form-control" id="ServiceNameEN" value="' + vals +'" />';
+                            //},
+                        },
+                         {
+                             "mData": "ServiceName",
+                            //"render": function (vals, type, full, meta) {
+                            //    return '<input type="text" class="form-control" id="ServiceNameEN" value="' + vals +'" />';
+                            //},
+                        },
+                        {
+                            "mData": "UnitPrice",
+                            //"render": function (vals, type, full, meta) {
+                            //    return '<input type="text" class="form-control currencyOnly" id="UnitPrice" value="' + vals + '" />';
+                            //},
+                        },
+                       // {
+                          //  "mData": "SupplierName",
+                            @*"render": function (vals, type, full, meta) {
+                                var selectedValues = new Array();
+                                if (full.SupplierId != null) {
+                                    selectedValues = string_to_array(full.SupplierId);
+                                    $("#supplier_upadate").val(selectedValues);
+                                }
+
+
+                                var html =  `<input type="hidden" name="SupplierId_upd" id="SupplierId_upd" />
+                                        <select class="form-control select2" id="supplier_upadate">
+                                                @foreach (var item in cls_DropDowns.GetSupplierList())
+                                                {
+                                                    <option value="@item.Value" selected>@item.Text</option>
+                                                }
+                                    </select>`
+
+                                return ``;
+                        },*@
+                       // },
+                        {
+                            "mData": "ServiceProviderName",
+                            @*"render": function (vals, type, full, meta) {
+                                return `<input type="hidden" name="ServiceProviderId_upd" id="ServiceProviderId_upd" />
+                                        <select class="form-control select2" id="serviceprovider_upadate">
+                                                @foreach (var item in cls_DropDowns.GetProviderList())
+                                                {
+                                                    <option value="@item.Value">@item.Text</option>
+                                                }
+                                        </select>`;
+                            },*@
+                        },
+                        {
+                            "mData": "IsDisplay",
+                            "render": function (vals, type, full, meta) {
+                                var check = '';
+                                if (vals === true) { check = 'checked'; }
+                                return '<div class="custom-control custom-checkbox" >' +
+                                    '<input type="checkbox"  disabled="disabled" id="IsDisplay_' + full.ServiceId + '" name="IsDisplay" readonly  class="custom-control-input" value="' + vals + '" ' + check + ' />' +
+                                    '<label class="custom-control-label" for="IsDisplay_' + full.ServiceId + '">@*@Translation.IsActive*@</label>' +
+                                    '</div>';
+                            },
+                            "orderable": false
+                        },
+                        {
+                            "mData": "Status",
+                            "render": function (vals, type, full, meta) {
+                                var check='';
+                                if (vals === true) { check = 'checked'; }
+                                        return '<div class="custom-control custom-checkbox" >' +
+                                            '<input type="checkbox"  disabled="disabled" id="Status_' + full.ServiceId +'" name="Status" readonly  class="custom-control-input" value="' + vals + '" '+ check +' />'+
+                                            '<label class="custom-control-label" for="Status_' + full.ServiceId +'">@*@Translation.IsActive*@</label>' +
+                                        '</div>';
+                            },
+                            "orderable": false
+                        },
+
+                        {
+                            "mData": "ServiceId",
+                            "render": function (vals, type, full, meta) {
+                                @*return '<a href="javascript:void(0)" onclick="Update(this)" class="btn btn-sm btn-primary">@Translation.Update</a>';*@
+                                return '<a href="@Url.Action("EditService")/' + full.EncryptId + '" class="btn btn-sm btn-primary">@Translation.Edit</a>';
+                            },
+                            "orderable": false
+                        },
+                    ],
+                    "order": [[0, "desc"]],
+                    "fnInitComplete": function (oSettings, json) {
+                        //
+                        //    count = 0;
+                        //    this.api().columns().every(function () {
+                        //        var title = this.header();
+                        //        //replace spaces with dashes
+                        //        title = $(title).html().replace(/[\W]/g, '-');
+                        //        var column = this;
+                        //        var select = $('<select id="' + title + '" class="select2" ></select>')
+                        //            //.appendTo($(column.footer()).empty())
+                        //            .on('change', function () {
+                        //                //Get the "text" property from each selected data
+                        //                //regex escape the value and store in array
+                        //                var data = $.map($(this).select2('data'), function (value, key) {
+                        //                    return value.text ? '^' + $.fn.dataTable.util.escapeRegex(value.text) + '$' : null;
+                        //                });
+
+                        //                //if no data selected use ""
+                        //                if (data.length === 0) {
+                        //                    data = [""];
+                        //                }
+
+                        //                //join array into string with regex or (|)
+                        //                var val = data.join('|');
+
+                        //                //search for the option(s) selected
+                        //                column
+                        //                    .search(val ? val : '', true, false)
+                        //                    .draw();
+                        //            });
+
+                        //        column.data().unique().sort().each(function (d, j) {
+                        //            select.append('<option value="' + d + '">' + d + '</option>');
+                        //        });
+
+                        //        //use column title as selector and placeholder
+                        //        $('#' + title).select2({
+                        //            multiple: true,
+                        //            closeOnSelect: false,
+                        //            placeholder: "Select a " + title
+                        //        });
+
+                        //        //initially clear select otherwise first option is selected
+                        //        $('.select2').val(null).trigger('change');
+                        //    });
+
+                    },
+                    "fnDrawCallback": function (oSettings) {
+
+                    },
+                    "fnCreatedRow": function (nRow, aData, iDataIndex) {
+
+                        $(nRow).attr('id', 'tr' + aData.ServiceId); // or whatever you choose to set as the id
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                         "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                        "emptyTable": false,
+                        "sEmptyTable": "@Translation.NoMatchingRecords",
+                    },
+                });
+            }
+
+        }
+
+        function string_to_array (str) {
+            return str.trim().split(",");
+        };
+
+        var Reset = function () {
+            $('#divSearch').find('input[type=text]').val('');
+            $('#divSearch').find('select').val('0');
+
+            BindDataTable();
+        }
+
+
+    </script>
+
+
+    <script>
+        //call add sucess view
+        function onSuccess(response) {
+            if (response.StatusId > 0) {
+                successPopup("@Translation.success_AddService");
+
+                setTimeout(function () { window.location = window.location.href; }, 3000);
+            }
+        }
+
+        function Update(button) {
+            onBegin();
+            //Determine the reference of the Row using the Button.
+            var row = $(button).closest("TR");
+
+            if (row.find('#UnitPrice').val() === '') {
+                warningPopup('@Translation.ReqAll');
+                return;
+            }
+
+            var SupplierId_upd =  $("#SupplierId_upd").val($("#supplier_upadate").val());
+            var ServiceProviderId_upd = $("#ServiceProviderId_upd").val($("#serviceprovider_upadate").val());
+
+            $.post('@Url.Action("AddEditService")', {
+                ServiceId: parseInt(row.attr("id").substring(2)),
+                ServiceNameEN: row.find('#ServiceNameEN').val(),
+                ServiceNameAR: row.find('#ServiceNameAR').val(),
+                UnitPrice: row.find('#UnitPrice').val(),
+                Status: row.find('input[name="Status"]').is(":checked"),
+                SupplierId: SupplierId_upd.val(),
+                ServiceProviderId: ServiceProviderId_upd.val()
+            }, function (response) {
+                if (response.StatusId > 0) {
+                    successPopup("@Translation.success_Update");
+                }
+                else {
+                    warningPopup(response.Message);
+                }
+                onComplete();
+            });
+        };
+    </script>
+
+    <script>
+        function getSelectValue() {
+            // $("#CategoryId").val($("#CategoryId").val());
+            $("#SupplierId").val($("#supplier").val());
+            $("#ServiceProviderId").val($("#serviceprovider").val());
+
+        };
+
+        RunSelect2();
+
+        function RunSelect2() {
+            $('#supplier').select2({
+                allowClear: true,
+                closeOnSelect: false,
+            }).on('select2:open', function () {
+
+                setTimeout(function () {
+                    $(".select2-results__option .select2-results__group").bind("click", selectAllclickHandler_supplier);
+                }, 0);
+            });
+
+            $('#serviceprovider').select2({
+                allowClear: true,
+                closeOnSelect: false,
+            }).on('select2:open', function () {
+
+                setTimeout(function () {
+                    $(".select2-results__option .select2-results__group").bind("click", selectAllclickHandler_serviceprovider);
+                }, 0);
+            });
+
+            $('#supplier_update').select2({
+                allowClear: true,
+                closeOnSelect: false,
+            }).on('select2:open', function () {
+
+                setTimeout(function () {
+                    $(".select2-results__option .select2-results__group").bind("click", selectAllclickHandler_supplier_update);
+                }, 0);
+            });
+
+            $('#serviceprovider_update').select2({
+                allowClear: true,
+                closeOnSelect: false,
+            }).on('select2:open', function () {
+
+                setTimeout(function () {
+                    $(".select2-results__option .select2-results__group").bind("click", selectAllclickHandler_serviceprovider_update);
+                }, 0);
+            });
+        };
+
+        var selectAllclickHandler_supplier = function () {
+            $(".select2-results__option .select2-results__group").unbind("click", selectAllclickHandler_supplier);
+            $('#supplier').select2('destroy').find('option').prop('selected', 'selected').end();
+            RunSelect2();
+        };
+
+        var selectAllclickHandler_serviceprovider = function () {
+            $(".select2-results__option .select2-results__group").unbind("click", selectAllclickHandler_serviceprovider);
+            $('#serviceprovider').select2('destroy').find('option').prop('selected', 'selected').end();
+            RunSelect2();
+        };
+
+        var selectAllclickHandler_supplier_update = function () {
+            $(".select2-results__option .select2-results__group").unbind("click", selectAllclickHandler_supplier_update);
+            $('#supplier_update').select2('destroy').find('option').prop('selected', 'selected').end();
+            RunSelect2();
+        };
+
+        var selectAllclickHandler_serviceprovider_update = function () {
+            $(".select2-results__option .select2-results__group").unbind("click", selectAllclickHandler_serviceprovider_update);
+            $('#serviceprovider_update').select2('destroy').find('option').prop('selected', 'selected').end();
+            RunSelect2();
+        };
+
+
+        $('#supplier').change(function () {
+            var arr = $(this).val();
+            console.log(arr)
+        })
+
+
+    </script>
+
+
+}
+
+
+
+

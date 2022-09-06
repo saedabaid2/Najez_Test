@@ -1,0 +1,291 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+
+    @*<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>*@
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link href="~/assets/global/plugins/fullcalendar/fullcalendar.min.css" rel="stylesheet" type="text/css" />
+
+    @*<link href="~/Content/Site.css" rel="stylesheet" />*@
+    <!-- favicon
+        ============================================ -->
+    <link rel="shortcut icon" type="image/x-icon" href="~/favicon.ico">
+    <!-- Google Fonts
+        ============================================ -->
+    <!--     Fonts and icons     -->
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    @using Almanea.BusinessLogic;
+    @{
+        var culture = System.Threading.Thread.CurrentThread.CurrentUICulture.Name.ToLowerInvariant();
+
+        var UserGroupTypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+        var UserId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserId]);
+        var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupId]);
+        var ActtypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+        //Arabic
+        if (culture.Equals("ar"))
+        {
+            <link href="~/vendor/bootstrap/css/bootstrap-rtl.css" rel="stylesheet" type="text/css">
+            <link href="~/vendor/ruang-admin.css" rel="stylesheet">
+            <link href="~/Content/Site-rtl.css" rel="stylesheet" />
+        }
+        else
+        {
+            <link href="/vendor/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css">
+            <link href="/vendor/ruang-admin.css" rel="stylesheet">
+            <link href="~/Content/Site.css" rel="stylesheet" />
+        }
+    }
+
+    <link href="/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    @*<link href="~/Content/DataTables/css/dataTables.bootstrap4.min.css" rel="stylesheet">*@
+
+    <link href="~/Scripts/dropzone/dropzone.min.css" rel="stylesheet" />
+
+    <link href="~/Content/css/select2.css" rel="stylesheet" />
+    <link href="~/Content/css/notification/notification.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+
+
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body class="page-top">
+    <div id="wrapper">
+        <!-- Sidebar -->
+        @Html.Partial("_LeftMenu")
+        <!-- Sidebar -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content" style="padding-bottom: 20px;">
+                <!-- TopBar -->
+                @Html.Partial("_TopMenu")
+                <!-- Topbar -->
+
+                <div class="container-fluid" id="container-wrapper">
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">@ViewBag.Title</h1>
+                        <ol class="breadcrumb">
+                          
+                                <li class="breadcrumb-item"><a href="@Url.Action("Dashboard","Home")">@Translation.Home</a></li>
+                            
+                           
+                            @if (ViewBag.ListLink != null)
+                            {
+                                <li class="breadcrumb-item"><a href="@ViewBag.ListLink">@ViewBag.ListName</a></li>
+                            }
+                            <li class="breadcrumb-item active" aria-current="page">@ViewBag.Title</li>
+                        </ol>
+                    </div>
+
+                    @RenderBody()
+                </div>
+            </div>
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        @{
+                            if (culture.Equals("ar"))
+                            {
+                                <span>&copy; جميع الحقوق محفوظة لصيانة @DateTime.Today.Year</span>
+                            }
+                            else
+                            {
+                                <span>Copyright &copy; @DateTime.Today.Year, Najez. All rights reserved.</span>
+                            }
+                        }
+
+                    </div>
+                </div>
+            </footer>
+            <!-- Footer -->
+        </div>
+    </div>
+
+    @Html.Partial("_Loader")
+
+    @Html.Partial("_ModalPopup")
+
+    @*<script src="/vendor/jquery/jquery.min.js"></script>*@
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/unobtrusiveajax")
+
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="/vendor/ruang-admin.js"></script>
+
+    <script src="~/Scripts/select2.js"></script>
+
+    <script src="~/Scripts/dropzone/dropzone.min.js"></script>
+    <script src="~/Scripts/dropzone.js"></script>
+
+    <script src="~/Scripts/DataTables/jquery.dataTables.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.bootstrap4.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.rowGroup.js"></script>
+    <script src="~/Scripts/js/notify.js"></script>
+
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.4.0/bootbox.min.js"></script>
+    <script src="~/assets/global/plugins/fullcalendar/fullcalendar.min.js" type="text/javascript"></script>
+
+    <script src="~/Scripts/Custom.js"></script>
+    <script type="text/javascript">
+        $(window).on('beforeunload', function () {
+            $("input[type=submit], input[type=button]").prop("disabled", "disabled");
+        });
+    </script>
+    <script>
+
+        $(document).ready(function () {
+            lang = '@culture';
+            ok = '@Translation.Ok';
+            $(".datepickerall").datepicker({  dateFormat: 'dd/mm/yy' });
+            $(".datepicker").datepicker({ minDate: 0, dateFormat: 'dd/mm/yy' });
+            $('.select2').select2();
+        });
+    </script>
+
+    <script>
+        function ChangeCulture(lang) {
+            $.ajax({
+                url: "@Url.Action("SetCulture", "Home")",
+                type: 'POST',
+                data: { 'culture': lang },
+                dataType: 'json',
+                success: function (response) {
+                    if (response > 0) {
+                        window.localStorage.setItem("uiCulture", lang);
+                        location.reload();
+                    }
+                }
+            });
+        }
+    </script>
+    <script>
+
+        //function foo() { };
+
+        $(document).ready(function () {
+           $.ajax({
+                url: "@Url.Action("GetNewOrderCount", "Home")",
+                type: 'GET',
+                dataType: 'json',
+               success: function (response) {
+                   if (response.StatusId > 0) {
+                       //Bind Menu
+                      /*  if ($('#bd_All').length > 0) {*/
+                            var count = parseInt(response.Data.AllOrders);
+                            if (count > 0) {
+                                $('#bd_All').text(count);
+                                $('#bd_All').show();
+                            }
+                       // }
+                        //if ($('#bd_Completed').length) {
+                        //    $('#bd_Completed').text(response.Data.Completed);
+                        //}
+                        //if ($('#bd_Archieve').length) {
+                        //    $('#bd_Archieve').text(response.Data.Archieve);
+                        //}
+                        //if ($('#bd_Finish').length) {
+                        //    $('#bd_Finish').text(response.Data.Finish);
+                        //}
+                        //if ($('#bd_Cancel').length) {
+                        //    $('#bd_Cancel').text(response.Data.Cancel);
+                        //}
+                        //if ($('#bd_Complain').length) {
+                        //    var count = parseInt(response.Data.Complain);
+                        //    if (count > 0) {
+                        //        $('#bd_Complain').text(count);
+                        //        $('#bd_Complain').show();
+                        //    }
+
+                        //}
+                        //if ($('#bd_Resolved').length) {
+                        //    $('#bd_Resolved').text(response.Data.Resolved);
+                        //}
+                    }
+                }
+           });
+                $.ajax({
+                url: "@Url.Action("GetNewServiceCount", "Home")",
+                type: 'GET',
+                dataType: 'json',
+               success: function (response) {
+                   if (response.StatusId > 0) {
+                       //Bind Menu
+                      /*  if ($('#bd_All').length > 0) {*/
+                       var count = parseInt(response.Data.NewService);
+                            if (count > 0) {
+                                $('#bd_NewService').text(count);
+                                $('#bd_NewService').show();
+                            }
+
+                    }
+                }
+           });
+                $.ajax({
+                url: "@Url.Action("GetNewComplainCount", "Home")",
+                type: 'GET',
+                dataType: 'json',
+               success: function (response) {
+                   if (response.StatusId > 0) {
+                       //Bind Menu
+                      /*  if ($('#bd_All').length > 0) {*/
+                       var count = parseInt(response.Data.NewComplain);
+                            if (count > 0) {
+                                $('#bd_Complain').text(count);
+                                $('#bd_Complain').show();
+                            }
+
+                    }
+                }
+           });
+            //$('#btnSearch').keypress(function (e) {
+            //
+            //    var key = e.which;
+            //    if (key == 13)  // the enter key code
+            //    {
+            //        new foo().shout();
+            //        //$('input[name = butAssignProd]').click();
+            //        //return false;
+            //    }
+            //});
+
+
+            //foo.prototype.shout = function () {
+            //    alert("hello"); //alert(shout); // shout was not defined.
+            //}
+
+            //var sampleInput = document.getElementById('btnSearch');
+
+            //sampleInput.onkeypress = function (e) {
+            //
+            //    if (e.charCode === 13) { // A pressed
+            //        new foo().shout();
+            //    }
+            //}
+        });
+    </script>
+
+    @{
+        if (culture.Equals("ar"))
+        {
+            <script>
+                $("div.input-group").has("div.input-group-prepend").addClass('input-prepend');
+            </script>
+        }
+    }
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

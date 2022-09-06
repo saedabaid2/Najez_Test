@@ -1,0 +1,89 @@
+﻿
+@using Almanea.Models
+@using Almanea.BusinessLogic
+
+@model vm_Complain
+
+@using (Ajax.BeginForm("AddComplain", "Complain", null,
+                                      new AjaxOptions
+                                      {
+                                          HttpMethod = "POST",
+                                          OnSuccess = "onComplain",
+                                          OnBegin = "onBegin",
+                                          OnComplete = "onComplete"
+                                      }, new { id = "frmAdd", @autocomplete = "off" }))
+{
+    @Html.AntiForgeryToken()
+
+<div class="row">
+
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <div class="form-group">
+            @Html.LabelFor(m => m.ComplainId, new { @class = "bmd-label-floating required" })
+
+            @*@Html.DropDownListFor(model => model.CategoryId, ViewBag.Category as List<SelectListItem>, Translation.Select, new { @class = "select2-multiple form-control", @name = "states[]", @multiple = "multiple" })*@
+            <select class="select2-multiple form-control" name="ComplainId" multiple="multiple"
+                    id="ComplainId" style="width: 100%;height:200px" >
+                @*<option value="0">@Translation.SelectStatus</option>*@
+                @foreach (var item in ViewBag.Category as List<SelectListItem>)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+            </select>
+        </div>
+        @Html.ValidationMessageFor(m => m.CategoryId, "", new { @class = "valid-text" })
+    </div>
+
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Complain, new { @class = "bmd-label-floating" })
+            @Html.TextAreaFor(m => m.Complain, new { @class = "form-control", @style = "resize:none;" })
+        </div>
+        @Html.ValidationMessageFor(m => m.Complain, "", new { @class = "valid-text" })
+    </div>
+
+</div>
+
+
+    <div class="row">
+      
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            @Html.HiddenFor(m => m.OrderId)
+            @Html.HiddenFor(m => m.ComplainBy)
+        </div>
+    </div>
+    <b><span id="spnclor" style="color:red;"></span></b>
+    <p style="vertical-align: bottom">
+        <input type="submit" value="@Translation.Submit" class="btn btn-primary" id="btnsubmitcomplain" />
+
+        @*<input type="submit" value="@Translation.Submit" class="btn btn-primary" onclick="confirm('@Translation.confirm_Complain')" />*@
+    </p>
+}
+<script>
+
+    $(document).ready(function () {
+        $('#frmAdd').submit(function (e) {
+
+            return confirm('@Translation.confirm_Complain');
+        });
+        $('.select2-multiple').select2();
+        $('#btnsubmitcomplain').hide();
+    });
+    $('#ComplainId').change(function () {
+        var minimum = 1;
+        if ($("#ComplainId").select2('data').length >= minimum) {
+            $('#btnsubmitcomplain').show();
+            $('#spnclor').html('');
+        }
+        else {
+            $('#btnsubmitcomplain').hide();
+            $('#spnclor').html('Please Select atleast one complain type ');
+        }
+    });
+ 
+
+    
+</script>

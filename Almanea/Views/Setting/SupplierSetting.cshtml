@@ -1,0 +1,297 @@
+﻿@model Almanea.Models.vm_ProviderSettings
+@using Almanea.BusinessLogic;
+@using System.Globalization;
+@{
+    ViewBag.Title = Translation.Settings;
+    var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+
+}
+
+<style>
+    .btn-group {
+        margin-bottom: 1rem !important;
+    }
+    /*.multiselect {*/
+        /* width: 200px; */
+        /*width:0 !important;
+    }*/
+    /* jQuery UI Datepicker moving pixels fix */
+    table.ui-datepicker-calendar {
+        border-collapse: separate;
+    }
+
+    .ui-datepicker-calendar td {
+        border: 1px solid transparent;
+    }
+
+    /* jQuery UI Datepicker hide datepicker helper */
+    #ui-datepicker-div {
+        display: none;
+    }
+
+    /* jQuery UI Datepicker emphasis on selected dates */
+    .ui-datepicker .ui-datepicker-calendar .ui-state-highlight a {
+        background: #743620 none;
+        color: white;
+    }
+</style>
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+
+            <div class="card-body">
+                @using (Ajax.BeginForm("ProviderSettingadd", "Setting", null,
+                     new AjaxOptions
+                     {
+                         HttpMethod = "POST",
+                         OnSuccess = "onSuccess",
+                         OnBegin = "onBegin",
+                         OnComplete = "onComplete",
+                     }, new { id = "frmAdd" }))
+                {
+                    @Html.AntiForgeryToken()
+                <div class="row">
+
+
+                    <div class="col-lg-2 col-md-4 col-sm-4 col-xs-12">
+                        <label>@Translation.InternalTeamOnly</label>
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" id="IsInternalcheckbox" class="custom-control-input" @(Model.IsInternal == true ? "checked" : "Unchecked") />
+
+                            <label for="IsInternalcheckbox" class="custom-control-label"></label>
+                            @Html.HiddenFor(m => m.IsInternal)
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12" hidden>
+                        <div class="form-group">
+                            <label>@Translation.TeamCapacity %</label>
+                            <input type="number" id="TeamCapacityPercentage" name="TeamCapacityPercentage" class="form-control" />
+
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-8 col-sm-6 col-xs-12" id="ChannelDiv">
+                        <div class="form-group">
+                            @Html.Label(Translation.ServiceProvider, Translation.ServiceProviderList, htmlAttributes: new { @class = "bmd-label-floating" })
+
+                            <select id="ChannelId" name="basic[]" multiple="multiple" class="form-control 3col active">
+                                @if (Model.IsInternal != true)
+                                {
+                                    <option value="" selected>@Translation.NoneSelected</option>
+                                }
+                            </select>
+
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-8 col-sm-6 col-xs-12" id="ddlDiv" style="display:none">
+                        <div class="form-group">
+                            @Html.Label(Translation.ServiceProvider, Translation.ServiceProviderList, htmlAttributes: new { @class = "bmd-label-floating" })
+                            
+                            <select id="ddlChannelId" name="ddlChannelId" multiple="multiple" class="form-control 3col active" disabled>
+                          
+                            </select>
+
+                        </div>
+                    </div>
+                    <script>
+                        $(function () {
+                            $('select[multiple].active.3col').multiselect({
+                                columns: 3,
+                                placeholder: 'Select States',
+                                search: true,
+                                searchOptions: {
+                                    'default': 'Search SP'
+                                },
+                                selectAll: true
+                            });
+                        });
+                    </script>
+
+
+                    @if (UserGroupId == (int)enumGroupType.Provider)
+                    {
+                        @*<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <label></label>
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" id="Autodispatch1" class="custom-control-input" @(Model.Autodispatch == true ? "checked" : "") />
+                    <label for="Autodispatch1" class="custom-control-label">@Translation.autodispatched</label>
+                </div>
+            </div>*@
+                    }
+                </div>
+                    @*@Html.HiddenFor(m => m.PreferInstallAsap)
+
+                    @Html.HiddenFor(m => m.IsProoduction)
+                    @Html.HiddenFor(m => m.Autodispatch)*@
+
+
+                    <p class="mg-t-15">
+                        <input type="submit" class="btn btn-primary pull-right" value="@Translation.Submit" />
+                    </p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet" />
+
+    <script src="~/Content/jquery.multiselect.js"></script>
+
+    <link href="~/Content/jquery.multiselect.css" rel="stylesheet" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
+
+    <link href="~/Content/Site.css" rel="stylesheet" />
+    <script>
+        function myfunctionclose() {
+            $("#exampleModalCenter").modal('hide');
+            $("#txtdate").val('');
+            $('#spnclor').html('');
+            $('#btnsubmitorder').hide();
+        }
+
+        $('#btnsubmit').click(function () {
+            $('#spnclor').html('');
+             $.get("@Url.Action("InstallationDate")",
+                 { Id: $('#Quantity').val(),Date }, function (data) {
+                        $("#UserGroupId").find('option').not(':first').remove();
+                        $.each(data, function (index, row) {
+                            $("#UserGroupId").append("<option value='" + row.Value + "'>" + row.Text + "</option>")
+                        });
+                    });
+            $("#myModalBody").load("@Url.Action("InstallationDate")/abc", function () {
+                $("#myModal").modal('show');
+                modalSize('lg');
+                $.validator.unobtrusive.parse($("#frmSchedule"))
+                $("#myModalLabel").text("@Translation.PreferInstallDateTime");
+
+              //  $('#frmSchedule #Comments').val($('#frmAdd #Comments').val());
+                $("#InstallDate").datepicker({ minDate: 0, dateFormat: 'dd/mm/yy' });
+            });
+        });
+    </script>
+    <script>
+        $("#IsInternalcheckbox").on('change', function () {
+            if ($(this).is(':checked')) {
+                $(this).attr('value', 'true');
+            } else {
+                $(this).attr('value', 'false');
+            }
+            $('#IsInternal').val($('#IsInternalcheckbox').val());
+
+
+            if ($('#IsInternalcheckbox').val() == "true") {
+                document.getElementById("ChannelDiv").style.display = "none";
+                document.getElementById("ddlDiv").style.display = "block";
+            }
+            else {
+                document.getElementById("ChannelDiv").style.display = "block";
+                document.getElementById("ddlDiv").style.display = "none";
+            }
+        });
+        var arraysp = [];
+
+
+        function loadChennelDropdown(options, url, selectText) {
+            $.getJSON(url, function (result) {
+                options.attr("disabled", "disabled");
+                options.empty();
+                //options.append($("<option />").val("").text(selectText));
+                $.each(result, function (i, item) {
+                    options.append($("<option/>").val(item.Value).text(item.Text));
+                });
+
+                arraysp.forEach(function (elemen1t) {
+                    //console.log("dd", elemen1t);
+                    $("#ChannelId option[value='" + elemen1t + "']").prop("selected", true);
+                });
+
+                options.removeAttr("disabled");
+                // options.selectpicker("refresh");
+
+                options.trigger("change");
+                options.multiselect('rebuild');
+                options.multiselect('refresh');
+            });
+        }
+
+        $(document).ready(function () {
+            if ($('#IsInternal').val() == "True") {
+               
+                document.getElementById("ChannelDiv").style.display = "none";
+                document.getElementById("ddlDiv").style.display = "block";
+            }
+            else {
+                document.getElementById("ChannelDiv").style.display = "block";
+                document.getElementById("ddlDiv").style.display = "none";
+            }
+
+            $('.select2').select2();
+
+            var date = new Date()
+
+            var val = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
+            var mindys = 3;
+            var d = new Date(val);
+            var prstday = d.getDay();
+
+
+            if (prstday != 0 && prstday != 1 && prstday != 6 && prstday != 5) {
+                mindys = 4;
+            }
+
+
+             $.ajax({
+        url: "@Url.Action("GetSPListsettingAssigned", "Orders")",
+        type: 'POST',
+
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+        success: function (response) {
+            console.log("ali", response);
+            response.forEach(function (element) {
+                arraysp.push(element.ServiceProviderId)
+                    //console.log("ali element", element
+            })
+           // console.log("ara", arraysp);
+
+        }
+
+
+    });
+
+
+            loadChennelDropdown($("#ChannelId"), "/Orders/GetSPListsetting", '');
+            $("#ChannelId").prop("disabled", true);
+            var data = [1, 7];
+
+            //$("#dataChannelIdmultiSelect('deselect_all');
+
+            // $("#ChannelId").multiSelect("select", data);
+            $('#ChannelId').multiselect('select', ['1', '7']);
+            $('#ChannelId').multiselect('refresh');
+
+
+        });
+        function onSuccess(response) {
+            onComplete();
+            if (response.StatusId > 0) {
+                successPopup("Successfully Update Setting");
+
+            }
+            else if (response.Message = '') {
+                warningPopup(response.Message);
+            }
+        }
+    </script>
+
+}
+
+
+
+

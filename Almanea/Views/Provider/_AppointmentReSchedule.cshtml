@@ -1,0 +1,723 @@
+﻿
+
+
+@model Almanea.Models.vm_OrderSchedule
+
+@using Almanea.BusinessLogic;
+@{
+    var installgetdate = Model.InstallDate;
+
+
+}
+
+@using (Ajax.BeginForm("AppointmentReSchedule", "Provider", null,
+                             new AjaxOptions
+                             {
+                                 HttpMethod = "POST",
+                                 OnSuccess = "onSuccess",
+                                 OnBegin = "onBegin",
+                                 OnComplete = "onComplete"
+                             }, new { id = "frmSchedule", @autoComplete = "off" }))
+{
+
+    @Html.AntiForgeryToken()
+
+    @*@ViewBag.GetDates ;*@
+
+    <label style="background-color: #5DC2C1; color: #fff; font-size: 15px;">Installation With Najez : @Model.TotalServiceTime  Hrs.</label>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-6 col-xs-12">
+            <label>@Translation.PreferInstallDateTime</label><br />
+            <div class="row" style="display:none;">
+                <div class="col-md-4">
+                    <input type="checkbox" class="assignmode" value="Is Manual Assign" />Auto Assign
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="custom-radio">
+                        <label class="bmd-label-floating required">
+                            <input type="radio" name="PreferDate" value="2" checked>&nbsp;@Translation.PreferSpecific
+                        </label>
+                    </div>
+                    <div id="divInstallDate">
+                        <div class="input-group">
+                            @Html.TextBoxFor(m => m.InstallDate, new { @class = "form-control datepicker" })
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                        @Html.ValidationMessageFor(m => m.InstallDate, "", new { @class = "valid-text" })
+
+                    </div>
+                </div>
+                @if (ViewBag.GetTimeSLOT != null)
+                {
+
+
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="divtime">
+                        <label class="bmd-label-floating required">
+                            <input type="radio" name="pt" value="0" checked>&nbsp;@Translation.PrefferTime
+                        </label>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class=" col-md-9" id="AllPrefferHr">
+                                    @*@Html.DropDownList("TimeSlot", null, "Select", htmlAttributes: new { @class = "form-control-sm"})*@
+                                    @Html.DropDownListFor(m => m.TimeSlot, new SelectList(ViewBag.GetTimeSLOT, "Value", "Text"), new { @class = "form-control select2" })
+                                </div>
+                                <div class=" col-md-3" id="CurrentDatePrefferHr" style="display:none">
+                                    @*@Html.DropDownList("TodayPrefferHr", null, "Select", htmlAttributes: new { @class = "form-control-sm" })*@
+                                    @Html.DropDownList("TodayPrefferHr", new SelectList(ViewBag.GetTimeSLOT, "Value", "Text"), new { @class = "form-control-sm" })
+                                </div>
+                                @*<div class=" col-md-3">
+                                        @Html.DropDownListFor(m => m.PrefferMeridian, cls_DropDowns.DDL_Meridian(), new { @class = "form-control-sm" })
+                                    </div>*@
+
+                            </div>
+                        </div>
+                    </div>
+                }
+           
+
+                <div class="col-md-12">
+                    <b><span id="spnclor4" style="color:brown;"></span></b>
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="labouravails">
+                    <label class="bmd-label-floating required">
+                        &nbsp;@Translation.Labour
+                    </label>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="row col-md-12">
+                                <div class="col-md-6">
+                                    @*@Html.DropDownListFor(m => m.LabourId, new SelectList(ViewBag.LabourId, "Value", "Text"), new { @class = "form-control-sm" })*@
+                                    @Html.DropDownList("LabourId2", new SelectList(ViewBag.LabourId2, "Value", "Text"), Translation.Select, new { @class = "form-control js-example-basic-multiple labours select2" })
+                                </div>
+                                <div class="col-md-4"><input type="button" style="border-radius: 0.25rem;" class="btn btn-primary add" value="@Translation.AddTeam" /></div>
+                                @*@Html.DropDownListFor(model => model.LabourId, new SelectList(ViewBag.Labours, "Value", "Text"), Translation.Select, new { @class = "form-control select2" })*@
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="serv" style="display:none;">
+                        @*@Html.DropDownList("ddlservices", new SelectList(ViewBag.services, "Value", "Text"), Translation.Select, new { @class = "form-control js-example-basic-multiple services" })*@
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 laboursContainer">
+
+        </div>
+    </div>
+    <div class="row mb-2" id="divcomments">
+        <div class="col-md-12">
+            <b><span id="spnclor3" style="color:brown;"></span></b>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Comments, new { @class = "bmd-label-floating" })
+                @Html.TextAreaFor(m => m.Comments, new { @class = "form-control", @style = "resize:none;" })
+            </div>
+            @Html.ValidationMessageFor(m => m.Comments, "", new { @class = "valid-text" })
+        </div>
+    </div>
+    <b><span id="spnclor2" style="color:#ffa500;"></span></b>
+    <p class="mg-t-15">
+        <input type="button" id="btn_submit" style="border-radius: 0.25rem;" class="btn btn-primary" value="@Translation.Submit" />
+    </p>
+
+    @Html.HiddenFor(m => m.OrderId)
+    <input type="hidden" name="DriversID" id="DriversID" />
+    <input type="hidden" name="LaboursID" id="LaboursID" />
+    <input type="hidden" value="@Model.InstallDate" id="appdate" />
+
+}
+
+<link href="~/Content/css/select2.css" rel="stylesheet" />
+<script src="/Scripts/select2.js"></script>
+@*<script src="~/Scripts/jquery-ui.multidatespicker.js"></script>*@
+
+<script>
+    function ToggleCheckbox(e, i) {
+        debugger;
+        var c = e.checked ? "1" : "0";
+        $(e).next().next().attr('value', c);
+        $(e).attr('value', c);
+    }
+    var index = [];
+    var i = 0;
+    $(document).on('click', '#removeRow', function () {
+        debugger;
+        var ii = $(this).parent().parent().index();
+        index.pop(ii);
+        var val = $(this).attr("val");
+        $("#LabourId2 option[value=" + val + "]").removeAttr('disabled').select2();
+
+        $(this).closest('#inputFormRow').remove();
+        //i--;
+    });
+    //};
+    function myFunction(e) {
+        debugger;
+        var opt = e.options[e.selectedIndex];
+
+        //var q = opt.title;
+        //var quantity = opt.value;
+
+        ////$(e).parent().next().find("[type=number]").val(q);
+        //$(e).parent().next().find("[type=number]").attr("max", q);
+        //$(e).parent().next().find("[type=number]").attr("quantity", quantity);
+        var form = $("#frmSchedule").serialize();
+
+        $.ajax({
+            url: "/Provider/OrderCalculate",
+            type: 'POST',
+            data: form,
+            success: function (response) {
+                debugger;
+                if (response.StatusId == -1) {
+                    debugger;
+                    $('#spnclor3').html(response.Message);
+                    $(e).parent().next().find("[type=number]").val(response.Data);
+                }
+                else {
+                    $('#spnclor3').html('');
+                }
+            }
+        });
+    };
+    function calc(e) {
+        debugger;
+        var form = $("#frmSchedule").serialize();
+
+        $.ajax({
+            url: "/Provider/OrderCalculate",
+            type: 'POST',
+            data: form,
+            success: function (response) {
+                debugger;
+                if (response.StatusId == -1) {
+                    debugger;
+                    $('#spnclor3').html(response.Message);
+                    //    $(e).val(response.Data);
+                }
+                else {
+                    $('#spnclor3').html('');
+                }
+            }
+        });
+    };
+    $(document).ready(function () {
+        $("#LabourId2").prop("disabled", true);
+
+        $('.js-example-basic-multiple').select2();
+
+        $(".assignmode").change(function () {
+            $("#TimeSlot").val("-1");
+            if (this.checked) {
+                $("#labouravails").hide();
+                $("#spnclor3").hide();
+            }
+            else {
+                $("#labouravails").show();
+                $("#spnclor3").show();
+            }
+        });
+
+          $(".add").click(function (e) {
+            var val = $("#LabourId2").val();
+
+            $('#spnclor3').html('');
+
+            var html = '';
+            var attr = $("#LabourId2 option[value=" + val + "]").attr('disabled')
+            if (typeof val == 'undefined' || val == null) {
+                $('#spnclor3').html('this labour is already added');
+                return false;
+            }
+            var ii = $(this).parent().index();
+            index.push(ii);
+             i = index.length - 1;
+            debugger;
+             @*@Model.OrdersAssigned val = null;*@
+
+            $("#LabourId2 option[value=" + val + "]").attr('disabled', 'disabled').select2();
+            var text = $("#LabourId2 option:selected").html();
+            var q = $("#Quantity").val();
+            var isleader = $("#isleader").val();
+            html += "<div class='row col-xs-12' id='inputFormRow'>";
+            html += "<div class='col-md-3'><select id='LabourIds[" + i + "]' name='LabourIds[" + i+"]' style='width:100%;font-size:12px;' class='form-control'><option value='" + val + "'>" + text + "</select></div>";
+            @*if (i == 0)
+             html += "<div class='col-md-2'><input type='checkbox' checked  value='1' onchange='ToggleCheckbox(this," + i + ")'><span style='font-size:12px;'>@Translation.Orderleader</span>";
+             else
+            html += "<div class='col-md-2'><input type='checkbox'  value='0' onchange='ToggleCheckbox(this," + i + ")'><span style='font-size:12px;'>@Translation.Orderleader</span>";
+            html += "<input type='hidden' id='Isleader[" + i + "]' value='0' name='Isleader[" + i + "]'></div>";*@
+            @*var statesAvailable = '@Json.Decode(ViewBag.services)'; debugger;*@
+            var statesAvailable = '@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.services))';
+            html += "<div class='col-md-3'><select id='ServiceIds[" + i + "]' onchange='myFunction(this)'  name='ServiceIds[" + i + "]' style= \"font-size: 12px;width:100%\" class='form-control'>";
+            html += "<option title='select service ' value='-1'>@Translation.SelectService ";
+            $.each(JSON.parse(statesAvailable), function (Text, Value) {
+                debugger;
+                html += "<option title=" + Value.Text.split(',')[1]+" value='" + Value.Value + "'>" + Value.Text  + "";
+            });
+            html += "</select></div>";
+            html += "<div class='col-md-1'><input type='number' style='width:100%;' onkeyup='calc(this)' id='Quantity[" + i + "]' name='Quantity[" + i + "]'></div>";
+              html += "<div class='col-md-2'><a class='btn btn-primary' value=" + val +"   id='AddService' style='font-size: 15px;color:white'>@Translation.Addservice</a></div>";
+              html += "<div class='col-md-1'><a class='btn btn-danger rmv' val='" + val + "' id='removeRow'><i class='fa fa-times' style='color:white'></i></a></div>";
+            html += "</div>";
+            i++;
+            $(".laboursContainer").append(html);
+            //console.log(myarray);
+            return false;
+        });
+        $('#btn_submit').on("click", (function (e) {
+
+            var form = $("#frmSchedule").serialize();
+            $.ajax({
+                url: "/Provider/OrderCheck",
+                type: 'POST',
+                data: form,
+                success: function (response) {
+                    debugger;
+                    if (response.StatusId == -1) {
+                        debugger;
+                        $('#spnclor3').html(response.Message);
+                        e.preventDefault();
+
+                        //e.preventDefault(); // cancel default behavior
+                        //return false;
+                    }
+                    else {
+                        debugger;
+                        $("#frmSchedule").submit();
+                    }
+                }
+            });
+            if ($("#TimeSlot").val() == "-1") {
+                $('#spnclor3').html('please choose time slot');
+                return false;
+            }
+
+        }));
+        $(document).on('click', '#AddService', function () {
+            debugger;
+            var ii = $(this).parent().parent().index();
+            index.push(ii);
+            i = index.length - 1;
+            var html = "";
+            var text = $("#LabourId2 option:selected").html();
+            var val = $(this).attr("value");
+            var selected = $("[id*=ServiceIds]").eq(ii).find("option:selected").val();
+            debugger;
+            var statesAvailable = '@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.services))';
+            html += "<div class='row col-xs-12' id='inputFormRow'>";
+            html += "<div class='col-md-3' style='visibility:hidden;'><select id='LabourIds[" + i + "]' name='LabourIds[" + i + "]' style= \"font-size: 12px;\" class='form-control'><option value='" + val + "'>" + text + "</select></div>";
+            //html += "<div class='col-md-2' style='visibility:hidden;'><input type='hidden' id='Isleader[" + i + "]'  name='Isleader[" + i + "]'>";
+            //html += "</div>";
+            html += "<div class='col-md-3'><select id='ServiceIds[" + i + "]' onchange='myFunction(this)' name='ServiceIds[" + i + "]' style= \"font-size: 12px;width:100%\" class='form-control'>";
+            html += "<option title='@Translation.SelectService ' value='-1'>@Translation.SelectService ";
+
+            $.each(JSON.parse(statesAvailable), function (Text, Value) {
+                debugger;
+                if (Value.Value!=selected)
+                html += "<option value='" + Value.Value + "' title=" + Value.Text.split(',')[1] +" >" + Value.Text  + "";
+            });
+            html += "</select></div>";
+            html += "<div class='col-md-1'><input type='number'  style='width:100%;' onkeyup='calc(this)' id='Quantity[" + i + "]' name='Quantity[" + i + "]'></div>";
+            html += "<div class='col-md-2'><a class='btn btn-primary' style=\"font-size: 15px;visibility:hidden;\" id='AddService'>@Translation.Addservice</a></div>";
+            html += "<div class='col-md-1'><a class='btn btn-danger rmv' val='" + val + "' id='removeRow'><i class='fa fa-times' style='color:white'></i></a></div>";
+
+
+            html += "</div>";
+            //var val = $(this).attr("val");
+            //$("#LabourId2 option[value=" + val + "]").removeAttr('disabled').select2();
+            $(".laboursContainer").append(html);
+        });
+
+        $("#SPrefferMeridian").val($("#PrefferMeridian").val());
+        if ($("#TimeSlot").val() == null) {
+            $('#btn_submit').hide();
+        }
+        else {
+            $('#btn_submit').show();
+        }
+        if ($('#appdate').val() != $('#InstallDate').val()) {
+            $('#btn_submit').show();
+        }
+
+        $('input[name="PreferDate"]').on('click', function () {
+            var status = $(this).val();
+            if (status == '2') {
+                $('#divInstallDate').show();
+            }
+            else {
+                $('#divInstallDate').hide();
+                $('#frmSchedule #InstallDate').val('');
+            }
+        });
+        //
+
+        $.ajax({
+            url: "@Url.Action("TeamCapacityReschedule")",
+            type: 'POST',
+            data: 'OrderId1=' + '90',
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+
+
+                $("#InstallDate").datepicker({
+                    minDate: 0,
+                    beforeShowDay: function (date) {
+                        var show = true;
+                        if (response.Message == "full block") {
+
+
+                            //show = false
+                        }
+                        if (date.getDay() == 5) {
+                            show = false
+                        }
+
+                        // var objarr = ["09-09-2021", "14-09-2021", "15-09-2021"];
+                        console.log("log", response.Data);
+                        response.Data.forEach(function (element) {
+                            // console.log("ali element", jQuery.datepicker.formatDate('dd-mm-yy', date), "ali2", element, element.dates.substring(0, 10));
+                            if (jQuery.datepicker.formatDate('dd/mm/yy', date) == element.dates.substring(0, 10)) {
+                                show = false;
+
+                                console.log("ali element", element);
+                            }
+
+                        })
+
+
+                        var string = jQuery.datepicker.formatDate('dd/mm/yy', date);
+                        //if ((arrayDate.indexOf(string) == -1) == false) {
+                        //    show = false
+                        //}
+                        return [show];
+
+                    },
+                    dateFormat: 'dd/mm/yy',
+                    onSelect: function (dateText, inst) {
+
+                        var date = $(this).val();
+                        var time = $('#time').val();
+                        loadtimeslotDropdown($("#TimeSlot"), "/Provider/Gettimeslot?abc=" + $('#InstallDate').val(), '');
+                        // loadtimeslotDropdown($("#TimeSlot"), "/Provider/Gettimeslot?abc=" + 'mkk', '');
+                        SelectCurrentDate(date);
+                        if (response.Message == 'In Capacity case 2') {
+
+
+                        }
+
+                        $('.overlay').show();
+
+                        $('.overlay').hide();
+                    }
+                });
+
+
+                onComplete();
+            }
+            });
+
+
+
+
+
+
+        $("#TodayPrefferHr").change(function () {
+            $("#PrefferHr").val($("#TodayPrefferHr").val());
+        });
+
+        $("#PrefferMeridian").change(function () {
+            var selectedtt = $(this).val();
+            var selecteddate = $("#InstallDate").val();
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var yyyy = today.getFullYear();
+            var currenttt = formatAMPM(today);
+
+            today = dd + '/' + mm + '/' + yyyy;
+            if (selecteddate == today) {
+                if (currenttt == "am" && selectedtt == "2") {
+                    document.getElementById("CurrentDatePrefferHr").style.display = "none";
+                    document.getElementById("AllPrefferHr").style.display = "block";
+                    $('#PrefferHr option').prop('selected', function () {
+                        return this.defaultSelected;
+                    });
+                }
+                else {
+                    document.getElementById("AllPrefferHr").style.display = "none";
+                    document.getElementById("CurrentDatePrefferHr").style.display = "block";
+
+                    $("#PrefferHr").val($("#TodayPrefferHr").val());
+                }
+            }
+            $("#SPrefferMeridian").val(selectedtt);
+        });
+        $('#btn_submit').click(function () {
+            if ($("#TimeSlot").val() == "-1") {
+                $('#spnclor3').html('please choose time slot');
+                return false;
+
+            }
+        });
+        $('#TimeSlot').change(function () {
+            if ($(this).val() == "-1")
+                $("#LabourId2").prop("disabled", true);
+            else
+                $("#LabourId2").prop("disabled", false);
+            if ($(".assignmode").is(':checked')) {
+                var url = "/Provider/GetAvilLaborDrp?abc=" + $('#TimeSlot').val() + "&abc2=" + $('#InstallDate').val();
+                $.getJSON(url, function (result) {
+                    debugger;
+                    $("#LabourIdAuto").val(result[0].Value);
+
+                });
+                var url2 = "/Provider/GetAvailDriver";
+
+                $.getJSON(url2, function (result1) {
+                    debugger;
+                    $("#DriveridAuto").val(result1[0].Value);
+
+                });
+            }
+
+            if ($("#TimeSlot").val() != "-1")
+            loadtimeslotbooked($("#TimeSlot"), "/Provider/GetBookedSlot?abc=" + $('#TimeSlot').val() + "&abc2=" + $('#InstallDate').val(), '');
+
+
+
+            //SelectCurrentDate(date);
+        });
+
+        $('#InstallDate').change(function () {
+            if ($("#TimeSlot").val() == "-1")
+                $('#btn_submit').hide();
+            else
+                $('#btn_submit').show();
+            $('#spnclor3').html('');
+            loadtimeslotDropdown($("#TimeSlot"), "/Provider/Gettimeslot?abc=" + $('#InstallDate').val(), '');
+
+            // var dd=moment(@ViewBag.GetDates, "DD.MM.YYYY").format("YYYY-MM-DD");
+
+
+            if ($('#appdate').val() == $('#InstallDate').val()) {
+                $('#spnclor2').html('');
+            }
+            else {
+                $('#spnclor2').html('@Translation.RescheuleAlertMessagse');
+            }
+
+            var date = $(this).val();
+            var time = $('#time').val();
+
+          //  SelectCurrentDate(date);
+        });
+
+        function formatAMPM(date) {
+            var hours = date.getHours();
+            var minutes = date.getMinutes();
+            var ampm = hours >= 12 ? 'pm' : 'am';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            var strTime = hours + ':' + minutes + ' ' + ampm;
+            return ampm;
+        }
+
+        function SelectCurrentDate(date) {
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var yyyy = today.getFullYear();
+            var tt = formatAMPM(today);
+
+            today = dd + '/' + mm + '/' + yyyy;
+            if (date == today) {
+                document.getElementById("AllPrefferHr").style.display = "none";
+                document.getElementById("CurrentDatePrefferHr").style.display = "block";
+
+                $("#PrefferHr").val($("#TodayPrefferHr").val());
+                if (tt == "am") {
+                    $("#PrefferMeridian").prop('selectedIndex', 1); // select AM option
+                    $("#PrefferMeridian").val("1");
+                    $("#SPrefferMeridian").val("1");
+                    document.getElementById("PrefferMeridian").disabled = false;
+                }
+                if (tt == "pm") {
+                    $("#PrefferMeridian").prop('selectedIndex', 0); // select PM option
+                    $("#PrefferMeridian").val("2");
+                    $("#SPrefferMeridian").val("2");
+                    document.getElementById("PrefferMeridian").disabled = true;
+                }
+            }
+            else {
+                document.getElementById("CurrentDatePrefferHr").style.display = "none";
+                document.getElementById("AllPrefferHr").style.display = "block";
+                $('#PrefferHr option').prop('selected', function () {
+                    return this.defaultSelected;
+                });
+                $('#PrefferMeridian option').prop('selected', function () {
+                    return this.defaultSelected;
+                });
+                document.getElementById("PrefferMeridian").disabled = false;
+                $("#SPrefferMeridian").val($("#PrefferMeridian").val());
+            }
+        }
+
+
+
+        //when change the install date
+        function loadtimeslotDropdown(options, url, selectText) {
+            $("#TimeSlot").val("-1");
+            // console.log("get url data", result,);
+            if ($('#appdate').val() != $('#InstallDate').val()) {
+                $('#btn_submit').show();
+            }
+            $.getJSON(url, function (result) {
+                console.log("get url data2", result);
+                if (result.length > 0) {
+                    $('#btn_submit').show();
+                }
+                else {
+                    $('#btn_submit').hide();
+                }
+                if ($('#appdate').val() != $('#InstallDate').val()) {
+                    $('#btn_submit').show();
+                }
+                options.attr("disabled", "disabled");
+                options.empty();
+                //  options.append($("<option />").val("-1").text("select time slot"));
+                $.each(result, function (i, item) {
+                    options.append($("<option />").val(item.Value).text(item.Text));
+                });
+                options.removeAttr("disabled");
+                //options.selectpicker("refresh");
+                options.trigger("change");
+            });
+        }
+
+
+        @*function loadtimeslotbooked(options, url, selectText) {
+            console.log("get url data", url,);
+            $.getJSON(url, function (result) {
+
+               // alert(result);
+                if (result == 'labour already booked') {
+                   // $('#spnclor2').html('@Translation.RescheuleAlertMessagse');
+                    $('#spnclor3').html('This time slot already booked your assigned labour, Please change another time slot, or please change your labour');
+                    $('#btn_submit').hide();
+            }
+            else {
+                    $('#spnclor3').html('');
+                    $('#btn_submit').show();
+            }
+
+            });
+        }*@
+          function loadtimeslotbooked(options, url, selectText) {
+            debugger;
+            console.log("get url data", url,);
+            $.getJSON(url, function (result) {
+                debugger;
+                // alert(result);
+              if (!$(".assignmode").is(':checked')) {
+                    // alert(result);
+                  if (result == '1') {// == if 'labour already booked'
+                      debugger;
+                        // $('#spnclor2').html('@Translation.RescheuleAlertMessagse');
+                       $('#spnclor3').html('This time slot is already booked to assigned labour. Please select different time slot, or select a different labour.');
+
+                    }
+                    //$('#btn_submit').hide();
+
+                    loadtimeslotDropdown2($("#LabourId2"), "/Provider/GetAvilLaborDrp?abc=" + $('#TimeSlot').val() + "&abc2=" + $('#InstallDate').val(), '');
+                }
+
+            //else {
+            //        $('#spnclor3').html('');
+            //        $("#labouravails").hide()
+            //        $('#btn_submit').show();
+            //}
+
+            });
+        }
+         @*function loadtimeslotbooked(options, url, selectText) {
+            console.log("get url data", url,);
+            $.getJSON(url, function (result) {
+
+               // alert(result);
+                if (result == 'labour already booked') {
+                    // $('#spnclor2').html('@Translation.RescheuleAlertMessagse');
+                    $('#spnclor3').html('This time slot already booked your assigned labour, Please change another time slot, or please change your labour    ' + '<a href="' + "/Provider/GetLaborAvailbleSlot?abc=" + $('#InstallDate').val()+ "&abc2=" + $('#InstallDate').val() +'">AVailable Labour</a>');
+                    //$('#btn_submit').hide();
+                    $("#labouravails").show()
+                    loadtimeslotDropdown2($("#LabourId2"), "/Provider/GetAvilLaborDrp?abc=" + $('#TimeSlot').val() + "&abc2=" + $('#InstallDate').val(), '');
+
+
+            }
+            else {
+                    $('#spnclor3').html('');
+                    $("#labouravails").hide()
+                    //$('#btn_submit').show();
+            }
+
+            });
+        }*@
+
+        //append available labours
+        function loadtimeslotDropdown2(options1, url, selectText) {
+            console.log("get url data2", url, options1);
+            $.getJSON(url, function (result) {
+                if (result.length == 0) {
+                    //$('#spnclor3').html('');
+                    $("#labouravails").hide();
+                    //$("#AllPrefferHr").hide();
+                    $('#btn_submit').hide();
+                    $('#spnclor3').html('This time slot is already booked. Please select different time slot.');
+
+                }
+                else {
+                    $('#spnclor3').html('');
+                    $("#labouravails").show()
+                    $('#btn_submit').show();
+                    console.log("get result labor", result,);
+                    options1.attr("disabled", "disabled");
+
+                    options1.empty();
+                    options1.html('');
+                    //options.selectpicker();
+                    // options1.append($("<option />").val("select time slot2").text(selectText));
+                    $.each(result, function (i, item2) {
+                        //$('#spnclor4').html(item2.Text);
+                        options1.append($("<option />").val(item2.Value).text(item2.Text));
+                    });
+
+                    options1.removeAttr("disabled");
+
+                    // $("#LabourId").selectpicker("refresh");
+                    // $('#LabourId').selectpicker('destroy');
+
+
+
+
+                    options1.trigger("change");
+                }
+                //options.trigger("liszt:updated");
+                // options.selectpicker("refresh");
+
+            });
+        }
+    });
+
+</script>
+

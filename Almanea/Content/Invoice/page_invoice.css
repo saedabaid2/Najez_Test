@@ -1,0 +1,152 @@
+/*Invoice Page
+------------------------------------*/
+@media print {
+	* { -webkit-print-color-adjust: exact; }
+	
+	.btn-u,
+	.header,
+	.footer-v1, 
+	.breadcrumbs,
+	#topcontrol {
+		display: none; 
+	}
+
+	.panel {
+		border: none;
+	}
+}
+
+/*Invoice Header*/
+.invoice-header {
+	color: #555;
+	overflow: hidden;
+	margin-bottom: 15px; border-bottom:3px solid #5DC2C1; padding-bottom: 15px;
+}
+
+.invoice-header h2 {
+	font-size: 30px;
+}
+
+.invoice-txt {
+	font-size: 30px; text-transform:uppercase;
+}
+
+.invoice-header .invoice-numb {
+	font-size: 15px; color:#5DC2C1; font-weight:normal;
+	text-align: left;
+}
+.invoice-header .invoice-numb p{
+	font-size: 14px; color:#5DC2C1; font-weight:bold;
+	text-align: right; padding:0px; margin:0px;
+}
+.invoice-header .invoice-numb span {
+	color: #555;
+	/*display: block;*/
+	font-size: 12px; font-weight:normal;
+}
+
+/*Invoice Info*/
+.invoice-info {
+	margin-bottom: 10px;
+}
+
+.invoice-info h2 {
+	color: #555;
+	font-size: 18px;
+}
+.invoice-info strong {
+	color:#5DC2C1;
+}
+
+/*Invoice Footer*/
+address {
+	line-height: 20px;
+}
+
+.invoice-total-info {
+	margin-bottom: 30px;
+}
+
+.invoice-total-info li {
+	font-size: 14px;
+	margin-bottom: 5px;
+	font-family: 'Open Sans'; 
+}
+
+
+
+/*Content logo */
+.content-logo img {
+	float: left;
+
+	margin-right: 15px;
+	display: inline-block;
+}
+.content-logo h3 {
+	color:#5DC2C1;margin-top:22px;
+}
+.content-logo strong {
+	color:#5DC2C1;
+}
+
+.desTitle {
+	color:#5DC2C1; text-align:center; padding:0px; font-style:italic;
+}
+
+.fntsize{ font-size:16px;}
+
+.txtalignR{ text-align:right;}
+
+
+.GridViewHeader
+{
+    background-color: #fff; vertical-align:middle;
+    
+    font-size: 13px;
+     text-align:center;
+    color: #5DC2C1; border: #dddddd 1px solid;
+}
+.GridViewHeader th
+{
+    background-color: #fff; vertical-align:middle;
+    
+    font-size: 13px;
+    font-weight: bold;  text-align:center;
+    color: #5DC2C1;  border: #dddddd 1px solid;
+}
+.GridViewalternativRow
+{
+    background-color: #fff; text-align:center; color: #555; font-weight: normal;border: #dddddd 1px solid;vertical-align:middle;
+}
+.GridViewalternativRow td
+{
+   border: #dddddd 1px solid;vertical-align:middle;
+}
+
+.GridViewRow
+{
+    text-align:center; color: #555; font-weight: normal;border: #dddddd 1px solid;vertical-align:middle;
+}
+.GridViewRow td
+{
+    border: #dddddd 1px solid;vertical-align:middle;
+}
+.btminfo strong {
+	color:#5DC2C1;
+}
+.txt-colo-orange {
+	color:#5DC2C1; font-size: 15px;
+}
+
+.box-bdr {
+	border: #5DC2C1 2px solid; padding:10px;
+}
+
+td.rotation {
+    text-align: center;
+}
+
+    td.rotation span {
+        writing-mode: vertical-lr;
+        transform: rotate(180deg);
+    }

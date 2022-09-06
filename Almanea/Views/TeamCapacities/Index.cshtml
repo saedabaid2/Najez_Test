@@ -1,0 +1,407 @@
+﻿
+
+@{
+    ViewBag.Title = Translation.TeamCapacity;// "Team Capacity";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var UserGroupTypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+    var UserId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserId]);
+    var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupId]);
+    var ActtypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+}
+
+@using Almanea.BusinessLogic;
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+
+            <div class="card-body">
+
+                <div class="row" id="divSearch">
+                    @if (UserGroupTypeId == (int)enumGroupType.Supplier && (ActtypeId == (int)enumSupplierAcct.Admin || ActtypeId == (int)enumSupplierAcct.SellerSupervisor))
+                    {
+
+                        <div class="col-xl-4 col-sm-6 col-md-4">
+                            <div class="form-group">
+                                <div class="form-label-group">
+                                    <select class="form-control select2" id="sCompany">
+                                        <option value="0">@Translation.All @Translation.ServiceProvider</option>
+                                        @foreach (var item in cls_DropDowns.GetSupplierandSupervisorCompanies(UserId, UserGroupId, UserGroupTypeId, ActtypeId))
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="text" id="StartDate" name="StartDate" class="form-control datepickerall" placeholder="@Translation.FinishStartDate" onkeypress="handleKeyPress(event)" autocomplete="off" />
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="text" id="EndDate" name="EndDate" class="form-control datepickerall" placeholder="@Translation.FinishEndDate" onkeypress="handleKeyPress(event)" autocomplete="off" />
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <p>
+                    @if (UserGroupTypeId == (int)enumGroupType.Supplier)
+                    {
+                        <button type="button" value="@Translation.Search" onclick="BindSupplierDataTable()" class="btn btn-primary pull-right">@Translation.Search</button>
+                    }
+                    @if (UserGroupTypeId == (int)enumGroupType.Provider)
+                    {
+                        <button type="button" value="@Translation.Search" onclick="BindDataTable()" class="btn btn-primary pull-right">@Translation.Search</button>
+                    }
+                </p>
+
+
+                <div class="table-responsive" style=" padding-top: 2%; padding-bottom: 2%;">
+                    <div class="table-responsive">
+                        <table class="table align-items-center table-flush" id="dataTable">
+                            <thead class="thead-light">
+                                <tr class="row1">
+                                    <th width="16%">@Translation.InstallDate</th>
+                                    <th width="10%">@Translation.DailyCapacity</th>
+                                    <th width="13%">@Translation.ConsumedCapacity</th>
+                                    <th width="12%">@Translation.CurrentCapacity</th>
+                                    <th width="10%">@Translation.CapacityPercentage</th>
+                                    <th width="10%">@Translation.Updatedate</th>
+                                    <th width="10%">@Translation.SellerName</th>
+                                    @if (UserGroupTypeId == (int)enumGroupType.Supplier)
+                                    {
+                                        <th width="13%">@Translation.CompanyNameEN</th>
+                                    }
+
+
+                                    @*<th width="20%">@Translation.Action</th>*@
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script>
+
+    function convertToDate(data) {
+       data= data == null ? new Date.UTC : data;
+        var dtStart = new Date(parseInt(data.substr(6)));
+
+        var dtStartWrapper = moment(dtStart);
+        return dtStartWrapper.format("DD/MM/YYYY");
+    }
+    function collabse(e) {
+        debugger;
+        $("[role=row]:not(.row1)").hide();
+
+        $(e).nextUntil(".group").show();
+        if ($(e).hasClass("expand")) {
+            $(e).removeClass("expand");
+            $(e).addClass("collabse");
+            $(e).nextUntil("[role=row]").hide();
+        }
+        else if ($(e).hasClass("collabse")) {
+            $(e).addClass("expand");
+            $(e).removeClass("collabse");
+            $(e).nextUntil("[role=row]").show();
+
+        }
+    }
+
+    $(document).ready(function () {
+        async: true;
+          if (@UserGroupTypeId == @Convert.ToInt32(enumGroupType.Supplier))
+          {
+              BindSupplierDataTable();
+          }
+          else {
+
+              BindDataTable();
+          }
+
+        });
+    var oTable;
+    var oTableS;
+        function BindDataTable(response) {
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+                    "bAutoWidth": false,
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("GetTeamCapacity")",
+
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+
+                        aoData.push(
+                            { "name": "ServiceProviderId", "value": $("#sCompany").val() },
+                            { "name": "StartDate", "value": $("#StartDate").val() },
+                            { "name": "EndDate", "value": $("#EndDate").val() }
+                        );
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+                    },
+
+                    "aoColumns": [
+
+                        //{
+                        //    'mData': 'InstallDate',
+                        //    'render': function (datett) {
+                        //        var date1 = new Date(parseInt(datett.substr(6)));
+                        //        var month1 = ("0" + (date1.getMonth() + 1)).slice(-2);
+                        //        return ("0" + date1.getDate()).slice(-2) + '/' + month1 + '/' + date1.getFullYear() + " " + date1.toLocaleTimeString(); /*date.toLocaleDateString();*/
+                        //    },
+                        //},
+                        {
+                            "data": "InstallDate",
+                            "render": function (data) { return convertToDate(data); }
+                        },
+                         {
+                             "mData": "DailyCapacity",
+                        },
+                          {
+                              "mData": "ConsumedCapacity",
+                        },
+                           {
+                               "mData": "CurrentCapacity",
+                        },
+                           {
+                               "mData": "CapcityPercentage",
+                        },
+                           {
+                        'mData': 'Updatedate',
+                               'render': function (jsonDate) {
+                            var date = new Date(parseInt(jsonDate.substr(6)));
+                            var month = ("0" + (date.getMonth() + 1)).slice(-2);
+                            return ("0" + date.getDate()).slice(-2) + '/' + month + '/' + date.getFullYear() + " " + date.toLocaleTimeString(); /*date.toLocaleDateString();*/
+                          },
+                        },
+                           {
+                               "mData": "tblOrder",
+                        }
+                        //    {
+                        //     "mData": "Updatedate","orderable": true
+                        //}
+                    ],
+                    "order": [[0, "desc"], [5, "asc"]],
+                    "fnInitComplete": function (oSettings, json) {
+                    },
+                    "drawCallback": function (settings) {
+                        var api = this.api();
+                        var rows = api.rows({ page: 'current' }).nodes();
+                        var last = null;
+
+                        api.column(0, { page: 'current' }).data().each(function (group, i) {
+                            debugger;
+                            if (last !== group) {
+                                var date = getDateIfDate(group);
+                                console.log(date);
+                                $(rows).eq(i).before(
+                                    '<tr class="group ' + group + ' collabse" onclick="collabse(this)"><td colspan="7">installation date : ' + date + '</td></tr>'
+                                );
+
+                                last = group;
+                            }
+                        });
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                        "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                        "emptyTable": false,
+                        "sEmptyTable": "@Translation.NoMatchingRecords",
+                    }
+                });
+            }
+    }
+    function getDateIfDate(d) {
+        var m = d.match(/\/Date\((\d+)\)\//);
+        return m ? (new Date(+m[1])).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : d;
+    }
+        function BindSupplierDataTable(response) {
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTableS.draw();
+            }
+            else {
+                oTableS = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+                    "bAutoWidth": false,
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("GetTeamCapacity")",
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+
+                        aoData.push(
+                            { "name": "ServiceProviderId", "value": $("#sCompany").val() },
+                            { "name": "StartDate", "value": $("#StartDate").val() },
+                            { "name": "EndDate", "value": $("#EndDate").val() }
+                        );
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+                    },
+                    "aoColumns": [
+                        {
+                            'mData': 'InstallDate',
+                            'render': function (jsonDate) {
+                                var date = new Date(parseInt(jsonDate.substr(6)));
+                                var month = ("0" + (date.getMonth() + 1)).slice(-2);
+                                return ("0" + date.getDate()).slice(-2) + '/' + month + '/' + date.getFullYear(); /*date.toLocaleDateString();*/
+                            }, "bSortable": true
+                        },
+                         {
+                            "mData": "DailyCapacity", "bSortable": true
+                        },
+                          {
+                              "mData": "ConsumedCapacity", "bSortable": true
+                        },
+                           {
+                               "mData": "CurrentCapacity", "bSortable": true
+                        },
+                           {
+                               "mData": "CapcityPercentage", "bSortable": true
+                        },
+                           {
+                        'mData': 'Updatedate',
+                        'render': function (jsonDate) {
+                            var date = new Date(parseInt(jsonDate.substr(6)));
+                            var month = ("0" + (date.getMonth() + 1)).slice(-2);
+                            return ("0" + date.getDate()).slice(-2) + '/' + month + '/' + date.getFullYear() + " " + date.toLocaleTimeString(); /*date.toLocaleDateString();*/
+
+                            //return date.toLocaleDateString()+ " "+ date.toLocaleTimeString(); /*("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear();*/
+                              }, "orderable": true
+                        },
+                           {
+                               "mData": "tblOrder", "bSortable": true
+                        },
+                        {
+
+                            "mData": "tblUserGroupCompany", "bSortable": true
+                        }
+                        //    {
+                        //     "mData": "Updatedate","orderable": true
+                        //}
+                    ],
+                     "order": [[0, "desc"]],
+                    "fnInitComplete": function (oSettings, json) {
+                    },
+                    "drawCallback": function (settings) {
+                        var api = this.api();
+                        var rows = api.rows({ page: 'current' }).nodes();
+                        var last = null;
+
+                        api.column(0, { page: 'current' }).data().each(function (group, i) {
+                            debugger;
+                            if (last !== group) {
+                                var date = getDateIfDate(group);
+                                console.log(date);
+                                $(rows).eq(i).before(
+                                    '<tr class="group ' + i + ' collabse" onclick="collabse(this);"><td colspan="8">installation date : ' + date + '</td></tr>'
+                                );
+
+                                last = group;
+                            }
+                        });
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                        "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                        "emptyTable": false,
+                        "sEmptyTable": "@Translation.NoMatchingRecords",
+                    }
+                });
+            }
+        }
+
+    function getdate(date) {
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        var strTime = hours + ':' + minutes + ' ' + ampm;
+
+        var month = ("0" + (date.getMonth() + 1)).slice(-2);
+
+        return ("0" + date.getDate()).slice(-2) + '/' + month + '/' + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + " " + ampm; /*date.toLocaleDateString();*/
+
+    }
+</script>
+<style>
+    tr.group, tr.group:hover {
+        background-color: #ddd !important;
+    }
+
+        tr.group td {
+            font-size: 17px;
+            font-weight: bold;
+            color: black;
+            border-bottom: 2px solid #b4b0b0;
+        }
+
+    .odd, .even {
+        display: none;
+    }
+
+   /* .expand ~ .odd, .expand ~ .odd, .expand ~ .even, .expand ~ .even {
+        display: block !important;
+    }*/
+
+ /*   .collabse ~ .odd, .collabse ~ .odd, .collabse ~ .even, .collabse ~ .even {
+        display: none !important;
+    }*/
+   
+    tr.odd td:first-child, tr.even td:first-child {
+        visibility: hidden;
+        border-bottom: 1px solid #eee;
+    }
+</style>

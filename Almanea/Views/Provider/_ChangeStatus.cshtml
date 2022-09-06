@@ -1,0 +1,99 @@
+﻿
+@model vm_OrderStatus
+
+@using Almanea.Models;
+@using Almanea.BusinessLogic;
+@{
+    var labours = (IEnumerable<SelectListItem>)ViewBag.Labours;
+    var drivers = (IEnumerable<SelectListItem>)ViewBag.Drivers;
+    var UserGroupTypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+    var ActtypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+
+}
+<div id="divStatus">
+    <hr class="thick" />
+
+    @using (Ajax.BeginForm("UpdateStatus", "Provider", null,
+   new AjaxOptions
+   {
+       HttpMethod = "POST",
+       OnSuccess = "onStatus",
+       OnBegin = "onBegin",
+       OnComplete = "onComplete"
+   }, new { id = "frmAdd" }))
+    {
+
+        @Html.AntiForgeryToken()
+
+<div class="row">
+
+
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Status, new { @class = "bmd-label-floating required" })
+            @if (UserGroupTypeId == (int)enumGroupType.Admin)
+            {
+                @Html.DropDownListFor(model => model.Status, cls_DropDowns.Admin_Get_OrderStatus((int)ViewBag.StatusId), Translation.Select, new { @class = "form-control select2" })
+            }
+            else if (UserGroupTypeId == (int)enumGroupType.Provider || UserGroupTypeId == (int)enumGroupType.SuperAdmin)
+            {
+                @Html.DropDownListFor(model => model.Status, cls_DropDowns.Get_OrderStatus((int)ViewBag.StatusId), Translation.Select, new { @class = "form-control select2" })
+            }
+            else if (ActtypeId == (int)enumSupplierAcct.Admin)
+            {
+                @Html.DropDownListFor(model => model.Status, cls_DropDowns.Get_OrderStatus((int)ViewBag.StatusId), Translation.Select, new { @class = "form-control select2" })
+
+            }
+            @Html.ValidationMessageFor(m => m.Status, "", new { @class = "valid-text" })
+        </div>
+
+    </div>
+    @if (ActtypeId != (int)enumSupplierAcct.Admin&& UserGroupTypeId != (int)enumGroupType.SuperAdmin)
+    {
+    @*<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12" id="DriverDiv">
+        <div class="form-group">
+            <div class="form-label-group">
+                @Html.LabelFor(m => m.DriverId, new { @class = "bmd-label-floating required" })
+                @Html.DropDownListFor(model => model.DriverId, new SelectList(ViewBag.Drivers, "Value", "Text"), Translation.Select, new { @class = "form-control select2" })
+
+                @Html.ValidationMessageFor(m => m.DriverId, "", new { @class = "valid-text" })
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12" id="LabourDiv">
+        <div class="form-group">
+            <div class="form-label-group">
+                @Html.LabelFor(m => m.LabourId, new { @class = "bmd-label-floating required" })
+                @Html.DropDownListFor(model => model.LabourId, new SelectList(ViewBag.Labours, "Value", "Text"), Translation.Select, new { @class = "form-control select2" })
+
+                @Html.ValidationMessageFor(m => m.LabourId, "", new { @class = "valid-text" })
+            </div>
+        </div>
+    </div>*@
+
+    }
+    <style>
+        .float-right{
+            display:none;
+        }
+    </style>
+
+</div>
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Comments, new { @class = "bmd-label-floating" })
+                    @Html.TextAreaFor(m => m.Comments, new { @class = "form-control", @style = "resize:none;" })
+                </div>
+                @Html.ValidationMessageFor(m => m.Comments, "", new { @class = "valid-text" })
+            </div>
+        </div>
+        <p class="mg-t-15">
+            <input type="submit" class="btn btn-primary" value="@Translation.Submit" id="btnchangestatus" />
+        </p>
+        @Html.Hidden("OrderId", (int)ViewBag.OrderId)
+        <input type="hidden" value="@Model.DriverId" id="DriverID" name="DriverID" />
+        <input type="hidden" value="@Model.LabourId" id="LabourID" name="LabourID" />
+    }
+</div>

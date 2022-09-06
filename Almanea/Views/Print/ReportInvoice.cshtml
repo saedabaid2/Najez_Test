@@ -1,0 +1,259 @@
+﻿@{
+    /**/
+
+    Layout = null;
+}
+
+@model Almanea.Models.vm_Invoice
+@using Almanea.BusinessLogic;
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <!-- Web Fonts -->
+    <link rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600&amp;subset=cyrillic,latin'>
+    <!-- CSS Global Compulsory -->
+    <link rel="stylesheet" href="~/Content/Invoice/bootstrap.min.css">
+    <link rel="stylesheet" href="/Content/Invoice/style.css">
+
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <!-- CSS Page Style -->
+    <link rel="stylesheet" href="/Content/Invoice/page_invoice.css">
+    <style>
+        td.rotation {
+            text-align: center;
+        }
+
+            td.rotation span {
+                writing-mode: vertical-lr;
+                transform: rotate(180deg);
+            }
+        tr {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+
+        <!--=== Content Part ===-->
+        <div class="container content" style="margin-top:30px;">
+            <!--Invoice Header-->
+            <div class="row invoice-header">
+                <div class="col-xs-6 col-md-8">
+                    <div class="content-logo">
+                        <img src="/Content/Light-Icon.png" width="150" alt="">
+                        <div class="overflow-h">
+                            <h3>@Model.Company_Title</h3>
+                            <ul class="list-unstyled">
+                                <li><strong>Phone:</strong> @Model.Company_Phone</li>
+                                <li><strong>Email:</strong> <a href="mailto:@Model.Company_Email">@Model.Company_Email</a></li>
+                                <li><strong>Website:</strong> <a href="@Model.Company_Website">@Model.Company_Website</a></li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-md-4 invoice-numb">
+                    <div class="tag-box tag-box-v3">
+                        <ul class="list-unstyled btminfo">
+                            <li><strong>Period of Time:</strong> @Model.PeriodTime</li>
+                            <li><strong>Total Finished Orders:</strong> @Model.TotalOrders</li>
+                            <li><strong>Subtotal:</strong> @Model.SubTotal.ToString("#.##") SAR</li>
+                            <li><strong>@ViewBag.ContractPercent% of Subtotal:</strong> @Model.Due.ToString("#.##") SAR</li>
+                        </ul>
+                    </div>
+
+                </div>
+                @*<div class="col-xs-12 col-md-6 invoice-numb">
+                    <h2 class="invoice-txt">Invoice</h2>
+                    <p>Invoice Date: <span>@Model.InvoiceDate</span></p>
+                    <p>Due Date: <span>@Model.DueDate</span></p>
+                    <p>Invoice Number: <span>@Model.InvoiceNo</span></p>
+                </div>*@
+            </div>
+            <!--End Invoice Header-->
+            <!--Invoice Detials-->
+            <div class="row invoice-info">
+                <div class="col-xs-6">
+                    <ul class="list-unstyled fntsize">
+                        <li><strong>To Account:</strong> <b>@Model.UserGroup</b></li>
+                    </ul>
+                </div>
+                <div class="col-xs-6">
+                    <ul class="list-unstyled fntsize txtalignR">
+                        <li><strong>Report Date:</strong> @Model.InvoiceDate</li>
+                    </ul>
+                </div>
+            </div>
+            <!--End Invoice Detials-->
+            <!--Invoice Description-->
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="desTitle">Description</h3>
+                </div>
+            </div>
+            <!--End Invoice Description-->
+            <!--Invoice Table-->
+            <div class="panel panel-default margin-bottom-40">
+
+                <table class="table invoice-table GridViewHeader">
+                    <thead>
+                        <tr>
+                            @*<th rowspan="1">Date</th>*@
+                            <th rowspan="1">Order #</th>
+                            <th rowspan="1">Invoice #</th>
+                            <th rowspan="1">Customer Name</th>
+                            <th rowspan="1">Customer Contact</th>
+                            @*<th rowspan="1">Area</th>*@
+                            <th rowspan="1">Scheduled Date</th>
+                            <th rowspan="1">Product or Service</th>
+                            <th rowspan="1">Qty.</th>
+                            <th rowspan="1">Unit Price</th>
+                            <th rowspan="1">Add. Amount</th>
+                            <th colspan="1">Amount</th>
+                        </tr>
+                        <tr>
+                            <th>x`</th>
+                            <th>Subtotal</th>
+                        </tr>
+                        <tr>
+                            <th>Vat</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Orders)
+                        {
+                            for (int i = 0; i < item.Orders.Count; i++)
+                            {
+                                var row = item.Orders[i];
+                                var services = row.Services;
+
+                        <tr class="GridViewRow">
+                            @*<td class="rotation" rowspan="@(item.Orders.Count)">
+            <span>@item.Date</span>
+        </td>*@
+                            <td>@row.OrderNo</td>
+                            <td>@row.InvoiceNo</td>
+                            <td>@row.CustomerName</td>
+                            <td>@row.CustomerNo</td>
+                            @*<td>@row.Area</td>*@
+                            <td>@row.InstallDate</td>
+
+                            @if (services.Count > 0)
+                            {
+                                <td>
+                                    @foreach (var s in services)
+                                    {@s.Title <br />}
+                                </td>
+                                <td>
+                                    @foreach (var s in services)
+                                    {@s.Quantity <br /> <br />}
+                                </td>
+                                <td>
+                                    @foreach (var s in services)
+                                    {@s.UnitPrice.ToString("#.##") <br /> <br />}
+                                </td>
+                                if (@row.AdditonalAmount > 0)
+                                {
+                                    <td>@row.AdditonalAmount.ToString("#.##") SAR</td>
+                                }
+                                else
+                                {
+                                    <td>0.00 </td>
+                                }
+                                <td>
+                                    @foreach (var s in services)
+                                    {@s.Vat.ToString("#.##") <br /> <br />}
+                                </td>
+                                <td>
+                                    @foreach (var s in services)
+                                    {@s.Total.ToString("#.##") <br /> <br />}
+                                </td>
+                            }
+                            else
+                            {
+                                <td>@row.Services[0].Title</td>
+                                <td>@row.Services[0].Quantity</td>
+                                <td>@row.Services[0].UnitPrice.ToString("#.##") SAR</td>
+                                if (@row.AdditonalAmount > 0)
+                                {
+                                    <td>@row.AdditonalAmount.ToString("#.##") SAR</td>
+                                }
+                                else
+                                {
+                                    <td>0.00 </td>
+                                }
+                                <td>@row.Services[0].Vat.ToString("#.##") SAR</td>
+
+                                <td>@row.Services[0].Total.ToString("#.##") SAR</td>
+                            }
+
+                            @*<td>@row.SubTotal SAR</td>*@
+                        </tr>
+                            }
+                        }
+                        
+                    </tbody>
+                </table>
+            </div>
+            <!--End Invoice Table-->
+            <!--Invoice Footer-->
+            <div class="row">
+                <div class="col-xs-6">
+                    @*<div class="tag-box tag-box-v3">
+                        <ul class="list-unstyled btminfo">
+                            <li><strong>Period of Time:</strong> @Model.PeriodTime</li>
+                            <li><strong>Total Finished Orders:</strong> @Model.TotalOrders</li>
+                            <li><strong>Subtotal:</strong> @Model.SubTotal.ToString("#.##") SAR</li>
+                            <li><strong>10% of Subtotal:</strong> @Model.Due.ToString("#.##") SAR</li>
+                        </ul>
+                    </div>*@
+
+                </div>
+                <div class="col-xs-6 text-right">
+                    <ul class="list-unstyled invoice-total-info">
+                        <li><strong>Sub - Total Amount:</strong> @Model.SubTotal.ToString("#.##") SAR</li>
+                        <li><strong>Additonal Amount:</strong>&nbsp;&nbsp;@String.Format("{0:0.00}", Model.Additional) SAR</li>
+                        <!--<li><strong>Discount:</strong> 14.8%</li>-->
+                        <li><strong>VAT (@ViewBag.Vat):</strong> @Model.Vat.ToString("#.##") SAR</li>
+                        <li><strong>Grand Total:</strong> @Model.Total.ToString("#.##") SAR</li>
+                    </ul>
+
+                </div>
+            </div>
+            @*<div class="row">
+                <div class="col-md-12">
+                    <p style="font:16px;"><b>As per contract @ViewBag.ContractPercent % of every order amount will be charged.</b></p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box-bdr">
+                        <ul class="list-unstyled btminfo" style="text-align:center; font:16px;">
+                            <li><strong>Due Amount:</strong> <b>@Model.Due.ToString("#.##") SAR (@cls_Number2Words.ConvertToWords(Model.Due.ToString("#.##")))</b> </li>
+
+                        </ul>
+
+                    </div>
+                </div>
+            </div>*@
+            <!--End Invoice Footer-->
+        </div><!--/container-->
+        <!--=== End Content Part ===-->
+
+    </div><!--/wrapper-->
+    <!-- JS Global Compulsory -->
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    @*<script type="text/javascript" src="js/jquery-migrate.min.js"></script>*@
+
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+
+</body>
+</html>

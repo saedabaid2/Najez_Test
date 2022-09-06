@@ -1,0 +1,418 @@
+﻿
+@{
+    ViewBag.Title = Translation.Dashboard;
+    var grp = ViewBag.UserGroupTypeId;
+    var style = (grp == (int)enumGroupType.Admin) ? "col-lg-2 col-md-2 col-sm-2 col-xs-12" : "col-lg-4 col-md-4 col-sm-4 col-xs-12";
+}
+
+@model vm_OrderList
+
+@using Almanea.Models;
+@using Almanea.BusinessLogic;
+<style>
+    .card {
+        overflow: hidden;
+    }
+
+    .card-body .rotate {
+        z-index: 8;
+        float: right;
+        height: 100%;
+    }
+
+        .card-body .rotate i {
+            color: rgba(20, 20, 20, 0.15);
+            position: absolute;
+            left: 0;
+            left: auto;
+            right: -10px;
+            bottom: 0;
+            display: block;
+            -webkit-transform: rotate(-44deg);
+            -moz-transform: rotate(-44deg);
+            -o-transform: rotate(-44deg);
+            -ms-transform: rotate(-44deg);
+            transform: rotate(-44deg);
+        }
+</style>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            @*<div class="card-header ta-right">
+                    <a href="@Url.Action("Details", "Print")/@ViewBag.Id" target="_blank" title="Print" data-toggle="tooltip"><i class="fa fa-print"></i></a>
+                </div>*@
+            @*@using (Ajax.BeginForm("SalesDashboard", "Order", new AjaxOptions
+                {
+                    HttpMethod = "POST"
+                }
+                                     , new { id = "frmAdd" }))
+                {
+                    @Html.AntiForgeryToken()*@
+            <div class="card-body">
+
+                <div class="row">
+                    @if (grp == (int)enumGroupType.Admin)
+                    {
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(@Translation.ServiceProvider, new { @class = "bmd-label-floating required" })
+                                @*onchange="getBranchData();*@
+                                <select class="form-control select2" id="sCompany">
+                                    <option value="0">@Translation.All @Translation.ServiceProvider</option>
+                                    @foreach (var item in cls_DropDowns.GetCompanies())
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                            <div class="form-group">
+                                <label class="bmd-label-floating required" style="text-transform: capitalize;">@Translation.Supplier</label>
+                                @*@Html.Label(@Translation.Supplier, new { @class = "bmd-label-floating required" })*@
+                                <select class="form-control select2" id="supplier" onchange="getBranchbyId();">
+                                    <option value="0">@Translation.All @Translation.Supplier</option>
+                                    @foreach (var item in cls_DropDowns.GetSupplierList())
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    }
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="form-group">
+                            <input type="hidden" id="branchId" />
+                            @Html.LabelFor(m => m.Branch, new { @class = "bmd-label-floating required" })
+                            <select class="form-control select2" multiple id="AjentId" name="AjentId">
+                                @*<option value="0">@Translation.All</option>
+                                    @foreach (var item in cls_DropDowns.GetAjentUsers())
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }*@
+                            </select>
+                        </div>
+                        @Html.ValidationMessageFor(m => m.AjentId, "", new { @class = "valid-text" })
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-4 col-xs-8">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.StartDate, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.StartDate, new { @class = "form-control numOnly", @placeholder = Translation.StartDate, @readonly = "readonly" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.StartDate, "", new { @class = "valid-text" })
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-4 col-xs-8">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.EndDate, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.EndDate, new { @class = "form-control numOnly", @placeholder = Translation.EndDate, @readonly = "readonly" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.EndDate, "", new { @class = "valid-text" })
+                    </div>
+                </div>
+                <p>
+                    <input type="button" value="@Translation.Search" class="btn btn-primary" id="btnGet" />
+                </p>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-xl-3 col-sm-6 py-2">
+                        <div class="card bg-success text-black-50 h-100">
+                            <div class="card-body bg-white">
+                                <div class="rotate">
+                                    <i class="fa fa-user fa-4x"></i>
+                                </div>
+                                <h6 class="text-uppercase">#@Translation.TotalOrders</h6>
+                                <h1 class="display-4"><span id="spntotalorders">@Model.AllOrders</span></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6 py-2">
+                        <div class="card bg-success text-black-50 h-100">
+                            <div class="card-body bg-white">
+                                <div class="rotate">
+                                    <i class="fa fa-list fa-4x"></i>
+                                </div>
+                                <h6 class="text-uppercase">#@Translation.ACs</h6>
+                                <h1 class="display-4"><span id="spnacsorder">@Model.Quantity</span></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6 py-2">
+                        <div class="card bg-success text-black-50 h-100">
+                            <div class="card-body bg-white">
+                                <div class="rotate">
+                                    <i class="fa fa-twitter fa-4x"></i>
+                                </div>
+                                <h6 class="text-uppercase">#@Translation.Reserved</h6>
+                                <h1 class="display-4"><span id="spnreservedorders">@Model.Reserved</span></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6 py-2">
+                        <div class="card bg-success text-black-50 h-100">
+                            <div class="card-body bg-white">
+                                <div class="rotate">
+                                    <i class="fa fa-share fa-4x"></i>
+                                </div>
+                                <h6 class="text-uppercase">#@Translation.Pending</h6>
+                                <h1 class="display-4"><span id="spnpendingorders">@Model.Pending</span></h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-xl-3 col-sm-6 py-2">
+                        <div class="card bg-success text-black-50 h-100">
+                            <div class="card-body bg-white">
+                                <div class="rotate">
+                                    <i class="fa fa-user fa-4x"></i>
+                                </div>
+                                <h6 class="text-uppercase">#@Translation.CompletedOrders</h6>
+
+                                @if (grp == (int)enumGroupType.Admin)
+                                {
+                                    <h1 class="display-4"><span id="spncompletedorders">@Model.Completed</span>/<span id="completeperunit" style="font-size:40px">@Model.NumberOfUnitCompleted </span><i style="font-size:25px">unit</i></h1>
+                                }
+                                else
+                                {
+                                    <h1 class="display-4"><span id="spncompletedorders">@Model.Completed</span></h1>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6 py-2">
+                        <div class="card bg-success text-black-50 h-100">
+                            <div class="card-body bg-white">
+                                <div class="rotate">
+                                    <i class="fa fa-list fa-4x"></i>
+                                </div>
+                                <h6 class="text-uppercase">#@Translation.CancelledOrders</h6>
+                                @if (grp == (int)enumGroupType.Admin)
+                                {
+                                    <h1 class="display-4"><span id="spncancelledorder">@Model.Cancel</span>/<span id="cancelperunit" style="font-size:40px">@Model.NumberOfUnitCancelled </span><i style="font-size:25px">unit</i></h1>
+                                }
+                                else
+                                {
+                                    <h1 class="display-4"><span id="spncancelledorder">@Model.Cancel</span></h1>
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="col-xl-3 col-sm-6 py-2">
+                            <div class="card bg-success text-black-50 h-100">
+                                <div class="card-body bg-white">
+                                    <div class="rotate">
+                                        <i class="fa fa-twitter fa-4x"></i>
+                                    </div>
+                                    <h6 class="text-uppercase">#@Translation.Archived</h6>
+                                    <h1 class="display-4"><span id="spnarchivedorders">@Model.Archieve</span></h1>
+                                </div>
+                            </div>
+                        </div>*@
+                    @if (grp == (int)enumGroupType.Admin)
+                    {
+                        <div class="col-xl-3 col-sm-6 py-2">
+                            <div class="card bg-success text-black-50 h-100">
+                                <div class="card-body bg-white">
+                                    <div class="rotate">
+                                        <i class="fa fa-reply fa-4x"></i>
+                                    </div>
+                                    <h6 class="text-uppercase">#@Translation.UnitInstallation</h6>
+                                    <h1 class="display-4"><span id="unitofinstallation">@Model.UnitOfInstallation</span></h1>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-sm-6 py-2">
+                            <div class="card bg-success text-black-50 h-100">
+                                <div class="card-body bg-white">
+                                    <div class="rotate">
+                                        <i class="fa fa-list fa-4x"></i>
+                                    </div>
+                                    <h6 class="text-uppercase">#@Translation.ComplainbyCustomer</h6>
+                                    <h1 class="display-4"><span id="complainbycustomer">@Model.ComplainbyCustomer</span></h1>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-sm-6 py-2">
+                            <div class="card bg-success text-black-50 h-100">
+                                <div class="card-body bg-white">
+                                    <div class="rotate">
+                                        <i class="fa fa-list fa-4x"></i>
+                                    </div>
+                                    <h6 class="text-uppercase">#@Translation.ComplainbySupplier</h6>
+                                    <h1 class="display-4"><span id="complainbysupplier">@Model.ComplainbySupplier</span></h1>
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="col-xl-3 col-sm-6 py-2">
+                                <div class="card bg-success text-black-50 h-100">
+                                    <div class="card-body bg-white">
+                                        <div class="rotate">
+                                            <i class="fa fa-list fa-4x"></i>
+                                        </div>
+                                        <h6 class="text-uppercase">#@Translation.Cancel</h6>
+                                        <h1 class="display-4"><span id="cancelUnit">@Model.Cancel</span>/<span id="cancelperunit" style="font-size:40px">@Model.NumberOfUnitCancelled </span><i style="font-size:25px">unit</i></h1>
+                                    </div>
+                                </div>
+                            </div>*@
+                        @*<div class="col-xl-3 col-sm-6 py-2">
+                                <div class="card bg-success text-black-50 h-100">
+                                    <div class="card-body bg-white">
+                                        <div class="rotate">
+                                            <i class="fa fa-list fa-4x"></i>
+                                        </div>
+                                        <h6 class="text-uppercase">#@Translation.Complete</h6>
+                                        <h1 class="display-4"><span id="completedUnit">@Model.Completed</span>/<span id="completeperunit" style="font-size:40px">@Model.NumberOfUnitCompleted </span><i style="font-size:25px">unit</i></h1>
+                                    </div>
+                                </div>
+                            </div>*@
+                        <div class="col-xl-3 col-sm-6 py-2">
+                            <div class="card bg-success text-black-50 h-100">
+                                <div class="card-body bg-white">
+                                    <div class="rotate">
+                                        <i class="fa fa-list fa-4x"></i>
+                                    </div>
+                                    <h6 class="text-uppercase">#@Translation.Response_Rate_By_Reserved</h6>
+                                    <h1 class="display-4"><span id="orderresponserate">@Model.ResponseRate </span><i style="font-size:25px">min</i></h1>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-sm-6 py-2">
+                            <div class="card bg-success text-black-50 h-100">
+                                <div class="card-body bg-white">
+                                    <div class="rotate">
+                                        <i class="fa fa-list fa-4x"></i>
+                                    </div>
+                                    <h6 class="text-uppercase">#@Translation.Response_Rate_By_Appointment_Confirmed</h6>
+                                    <h1 class="display-4"><span id="responseratebyappconfirmed">@Model.RESPONSERATEBYAPPCONFIRMED </span><i style="font-size:25px">min</i></h1>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+            @*}*@
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    <script>
+        function getBranchbyId() {
+            // get references to the source and target drop downs html controls
+            // These are jquery searches to find the drop down controls
+
+            // find a control with id=Manufacturer
+            src = $("#supplier");
+            // find a control with id=Model (you need to add this to your view)
+            tgt = $("#AjentId");
+            // clear drop down
+            tgt.empty();
+            tgt.append('<option value="0">@Translation.All</option>');
+
+            // Get new model dataset via ajax
+            // based on manufacturer
+            // The url parameter points at your web method
+
+            if (src.val() != "0" || src.val() == '' || src.val() == null || src.val() == undefined) {
+                $.ajax({
+                    type: 'GET',
+                    url: '/Orders/GetBranch',
+                    dataType: 'json',
+                    data: { groupid: src.val() },
+                    // success is called when dataset returns
+                    success: function (p) {
+                        // Populate with each returned member
+                        $.each(p, function (i, pr) {
+                            tgt.append(
+                                '<option value="' + pr.Value + '">' +
+                                pr.Text + '</option>'
+                            );
+                        })
+                    }
+                });
+            }
+        };
+
+        $('#AjentId').on("select2:select", function (e) {
+            var data = e.params.data.text;
+            if (data.toLowerCase() == 'all'.toLowerCase()) {
+                $("#AjentId > option").prop("selected", "selected");
+                $("#AjentId").trigger("change");
+            }
+        });
+
+        $("#StartDate").datepicker({
+            numberOfMonths: 1,
+            //maxDate: 0,
+            onSelect: function (selected) {
+                //var dt = new Date(selected);
+                //dt.setDate(dt.getDate() + 1);
+                $("#EndDate").datepicker("option", "minDate", selected);
+            }, dateFormat: 'dd/mm/yy'
+        });
+
+        $("#EndDate").datepicker({
+            numberOfMonths: 1,
+            //maxDate: 0,
+            onSelect: function (selected) {
+                //var dt = new Date(selected);
+                //dt.setDate(dt.getDate() - 1);
+
+                $("#StartDate").datepicker("option", "maxDate", selected);
+            }, dateFormat: 'dd/mm/yy'
+        });
+
+        $(function () {
+            $("#btnGet").click(function () {
+                
+                var person = {};
+                var branch = $("#branchId").val($("#AjentId").val());
+                person.AjentId = ($("#AjentId").val() == undefined || $("#AjentId").val() == "" || $("#AjentId").val().length == 0) ? 0 : branch.val();
+                person.supplier = $("#supplier").val();
+                person.StartDate = $("#StartDate").val();
+                person.EndDate = $("#EndDate").val();
+                person.CompanyId = $("#sCompany").val();
+                $.ajax({
+                    type: "POST",
+                    url: "/Orders/SalesDashboard",
+                    data: '{obj: ' + JSON.stringify(person) + '}',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        $("#spntotalorders").html(response.AllOrders);
+                        $("#spnarchivedorders").html(response.Archieve);
+                        $("#spncancelledorder").html(response.Cancel);
+                        $("#spnreservedorders").html(response.Reserved);
+                        $("#spnpendingorders").html(response.Pending);
+                        $("#spncompletedorders").html(response.Completed);
+                        $("#spnacsorder").html(response.Quantity);
+                        $("#unitofinstallation").html(response.UnitOfInstallation);
+                        $("#complainbycustomer").html(response.ComplainbyCustomer);
+                        $("#complainbysupplier").html(response.ComplainbySupplier);
+                        $("#cancelandcompleted").html(response.Cancel + "/" + response.Completed);
+                        $("#cancelUnit").html(response.Cancel);
+                        $("#completedUnit").html(response.Completed);
+                        $("#cancelperunit").html(response.NumberOfUnitCancelled);
+                        $("#completeperunit").html(response.NumberOfUnitCompleted);
+                        $("#orderresponserate").html(response.ResponseRate);
+                        $("#responseratebyappconfirmed").html(response.RESPONSERATEBYAPPCONFIRMED);
+                        //  alert("Hello: " + response.Name + ".\nCurrent Date and Time: " + response.DateTime);
+                    },
+                    failure: function (response) {
+                        alert(response.responseText);
+                    },
+                    error: function (response) {
+                        alert(response.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+}
+

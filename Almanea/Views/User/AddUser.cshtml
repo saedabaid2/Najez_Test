@@ -1,0 +1,246 @@
+﻿
+@{
+    /**/
+
+    ViewBag.Title = Translation.AddUser;
+}
+
+
+@model Almanea.Models.vm_User
+
+@using Almanea.BusinessLogic;
+@using Almanea.Models;
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+
+            <div class="card-body">
+                @using (Ajax.BeginForm("AddEditUser", "User", Model,
+                                    new AjaxOptions
+                                    {
+                                        HttpMethod = "POST",
+                                        OnSuccess = "onSuccess",
+                                        OnBegin = "onBegin",
+                                        OnComplete = "onComplete",
+                                        OnFailure = "OnFailure",
+                                    }, new { id = "frmAdd", @autocomplete = "off" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.UserGroupTypeId, new { @class = "bmd-label-floating required" })
+                                @Html.DropDownListFor(model => model.UserGroupTypeId, cls_DropDowns.DDL_UserGroupTypes(1), Translation.Select, new { @class = "form-control select2" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.UserGroupTypeId, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.UserGroupId, new { @class = "bmd-label-floating required" })
+                                @Html.DropDownListFor(model => model.UserGroupId, new SelectList(""), Translation.Select, new { @class = "form-control select2" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.UserGroupId, "", new { @class = "valid-text" })
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.AccountTypeId, new { @class = "bmd-label-floating required" })
+                                @Html.DropDownListFor(model => model.AccountTypeId, cls_DropDowns.DDL_AccountTypes(0), Translation.Select, new { @class = "form-control selectpicker" })
+
+                            </div>
+                            @Html.ValidationMessageFor(m => m.AccountTypeId, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Email, new { @class = "bmd-label-floating required" })
+                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @placeholder = Translation.ReqEmail })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "valid-text" })
+                        </div>
+
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.FirstName, new { @class = "bmd-label-floating required" })
+                                @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", @placeholder = Translation.ReqFirstName })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.LastName, new { @class = "bmd-label-floating required" })
+                                @Html.TextBoxFor(m => m.LastName, new { @class = "form-control", @placeholder = Translation.ReqLastName })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "valid-text" })
+                        </div>
+
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
+                            @Html.LabelFor(m => m.MobileNo, new { @class = "bmd-label-floating required", @id = "lblmobile" })
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">+966</span>
+                                </div>
+                                @Html.TextBoxFor(m => m.MobileNo, new { @class = "form-control numOnly", @placeholder = Translation.MobileFormat })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.MobileNo, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(Translation.IqaamaNo, new { @class = "bmd-label-floating required" })
+                                @Html.TextBoxFor(m => m.IqaamaNo, new { @class = "form-control numOnly", @placeholder = Translation.IqaamaNoPlaceHolder })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.IqaamaNo, "", new { @class = "valid-text" })
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Password, new { @class = "bmd-label-floating required" })
+                                @Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder = Translation.ReqPassword })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.ConfirmPassword, new { @class = "bmd-label-floating required" })
+                                @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", @placeholder = Translation.ReqPassword })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "valid-text" })
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.ProfilePic, new { @class = "bmd-label-floating" })
+                                <div id="fileUpload" class="dropzone"></div>
+                                @Html.HiddenFor(m => m.ProfilePic)
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <label style="font-size:large;"><b></b></label>
+                            <div class="form-group custom-control custom-checkbox">
+                                <div class="custom-checkbox" id="LabourIsDriverCheckBox" style="display:none">
+                                    <input type="checkbox" class="custom-control-input" name="LabourIsDriver" id="LabourIsDriver" value="" />
+                                    <label for="LabourIsDriver" class="custom-control-label">@Translation.IsLabouradriveralso</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="mg-t-15">
+                        <input type="submit" class="btn btn-primary pull-right" value="@Translation.Submit" />
+                    </p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+    <script>
+         var enumOrder = @(Html.EnumToString<enumGroupType>())
+
+        Dropzone.autoDiscover = false;
+        var fileType = '.png,.jpg,.gif,.bmp,.jpeg';
+        var maxsize =   @cls_Defaults.Filesize.ToString();
+
+        $(document).ready(function () {
+            $('.selectpicker').select2();
+            dropUploader.autodropzone('fileUpload', fileType, "ProfilePic", maxsize, "@cls_Defaults.ProfilePic");
+
+            $("#UserGroupTypeId").change(function () {
+                var DropVal = this.value;
+
+                if (DropVal == 10) {
+                    document.getElementById("UserGroupId").disabled = true;
+                }
+                else {
+                    document.getElementById("UserGroupId").disabled = false;
+                }
+            });
+
+            $("#LabourIsDriver").change(function () {
+                if (this.checked) {
+                    $("#LabourIsDriver").val("true");
+                }
+                else {
+                    $("#LabourIsDriver").val("false");
+                }
+
+            });
+            $("#AccountTypeId").change(function () {
+                var DropVal = this.value;
+                var LabourIsDriverCheckBox = document.getElementById("LabourIsDriverCheckBox");
+                if (DropVal == "10") {
+                    LabourIsDriverCheckBox.style.display = "block";
+                }
+                else {
+                    LabourIsDriverCheckBox.style.display = "none";
+                }
+
+            });
+
+
+
+            $('#UserGroupTypeId').change(function () {
+                $.get("@Url.Action("BindUserGroup", "User")",
+                    { Id: $(this).val() }, function (data) {
+                        $("#UserGroupId").find('option').not(':first').remove();
+                        $.each(data, function (index, row) {
+                            $("#UserGroupId").append("<option value='" + row.Value + "'>" + row.Text + "</option>")
+                        });
+                    });
+
+                $.get("@Url.Action("BindAccountType", "User")",
+                    { Id: $(this).val() }, function (data) {
+                        $("#AccountTypeId").find('option').not(':first').remove();
+                        $.each(data, function (index, row) {
+                            console.log(data);
+                            //if (data.length = 1 && row.Text == "Admin") {
+                            //    $("#AccountTypeId").append("<option value='" + row.Value + "'>" + row.Text + "</option>")
+                            //} else {
+                                $("#AccountTypeId").append("<option value='" + row.Value + "'>" + row.Text + "</option>")
+
+                            //}
+                        });
+
+
+                });
+                //if ($(this).val()=="2") {
+                //    $("#lblmobile").removeClass("required");
+                //}
+                //else {
+                //    $("#lblmobile").addClass("required");
+                //}
+            });
+        });
+
+        function onSuccess(response) {
+            onComplete();
+            if (response.StatusId > 0) {
+               // alert(response.StatusId);
+                successPopup("@Translation.success_AddUser");
+
+                setTimeout(function () { window.location = '@Url.Action("Index", "User")'; }, 3000);
+            }
+            else  {
+                warningPopup(response.Message);
+            }
+        }
+
+        function OnFailure(response) {
+            warningPopup("Something wrong!");
+        }
+    </script>
+}
+
+
+

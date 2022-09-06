@@ -1,0 +1,974 @@
+﻿
+@{
+
+    ViewBag.Title = Translation.NewOrder;
+    var UserGroupTypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+    var UserId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserId]);
+    var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupId]);
+    var ActtypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+
+
+    //if (ViewBag.Customers != null)
+    //{
+    //    var datdata = (List<Almanea.Models.vm_installdateblock>)ViewBag.Customers;
+    //}
+
+}
+
+@model Almanea.Models.vm_Order
+@using Almanea.BusinessLogic;
+
+<style>
+    #ui-datepicker-div {
+        top: 50% !important;
+        left: 40% !important;
+    }
+</style>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+
+            <div class="card-body">
+                @*<div>
+                    @using (Html.BeginForm("importexcel", "Orders", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    {
+                        <samp> please select the excel file to upload: </samp>
+                        <span></span>
+
+                        <input type="file" name="file" />
+                        <input type="submit" value="submit" />
+                    }
+                </div>*@
+
+                @*@using (Html.BeginForm("AddEditOrder", "Orders", FormMethod.Post, new { @class = "", @role = "form", enctype = "multipart/form-data" }))*@
+
+                <form id="frmAdd" autocomplete="off">
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.SellerName, new { @class = "bmd-label-floating required" })
+                                @Html.TextBoxFor(m => m.SellerName, new { @class = "form-control", @placeholder = Translation.ReqSellerName, @readonly = "true" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.SellerName, "", new { @class = "valid-text" })
+                        </div>
+
+
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            @Html.LabelFor(m => m.SellerContact, new { @class = "bmd-label-floating required" })
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">+966</span>
+                                </div>
+                                @Html.TextBoxFor(m => m.SellerContact, new { @class = "form-control numOnly", @placeholder = Translation.MobileFormat })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.SellerContact, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.InvoiceNo, new { @class = "bmd-label-floating required" })
+                                @Html.TextBoxFor(m => m.InvoiceNo, new { @class = "form-control", @placeholder = Translation.ReqInvoiceNo })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.InvoiceNo, "", new { @class = "valid-text" })
+                        </div>
+                    </div>
+
+
+                    @*@if (Session[cls_Defaults.Session_AccountTypeId].ToString() == "14" || Session[cls_Defaults.Session_AccountTypeId].ToString() == "15" || Session[cls_Defaults.Session_AccountTypeId].ToString() == "6")
+                        {
+                            <div class="row">
+
+
+                                <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
+                                    <div class="form-group">
+                                        @Html.Label("Servuce Provider List", "Service Provider List", htmlAttributes: new { @class = "bmd-label-floating" })
+
+                                        <select id="ChannelId" name="basic[]" multiple="multiple" class="form-control 3col active">
+                                        </select>
+
+                                    </div>
+                                </div>
+                                <script>
+                                    $(function () {
+                                        $('select[multiple].active.3col').multiselect({
+                                            columns: 3,
+                                            placeholder: 'Select States',
+                                            search: true,
+                                            searchOptions: {
+                                                'default': 'Search SP'
+                                            },
+                                            selectAll: true
+                                        });
+                                    });
+                                </script>
+
+                            </div>
+                        }*@
+
+                    <hr class="thick" />
+
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.CustomerName, new { @class = "bmd-label-floating required" })
+                                @Html.TextBoxFor(m => m.CustomerName, new { @class = "form-control", @placeholder = Translation.ReqCustomerName })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.CustomerName, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.LocationId, new { @class = "bmd-label-floating required" })
+                                @Html.DropDownListFor(model => model.LocationId, cls_DropDowns.GetLocations(UserGroupId, UserGroupTypeId, ActtypeId), Translation.Select, new { @class = "form-control select2" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.LocationId, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            @Html.LabelFor(m => m.CustomerContact, new { @class = "bmd-label-floating required" })
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">+966</span>
+                                </div>
+                                @Html.TextBoxFor(m => m.CustomerContact, new { @class = "form-control numOnly", @placeholder = Translation.MobileFormat })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.CustomerContact, "", new { @class = "valid-text" })
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        @*<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                @Html.LabelFor(m => m.InstallDate, new { @class = "bmd-label-floating required" })
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="custom-radio">
+                                            @if ((bool)ViewBag.AllowAsap == true)
+                                            {
+                                                <label>
+                                                    @Html.RadioButton("PreferDate", 1, true, new { @class = "check-mark" })&nbsp;@Translation.PreferAsap
+                                                </label>
+                                                <br />
+                                                <label>
+                                                    @Html.RadioButton("PreferDate", 2, false, new { @class = "check-mark" })&nbsp;@Translation.PreferSpecific
+                                                </label>
+                                            }
+                                            else
+                                            {
+                                                <label>
+                                                    @Html.RadioButton("PreferDate", 2, false, new { @class = "check-mark" })&nbsp;@Translation.PreferSpecific
+                                                </label>
+                                            }
+
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8" id="divInstallDate" style="display:none;">
+                                        <div class="input-group">
+                                            @Html.TextBoxFor(m => m.InstallDate, new { @class = "form-control" })
+                                            <div class="input-group-append">
+                                                <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.InstallDate, "", new { @class = "valid-text" })
+                                    </div>
+                                </div>
+                            </div>*@
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Comments, new { @class = "bmd-label-floating " })
+                                @Html.TextBoxFor(m => m.Comments, new { @class = "form-control", @placeholder = Translation.Comments })
+
+                            </div>
+                        </div>
+                        @*<div class="col-lg-2 col-md-2 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.PrefferTime, new { @class = "bmd-label-floating required" })
+                                    <div class="custom-radio">
+                                        <label><input type="radio" name="PrefferTime" value="1" checked>&nbsp;@Translation.MorningTime</label><br />
+                                        <label><input type="radio" name="PrefferTime" value="2">&nbsp;@Translation.EveningTime</label>
+                                    </div>
+                                </div>
+                            </div>*@
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                <label>@Translation.SMSLanguage</label>
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" id="IsArabic" class="custom-control-input" checked />
+                                    <label for="IsArabic" class="custom-control-label">@Translation.Arabic</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            @Html.LabelFor(m => m.AlternateMobile, new { @class = "bmd-label-floating" })
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">+966</span>
+                                </div>
+                                @Html.TextBoxFor(m => m.AlternateMobile, new { @class = "form-control numOnly", @placeholder = Translation.MobileFormat })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.AlternateMobile, "", new { @class = "valid-text" })
+                        </div>
+                    </div>
+
+                    <hr class="thick" />
+                    @Html.Partial("_OrderServices")
+                    <div class="row mt-5">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            &nbsp;
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group" style="text-align:right;">
+                                @Translation.Quantity
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group">
+                                @Html.TextBox("Quantity", 0, new { @class = "form-control", @readonly = "true", @value = "0" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row ">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            &nbsp;
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group" style="text-align:right;">
+                                @Translation.SubTotal
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group">
+                                @Html.TextBox("SubTotal", 0, new { @class = "form-control", @readonly = "true", @value = "0" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            &nbsp;
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group" style="text-align:right;">
+                                @Translation.Vat&nbsp;(@ViewBag.Vat%)
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group">
+                                @Html.TextBox("Vat", 0, new { @class = "form-control", @readonly = "true", @value = "0" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            &nbsp;
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group" style="text-align:right;">
+                                @Translation.GrandTotal
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group">
+                                @Html.TextBox("TotalAmount", 0, new { @class = "form-control", @readonly = "true", @value = "0" })
+                                @*@Html.TextBoxFor(m => m.TotalAmount, new { @class = "form-control", @readonly = "true", @value = "0" })*@
+                            </div>
+                        </div>
+                    </div>
+                    @*<p class="mg-t-15">
+
+                        </p>*@
+                    <p class="mg-t-15" id="divbutton">
+                        <button type="button" class="btn btn-primary" onclick="teamcapacity();" data-toggle="modal" data-target="#exampleModalCenter"
+                                id="#modalCenter" data-backdrop="static" data-keyboard="false">
+                            @Translation.SelectInstallationDate
+                        </button>
+                        @*<input type="button" class="btn btn-primary pull-right" id="btnsubmit" value="@Translation.Submit" />*@
+                    </p>
+                    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+                         aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalCenterTitle">@Translation.PreferInstallDateTime</h5>
+                                    <button type="button" class="close" onclick="myfunctionclose();" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(m => m.InstallDate, new { @class = "form-control", @readonly = "readonly", @id = "txtdate" })
+                                        <div id="calidd" class="input-group-append">
+                                            <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.InstallDate, "", new { @class = "valid-text" })
+                                    @*<br />*@
+                                    <div class="form-group">
+                                        @*@Html.LabelFor(m => m.PrefferTime, new { @class = "bmd-label-floating required" })*@
+                                        <div class="custom-radio">
+                                            <label id="timemor"><input type="radio" name="PrefferTime" value="1">&nbsp;@Translation.MorningTime</label><br />
+                                            <label id="timeeve"><input type="radio" name="PrefferTime" value="2" checked>&nbsp;@Translation.EveningTime</label>
+                                        </div>
+                                    </div>
+                                    <b><span id="spnclor" style="color:red;"></span></b><br /><br />
+                                    <b><span id="spnclor2" style="color:red;"></span></b>
+                                </div>
+                                <input type="hidden" id="startdate" value="0" />
+                                <div class="modal-footer">
+                                    @*<button type="button" class="btn btn-outline-primary" onclick="myfunctionclose();" >Close</button>*@
+                                    <input type="submit" class="btn btn-primary pull-right" value="@Translation.Submit" id="btnsubmitorder" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                @*// }*@
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Center -->
+
+
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet" />
+
+    <script src="~/Content/jquery.multiselect.js"></script>
+
+    <link href="~/Content/jquery.multiselect.css" rel="stylesheet" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
+
+    <link href="~/Content/Site.css" rel="stylesheet" />
+    <script>
+
+
+        function myfunctionclose() {
+            $("#exampleModalCenter").modal('hide');
+            $("#txtdate").val('');
+            $('#spnclor').html('');
+            $('#spnclor2').html('');
+            $('#btnsubmitorder').hide();
+        }
+        var array = '@ViewBag.BlockDate'.split(',');
+        var arrayDate = [];
+        for (var i = 0; i < array.length; i++)
+        {
+            arrayDate.push(array[i].trim());
+        };
+        @*$("#txtdate").datepicker({
+
+            minDate: $('#startdate').val(),
+            beforeShowDay: function (date) {
+                    var show = true;
+                if (date.getDay() == 5) {
+                    show = false
+                }
+
+                var string = jQuery.datepicker.formatDate('dd/mm/yy', date);
+                if ((arrayDate.indexOf(string) == -1) == false) {
+                    show = false
+                }
+                return [show];
+
+            },
+            dateFormat: 'dd/mm/yy',
+            onSelect: function (dateText, inst) {
+                var date = $(this).val();
+                var time = $('#time').val();
+                $('.overlay').show();
+               // alert('on select triggered');
+              //  $("#start").val(date + time.toString(' HH:mm').toString());
+                 $.get("@Url.Action("InstallationDate","Orders")",
+                     { Id: $('#Quantity').val(), sDate: date }, function (data) {
+                         if (data.order == true) {
+                             $('#btnsubmitorder').show();
+                             $('#spnclor').html('');
+                         }
+                         else {
+                             $('#btnsubmitorder').hide();
+                           //  $.notify("Maximum Orders Quantity Reached Per day.please Select othetr date", { position: "right middle", style: "bootstrap", className: "warning", showAnimation: 'slideDown', showDuration: 400, });
+                             $('#spnclor').html('@Translation.Warning_quantityexceed');
+
+                         }
+                    });
+                $('.overlay').hide();
+            }
+        });*@
+        $('#btnsubmit').click(function () {
+            $('#spnclor').html('');
+            $('#spnclor2').html('');
+             $.get("@Url.Action("InstallationDate")",
+                 { Id: $('#Quantity').val(),Date }, function (data) {
+                        $("#UserGroupId").find('option').not(':first').remove();
+                        $.each(data, function (index, row) {
+                            $("#UserGroupId").append("<option value='" + row.Value + "'>" + row.Text + "</option>")
+                        });
+                    });
+            $("#myModalBody").load("@Url.Action("InstallationDate")/@Model.EncryptId", function () {
+                $("#myModal").modal('show');
+                modalSize('lg');
+                $.validator.unobtrusive.parse($("#frmSchedule"))
+                $("#myModalLabel").text("@Translation.PreferInstallDateTime");
+
+              //  $('#frmSchedule #Comments').val($('#frmAdd #Comments').val());
+                $("#InstallDate").datepicker({ minDate: 0, dateFormat: 'dd/mm/yy' });
+            });
+        });
+    </script>
+    <script>
+        var $total = 0;
+        var $vatPerc = parseInt(@ViewBag.Vat);
+        var $vat = 0;
+        var $subTotal = 0;
+        var $Quantity = 0;
+
+
+
+
+
+        function loadChennelDropdown(options, url, selectText) {
+                    $.getJSON(url, function (result) {
+                        options.attr("disabled", "disabled");
+                        options.empty();
+                        //options.append($("<option />").val("").text(selectText));
+                        $.each(result, function (i, item) {
+                            options.append($("<option />").val(item.Value).text(item.Text));
+                        });
+                        options.removeAttr("disabled");
+                       // options.selectpicker("refresh");
+
+                       options.trigger("change");
+                        options.multiselect('rebuild');
+                         options.multiselect('refresh');
+
+                       //  $('#ChannelId').multiselect('refresh');
+
+                       // $("#ChannelId").multiselect('refresh');
+                    });
+                }
+
+        $(document).ready(function () {
+            var cal = "";
+            $('.select2').select2();
+
+            var date = new Date()
+
+            var val = (date.getMonth() + 1)+ "/" + date.getDate()+ "/" + date.getFullYear();
+            var mindys = 3;
+            var d = new Date(val);
+            var prstday = d.getDay();
+
+
+            if (prstday!= 0 && prstday != 1 && prstday!= 6 && prstday != 5) {
+                mindys = 4;
+            }
+
+            loadChennelDropdown($("#ChannelId"), "/Orders/GetSpList", '');
+
+            var data = [1,7];
+
+//$("#dataChannelIdmultiSelect('deselect_all');
+
+           // $("#ChannelId").multiSelect("select", data);
+            $('#ChannelId').multiselect('select', ['1', '7']);
+            $('#ChannelId').multiselect('refresh');
+
+            //$('#InstallDate').datepicker({
+            //    minDate: mindys,
+            //    beforeShowDay: function (date) {
+            //        var show = true;
+            //        if (date.getDay() == 5) show = false
+            //        return [show];
+            //    }, dateFormat: 'dd/mm/yy'
+            //});
+
+            var dtServices = $('#dtServices').DataTable({
+                "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                "bSearchable": false,
+                "bSortable": false,
+                "bInfo": false,
+                "bLengthChange": false,
+                "AutoWidth": true,
+                "bPaginate": false,
+                "language": {
+                    "paginate": {
+                        "previous": "«",
+                        "next": "»",
+                    },
+                     "sEmptyTable": "@Translation.NoMatchingRecords",
+                    "emptyTable": false
+                },
+            });
+
+            $('input[name="PreferDate"]').on('click', function () {
+                var status = $(this).val();
+                if (status == '2') {
+                    $('#divInstallDate').show();
+                }
+                else {
+                    $('#divInstallDate').hide();
+                    $('#InstallDate').val('');
+                }
+            });
+
+            $('#btnAddService').on('click', function () {
+
+                onBegin();
+
+                var AddRow = true;
+                var $service = $('#sAddService').val();
+                var $addcount = $('#sAddCount').val();
+                //var $unit = $('#sUnit').val();
+                if ($service === "" || $addcount === "" ) {
+                    warningPopup("@Translation.error_detailMissing");
+                    AddRow = false;
+                }
+                else { //Check service already exists
+                    $("#dtServices > tbody").find('tr').each(function () {
+                        var $role = $(this).attr('role');
+                        if (typeof $role !== typeof undefined && $role !== false) {
+                            var $extService = $(this).find("#hfService").val();
+
+                            if ($extService === $service.split('_')[0]) {
+                                warningPopup("@Translation.ServiceAlreadyAdded");
+                                AddRow = false;
+                            }
+                        }
+                    });
+                }
+
+                if (AddRow === true) {
+                    var $serviceId = $service.split('_')[0];
+                    var $servicePrice = $service.split('_')[1];
+                    var $price = $servicePrice * $addcount;
+                    var $itemVat = $price * ($vatPerc / 100);
+                    console.log("ali price and total", $price, $itemVat);
+                    var $oldTotal = $total;
+                    var $oldQuantity = $Quantity;
+                    var $oldVat = $vat;
+
+                    dtServices.row.add([
+                        $("#sAddService option:selected").html(),
+                       /* $unit,*/
+                        $addcount,
+                        $servicePrice,
+                        $price,
+
+                        '<input type="hidden" id="hfService" value="' + $serviceId + '"  />' +
+                        '<input type="hidden" id="hfUnit" value="0"  />' +
+                        '<input type="hidden" id="hfQuantity" value="' + $addcount + '"  />' +
+                        '<input type="hidden" id="hfPrice" value="' + $price + '"  />' +
+                        '<input type="hidden" id="hfVat" value="' + $itemVat + '"  />' +
+                        '<input type="button" class="btn btn-danger delete" value="X" />'
+                    ]).node().id = 'tr_0';
+
+                    dtServices.draw(false);
+
+                    $vat += $itemVat;
+                    $total += $price + $itemVat;
+                    $subTotal += $price;
+                    $Quantity +=Number( $addcount);
+
+                    $('#Vat').val($vat.toFixed(2));
+                    $('#TotalAmount').val($total.toFixed(2));
+                    $('#SubTotal').val($subTotal.toFixed(2));
+                    $('#Quantity').val($Quantity);
+                    if (Number($Quantity) > 0) {
+                        $('#divbutton').show();
+                    }
+                    else {
+                        $('#divbutton').hide();
+                    }
+                    $('#frmService').find('#sAddService').val('');
+                    $('#frmService').find('input[type=text]').val('');
+                    $("#sAddService").val('').trigger('change');
+
+                    onComplete();
+                }
+                else {
+                    onComplete();
+                }
+
+            });
+
+            $('#dtServices tbody').on('click', '.delete', function () {
+
+                var rowCount = $('#dtServices tbody tr').length;
+
+                if (rowCount == 1) {
+                    $('#Vat').val('0');
+                    $('#TotalAmount').val('0');
+                    $('#SubTotal').val('0');
+                    $('#Quantity').val('0');
+                    $subTotal = 0;
+                    $vat = 0;
+                    $total = 0;
+                    $Quantity = 0;
+                }
+                else {
+                    var $tr = $(this).parents('tr');
+
+                    var $currPrice = parseFloat($tr.find('#hfPrice').val());
+                    var $currVat = parseFloat($tr.find('#hfVat').val());
+                    var hfQuantity = Number($tr.find('#hfQuantity').val());
+                    var $minTotal = ($currPrice + $currVat);
+                    $vat -= $currVat
+                    $total -= $minTotal;
+                    $subTotal -= $currPrice;
+                    $Quantity -= Number(hfQuantity);
+                    $('#SubTotal').val($subTotal.toFixed(2));
+                    $('#Vat').val($vat.toFixed(2));
+                    $('#TotalAmount').val($total.toFixed(2));
+                    $('#Quantity').val($Quantity);
+                }
+
+                dtServices.row($(this).parents('tr')).remove().draw();
+
+
+            });
+        });
+
+    </script>
+    <script>
+        $(document).ready(function () {
+
+            $('#divbutton').hide();
+            $('#btnsubmitorder').hide();
+            $('#frmAdd').submit(function (e) {
+
+                onBegin();
+                $("#exampleModalCenter").modal('hide');
+                e.preventDefault();
+                var $form = $(this);
+
+                if ($form.valid()) {
+                    var o = [];
+                    $("#dtServices > tbody").find('tr').each(function () {
+                        var $role = $(this).attr('role');
+                        if (typeof $role !== typeof undefined && $role !== false) {
+                            var $this = $(this);
+                            var $active = $(this).find("#IsActive");
+                            if ($active === undefined || $active.length == 0) {
+                                $active = true;
+                            } else {
+                                $active = $(this).find("#IsActive").prop("checked");
+                            }
+
+
+                             var serialized = "ServiceId=" + parseInt($(this).find("#hfService").val());
+                            serialized += "&Unit=0";
+                            serialized += "&Quantity=" + parseInt($(this).find("#hfQuantity").val());
+                            serialized += "&IsActive=" + $active;
+                            serialized += "&OrderServiceId=" + parseInt($(this).attr("Id").split('_')[1]);
+                            var item = $.toDictionary(serialized);
+                            o.push(item);
+                        }
+                    });
+
+                    if (o.length == 0) {
+                        warningPopup("@Translation.error_Atleast1Service");
+
+                        return;
+                    }
+
+                     var $formData = new FormData($($form)[0]);
+                    $formData.append('Services', JSON.stringify(o));
+                    var isArabic = $('#frmAdd').find('#IsArabic').prop("checked");
+                    $formData.append('SmsInArabic', isArabic);
+                    //var f = ('#frmAdd').serialize();
+                    debugger;
+                    $.ajax({
+                        url: "@Url.Action("AddEditOrder")",
+                        type: 'POST',
+                        data: $formData,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            onComplete();
+                            if (response.StatusId == 424 && response.Message == 'error') {
+                                warningPopup("@Translation.NoInstallDateOnCreate");
+                            }
+                            else {
+                                if (response.StatusId == -2) {
+                                    warningPopup(response.Message);
+                                }
+                                if (response.StatusId > 0 && response.StatusId != 424) {
+                                    //Success Message
+                                    successPopup("@Translation.success_NewOrder");
+
+                                    setTimeout(function () { window.location = '@Url.Action("Index")'; }, 3000);
+                                }
+                                else {
+                                    TranslationlationlationningPopup(response.Message);
+                                }
+                            }
+
+
+                            @*onComplete();
+
+                            if (response.StatusId > 0) {
+                                //Success Message
+                                successPopup("@Translation.success_NewOrder");
+
+                                setTimeout(function () { window.location = '@Url.Action("Index")'; }, 3000);
+                            }
+                            else {
+                                warningPopup(response.Message);
+                            }*@
+
+                        },
+                        error: function () {
+                            onComplete();
+                        }
+                    });
+                }
+                else {
+                    var validator = $('#frmAdd').validate();
+                    $.each(validator.errorMap, function (index, value) {
+                        console.log('Id: ' + index + ' Message: ' + value);
+                    });
+
+                    onComplete();
+                }
+            });
+        });
+
+
+    </script>
+
+    <script>
+        function teamcapacity(e) {
+           /*alert("ali call");*/
+            var startval;
+            var data = new FormData(document.getElementById("frmAdd"));
+            var o = [];
+
+
+
+                    $("#dtServices > tbody").find('tr').each(function () {
+                        var $role = $(this).attr('role');
+                        if (typeof $role !== typeof undefined && $role !== false) {
+                            var $this = $(this);
+                            var $active = $(this).find("#IsActive");
+                            if ($active === undefined || $active.length == 0) {
+                                $active = true;
+                            } else {
+                                $active = $(this).find("#IsActive").prop("checked");
+                            }
+
+
+                             var serialized = "ServiceId=" + parseInt($(this).find("#hfService").val());
+                            serialized += "&Quantity=" + parseInt($(this).find("#hfQuantity").val());
+                            serialized += "&OrderServiceId=" + parseInt($(this).attr("Id").split('_')[1]);
+                            var item = $.toDictionary(serialized);
+                            o.push(item);
+                        }
+                    });
+
+             data.append('Services', JSON.stringify(o));
+            console.log("Created FormData, " + [...data.keys()].length + " keys in data");
+
+             $.ajax({
+                        url: "@Url.Action("TeamCapacity")",
+                        type: 'POST',
+                        data: data,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                 success: function (response) {
+                     console.log("ali success",response,"ali success",response.Message);
+                    // alert("ali success",response.Message);
+                     if (response.Message == 'true') {
+                        // $('#startdate').val(1);
+                         startval = 1;
+                         console.log("ali call respone", response.Message);
+                         $('#btnsubmitorder').show();
+                         $('#spnclor').html('');
+                         $('#timemor').show();
+                         $('#timeeve').show();
+                         $("#txtdate").show();
+                         $("#calidd").show();
+                     }
+                     if (response.Message == 'In Capacity case 1') {
+                         //$('#startdate').val(2);
+                         startval = 2;
+                         $('#btnsubmitorder').show();
+                         $('#spnclor').html('');
+                         $('#timemor').show();
+                         $('#timeeve').show();
+                         $("#calidd").show();
+                     }
+                     if (response.Message == 'In Capacity case 2') {
+                         //$('#startdate').val(5);
+                         console.log("ali call respone2", response.Message);
+                         startval =1;
+                         $('#btnsubmitorder').show(); debugger;
+                          $('#spnclor').html('@Translation.Warning_quantityexceed');
+                         $('#timemor').show();
+                         $('#timeeve').show();
+                         $("#txtdate").show();
+                         $("#calidd").show();
+                     }
+                     if (response.Message == "full block") {
+                         debugger;
+                         $('#btnsubmitorder').hide();
+                         //   var myJsVariable = '@ViewBag.srv'
+                         $('#spnclor').html('@Translation.NoserviceProvideravailable').append("<br/>"+response.Data2);
+                         //$('#spnclor').html('@Translation.NoserviceProvideravailable');
+                         //$('#spnclor').html(response.Data);
+                         $("#txtdate").hide();
+                         $('#timemor').hide();
+                         $('#timeeve').hide();
+                         $("#calidd").hide();
+                        // warningPopup("No service provider available to deliver this service");
+                         //show = false
+                     }
+
+                     else {
+                         $('#startdate').val(1);
+                         //$('#btnsubmitorder').show();
+                     }
+
+
+                     $("#txtdate").datepicker({
+
+                         minDate: startval,
+                         beforeShowDay: function (date) {
+                             var show = true;
+                             if (response.Message == "full block") {
+                                 $('#btnsubmitorder').hide();
+
+                                 //show = false
+                             }
+                             if (date.getDay() == 5) {
+                                 show = false
+                             }
+
+                            // var objarr = ["09-09-2021", "14-09-2021", "15-09-2021"];
+                             console.log("log", response.Data);
+                             response.Data.forEach(function (element) {
+                                // console.log("ali element", jQuery.datepicker.formatDate('dd-mm-yy', date), "ali2", element, element.dates.substring(0, 10));
+                                 if (jQuery.datepicker.formatDate('dd/mm/yy', date) == element.dates.substring(0, 10)) {
+                                     show = false;
+
+                                     console.log("ali element", element);
+                                 }
+
+                             })
+
+
+                    var string = jQuery.datepicker.formatDate('dd/mm/yy', date);
+                    if ((arrayDate.indexOf(string) == -1) == false) {
+                        show = false
+                    }
+                    return [show];
+
+                },
+            dateFormat: 'dd/mm/yy',
+                         onSelect: function (dateText, inst) {
+
+
+                var date = $(this).val();
+                var time = $('#time').val();
+                if (response.Message == 'In Capacity case 2') {
+                    $('#spnclor').html("@Translation.Warning_quantityexceed");
+                }
+                $('.overlay').show();
+                             $('.overlay').hide();
+
+                             var data = new FormData(document.getElementById("frmAdd"));
+                             data.append('date', date);
+                             $.ajax({
+                                 url: "@Url.Action("checkblockdate")",
+                                 type: 'POST',
+                                 data: data,
+                                 dataType: 'json',
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+        success: function (response2) {
+
+            if (response2.Message == "No SP available") {
+                debugger;
+                $('#spnclor2').html('@Translation.NoserviceProvideravailable');
+                $('#spnclor').html('');
+                $('#btnsubmitorder').hide();
+               // $('#timemor').hide();
+                //$('#timeeve').hide();
+               // $("#txtdate").hide();
+                //$("#calidd").hide();
+
+                //show = false
+            }
+            else {
+                $('#btnsubmitorder').show();
+                $('#spnclor2').html('');
+                $('#timemor').show();
+                $('#timeeve').show();
+                $("#txtdate").show();
+                $("#calidd").show();
+            }
+
+            onComplete();
+
+        }
+
+
+    });
+
+            }
+        });
+
+                     onComplete();
+                     if (response.Message == 'In Capacity case 2') {
+                         cal = "case2";
+                     }
+                     if (response.Message == 'In Capacity case 1') {
+                         cal = "case1";
+                     }
+                           else if (response.StatusId == 424 && response.Message == 'error') {
+                                warningPopup("@Translation.NoInstallDateOnCreate");
+                            }
+                            else {
+                                if (response.StatusId > 0 && response.StatusId != 424) {
+                                    //Success Message
+                                   // successPopup("@Translation.success_NewOrder");
+
+                                    //setTimeout(function () { window.location = '@Url.Action("Index")'; }, 3000);
+                                }
+                                else {
+                                    //warningPopup(response.Message);
+                                }
+                            }
+
+
+                            @*onComplete();
+
+                            if (response.StatusId > 0) {
+                                //Success Message
+                                successPopup("@Translation.success_NewOrder");
+
+                                setTimeout(function () { window.location = '@Url.Action("Index")'; }, 3000);
+                            }
+                            else {
+                                warningPopup(response.Message);
+                            }*@
+
+                        },
+                        error: function () {
+                            onComplete();
+                        }
+             });
+
+            jQuery("#txtdate").datepicker("refresh");
+        }
+    </script>
+}
+
+
+
+

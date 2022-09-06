@@ -1,0 +1,764 @@
+﻿
+@{
+    ViewBag.Title = Translation.Dashboard;
+    var grp = ViewBag.UserGroupTypeId;
+    var style = (grp == (int)enumGroupType.Admin) ? "col-lg-2 col-md-2 col-sm-2 col-xs-12" : "col-lg-4 col-md-4 col-sm-4 col-xs-12";
+}
+
+@model vm_Dashboard
+
+@using Almanea.Models;
+@using Almanea.BusinessLogic;
+
+<script src="~/Scripts/coreui-chartjs.bundle.js"></script>
+<link href="~/Scripts/coreui-chartjs.css" rel="stylesheet" />
+<style>
+    .setheightwidth {
+        height: 110px;
+        width: 270px;
+    }
+
+    .setheader {
+        padding-bottom: 0px;
+        padding-top: 5%
+    }
+
+    .dataTables_length {
+        padding-top: 6px;
+    }
+
+    .dataTables_filter {
+        padding-top: 6px;
+    }
+
+    .cardsettingEng {
+        margin-inline-end: 20px;
+        margin-left: 10px;
+        margin-inline-start: 23px;
+    }
+
+    .cardsettingArb {
+        margin-inline-end: 23px;
+        margin-right: 10px;
+        margin-inline-start: 20px;
+    }
+
+    .cardtext {
+        margin-top: 20px;
+    }
+    .table-outline {
+        border: 1px solid;
+        border-color: #d8dbe0;
+    }
+    .txtUpperCase {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 14px;
+        line-height: 16px;
+        font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+        letter-spacing: 0.996px;
+        text-transform: uppercase;
+        color: #FFFFFF;
+    }
+    .card-body-custom {
+        padding-top: 2% !important;
+        padding-left: 5% !important;
+        padding-right: 5% !important;
+    }
+
+    .card-body-icon {
+        padding-top: 2% !important;
+    }
+
+    .card-body-value {
+        margin-left: 0% !important;
+    }
+
+    .OpenComplaintsIcon {
+        width: 56px;
+        height: 59px;
+        background-image: url('../../images/AdminDashboard/outline_list_white_24dp 1@3x.png');
+    }
+
+    .CloseComplaintsIcon {
+        width: 53px;
+        height: 47px;
+        background-image: url('../../images/ServiceProviderDashboard/outline_feedback_white_48dp 1.png');
+    }
+
+    .AverageClosingTimeIcon {
+        width: 56px;
+        height: 50px;
+        background-image: url('../../images/AdminDashboard/outline_watch_later_white_48dp 1.png');
+    }
+
+    .TodaysinstallationOrdersIcon {
+        width: 46.55px;
+        height: 50px;
+        top: 18px;
+        background: url('../../images/AdminDashboard/outline_inventory_white_48dp 1.png');
+    }
+
+    .TomorrowsinstallationOrdersIcon {
+        width: 43.75px;
+        height: 50px;
+        top: 12px;
+        background: url('../../images/AdminDashboard/outline_pending_actions_white_48dp 1.png');
+    }
+
+    .txtUpperCase {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 14px;
+        line-height: 16px;
+        /* or 114% */
+
+        letter-spacing: 0.996px;
+        text-transform: uppercase;
+        color: #FFFFFF;
+    }
+    .cardHeader {
+        font-family: 'Roboto';
+        font-weight: 500;
+        font-style: normal;
+        color: #3A3B3F;
+    }
+    .arabicNumber {
+        padding-left: 100%;
+    }
+    .number {
+        padding-left: 0%;
+        margin: 0%;
+        padding-top: 09%;
+    }
+</style>
+
+
+
+<div class="fade-in">
+    <div class="card">
+        <div class="card-body">
+
+            <div class="row" style="align-content:center">
+                @if (!Culture.Contains("ar"))
+                {
+                    <div class="col-sm-6 col-lg-2 cardsettingEng" style="margin-left: 0">
+                        <div class="card text-white setheightwidth" style="background: #458A46">
+                            <div class="card-body card-body pb-0 d-flex justify-content-between align-items-start card-body-custom">
+                                <div>
+                                    <div class="txtUpperCase">@Translation.Open_Complaints</div>
+                                    <div class="card-body-value">
+                                       
+                                            <h3 class="number" id="TotalOpenComplaints">0</h3>
+                                        </div>
+
+                                </div>
+                                <div>
+                                    <div class="text-value-lg card-body-icon">
+                                        <i class="fa fa-list fa-2x" style="color: #fff"></i>
+                                    </div>
+                                    <div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-2 cardsettingEng ">
+                        <div class="card text-white setheightwidth" style="background-color: #2C51BE">
+                            <div class="card-body card-body pb-0 d-flex justify-content-between align-items-start card-body-custom">
+                                <div>
+                                    <div class="txtUpperCase">@Translation.Close_Complaints</div>
+                                    <div class="card-body-value">
+                                        <h3 class="number" id="TotalCloseComplaints">0</h3>
+                                    </div>
+
+                                </div>
+                                <div>
+                                    <div class="text-value-lg card-body-icon CloseComplaintsIcon">
+                                        @*<i class="fas fa-exclamation-circle fa-2x"></i>*@
+                                    </div>
+                                    <div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-2 cardsettingEng ">
+                        <div class="card text-white setheightwidth" style="background-color: #F2C94C">
+                            <div class="card-body card-body pb-0 d-flex justify-content-between align-items-start card-body-custom">
+                                <div>
+                                    <div class="txtUpperCase">@Translation.Average_Closing_Time</div>
+                                    <div class="card-body-value">
+                                        <h3><span class="number" id="AverageClosingTime">0</span></h3>
+                                    </div>
+
+                                </div>
+                                <div>
+                                    <div class="text-value-lg card-body-icon AverageClosingTimeIcon">
+                                    </div>
+                                    <div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-2 cardsettingEng ">
+                        <div class="card text-white  setheightwidth" style="background-color: #226DB5">
+                            <div class="card-body card-body pb-0 d-flex justify-content-between align-items-start card-body-custom">
+                                <div>
+                                    <div class="txtUpperCase">@Translation.Todays_Installation_Order</div>
+                                    <div class="card-body-value">
+                                        <h3><span class="number" id="TotalTodayOrderInstallation">0</span>/<span class="number" id="TotalTodayOrderInstallationUnit">0</span> <span style="font-size:smaller">@Translation.Service</span></h3>
+                                    </div>
+
+                                </div>
+                                <div>
+                                    <div class="text-value-lg card-body-icon TodaysinstallationOrdersIcon">
+                                        @*<i class="fa fa-list-alt fa-2x"></i>*@
+                                    </div>
+                                    <div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-2 cardsettingEng ">
+                        <div class="card text-white setheightwidth" style="background-color: #694FD6">
+                            <div class="card-body card-body pb-0 d-flex justify-content-between align-items-start card-body-custom">
+                                <div>
+                                    <div class="txtUpperCase">@Translation.Tomorrows_Installation_Orders</div>
+                                    <div class="card-body-value">
+                                        <h3><span class="number" id="TotalTomorrowOrderInstallation">0</span>/<span class="number" id="TotalTomorrowOrderInstallationUnit">0</span> <span style="font-size:smaller">@Translation.Service</span></h3>
+                                    </div>
+
+                                </div>
+                                <div>
+                                    <div class="text-value-lg card-body-icon TomorrowsinstallationOrdersIcon">
+                                        @*<i class="fas fa-dollar-sign fa-2x"></i>*@
+                                    </div>
+                                    <div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (Culture.Contains("ar"))
+                {
+                    <div class="col-sm-6 col-lg-2 cardsettingArb" style="margin-right: 0">
+                        <div class="card text-white setheightwidth" style="background: #458A46">
+                            <div class="card-body card-body pb-0 d-flex justify-content-between align-items-start card-body-custom">
+                                <div>
+                                    <div class="txtUpperCase">@Translation.Open_Complaints</div>
+                                    <div class="card-body-value">
+                                        <h3 class="arabicNumber" id="TotalOpenComplaints">0</h3>
+                                    </div>
+
+                                </div>
+                                <div>
+                                    <div class="text-value-lg card-body-icon">
+                                        <i class="fa fa-list fa-2x" style="color: #fff"></i>
+                                    </div>
+                                    <div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-2 cardsettingArb ">
+                        <div class="card text-white setheightwidth" style="background: #2C51BE">
+                            <div class="card-body card-body pb-0 d-flex justify-content-between align-items-start card-body-custom">
+                                <div>
+                                    <div class="txtUpperCase">@Translation.Close_Complaints</div>
+                                    <div class="card-body-value">
+                                        <h3 class="arabicNumber" id="TotalCloseComplaints">0</h3>
+                                    </div>
+
+                                </div>
+                                <div>
+                                    <div class="text-value-lg card-body-icon CloseComplaintsIcon">
+                                        @*<i class="fas fa-exclamation-circle fa-2x"></i>*@
+                                    </div>
+                                    <div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-2 cardsettingArb ">
+                        <div class="card text-white setheightwidth" style="background-color: #F2C94C">
+                            <div class="card-body card-body pb-0 d-flex justify-content-between align-items-start card-body-custom">
+                                <div>
+                                    <div class="txtUpperCase">@Translation.Average_Closing_Time</div>
+                                    <div class="card-body-value">
+                                        <h3><span class="arabicNumber" id="AverageClosingTime">0</span></h3>
+                                    </div>
+
+                                </div>
+                                <div>
+                                    <div class="text-value-lg card-body-icon AverageClosingTimeIcon">
+                                    </div>
+                                    <div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-2 cardsettingArb ">
+                        <div class="card text-white setheightwidth" style="background-color: #226DB5">
+                            <div class="card-body card-body pb-0 d-flex justify-content-between align-items-start card-body-custom">
+                                <div>
+                                    <div class="txtUpperCase">@Translation.Todays_Installation_Order</div>
+                                    <div class="card-body-value">
+                                        <h3><span class="number" id="TotalTodayOrderInstallation">0</span>/<span class="number" id="TotalTodayOrderInstallationUnit">0</span> <span style="font-size:smaller">@Translation.Service</span></h3>
+                                    </div>
+
+                                </div>
+                                <div>
+                                    <div class="text-value-lg card-body-icon TodaysinstallationOrdersIcon">
+                                        @*<i class="fa fa-list-alt fa-2x"></i>*@
+                                    </div>
+                                    <div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-2 cardsettingArb ">
+                        <div class="card text-white setheightwidth" style="background-color: #694FD6">
+                            <div class="card-body card-body pb-0 d-flex justify-content-between align-items-start card-body-custom">
+                                <div>
+                                    <div class="txtUpperCase">@Translation.Tomorrows_Installation_Orders</div>
+                                    <div class="card-body-value">
+                                        <h3><span class="number" id="TotalTomorrowOrderInstallation">0</span>/<span class="number" id="TotalTomorrowOrderInstallationUnit">0</span> <span style="font-size:smaller">@Translation.Service</span></h3>
+                                    </div>
+
+                                </div>
+                                <div>
+                                    <div class="text-value-lg card-body-icon TomorrowsinstallationOrdersIcon">
+                                        @*<i class="fas fa-dollar-sign fa-2x"></i>*@
+                                    </div>
+                                    <div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+
+            </div>
+
+            <div>
+
+                <main>
+                    <div class="col-xl-12 col-sm-12 py-2 row">
+                        <div>
+                            <div id="reportrange" class="form-control" style="background: #fff; cursor: pointer; border: 1px solid #ccc; width: 100%">
+                                <i class="fa fa-calendar"></i>&nbsp;
+                                <span></span> <i style="float:right" class="fa fa-caret-down"></i>
+                            </div>
+                        </div>
+                        <button class="form-control col-xl-1 col-sm-1" style="Text-align: center;margin-left:1%;margin-right: 1%;" id="btnSearch" onclick="Search()">@Translation.Search</button>
+
+                    </div>
+                </main>
+
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-xl-5 col-sm-5 py-2">
+                    <div class="card text-black-50" style="margin-bottom: 0 !important">
+                        <div class="card-header setheader cardHeader">
+                            @if (!Culture.Contains("ar"))
+                            {
+                                <h5><b>@Translation.Service_Distribution</b></h5>
+                            }
+                            @if (Culture.Contains("ar"))
+                            {
+                                <h5 style=" text-align:right;padding-right:2%;"><b>@Translation.Service_Distribution</b></h5>
+                            }
+                        </div>
+
+                        <div class="card-body" style="padding-bottom: 0%; padding-top: 0%" id="ServicesDistribution-container">
+                            <canvas id="ServicesDistribution" style="width: 100%;height:100%; min-height: 400px"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-7 col-sm-7 py-2">
+                    <div class="card text-black-50" style="margin-bottom: 0 !important">
+                        <div style="padding-bottom: 2%; padding-top: 2%; padding-left: 2%" class="cardHeader">
+                            @if (!Culture.Contains("ar"))
+                            {
+                                <h5><b>@Translation.FinishedOrders</b></h5>
+                            }
+                            @if (Culture.Contains("ar"))
+                            {
+                                <h5 style=" text-align:right;padding-right:2%;"><b>@Translation.FinishedOrders</b></h5>
+                            }
+                        </div>
+
+                        <div class="card-body" style="padding-top: 0%;padding-bottom: 0%">
+                            <div class="c-chart-wrapper" id="CompletedOrders-container">
+                                <div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
+                                <canvas id="CompleteOrders" style="display: block;width: 100%;height:100%; min-height: 394px" class="chartjs-render-monitor"></canvas>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+
+                <div class="col-xl-12 col-sm-12 py-2">
+                    <div class="card text-black-50">
+                        <div class="card-header cardHeader" style="padding-bottom: 0%">
+                            @if (!Culture.Contains("ar"))
+                            {
+                                <h5><b>@Translation.Installation_Workers_Utilization</b></h5>
+                            }
+                            @if (Culture.Contains("ar"))
+                            {
+                                <h5 style=" text-align:right;padding-right:1%;"><b>@Translation.Installation_Workers_Utilization</b></h5>
+                            }
+
+                        </div>
+                        @*<hr />*@
+                        <div class="card-body" style="overflow-y: scroll; padding-top: 0%" id="TableInstallationWorkersUtilization-container">
+                            <table class="table table-responsive-sm table-hover table-outline mb-0" style="text-align:center" id="TableInstallationWorkersUtilization">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>
+                                            <lable>@Translation.Worker</lable>
+                                        </th>
+                                        <th>
+                                            @Translation.Todays_Orders
+                                        </th>
+                                        <th>
+                                            @Translation.Total_Units
+                                        </th>
+                                        <th>
+                                            @Translation.Total_Orders
+                                        </th>
+                                        <th>
+                                            @Translation.Performance
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="InstallationWorkersUtilizationTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+@section scripts{
+    @*<link href="~/Content/css/dashboard_style.css" rel="stylesheet" />*@
+    <link href="~/Content/css/coreui-chartjs.css" rel="stylesheet" />
+    <script type="text/javascript">
+        var StartDate;
+        var EndDate;
+        $(function () {
+            //var start = moment().subtract(29, 'days');
+            //var end = moment();
+            var start = moment().startOf('month');
+            var end = moment().endOf('month');
+            function cb(start, end) {
+                $('#reportrange span').html(start.format('DD-MM-YYYY') + ' - ' + end.format('DD-MM-YYYY'));
+                StartDate = start;
+                EndDate = end;
+            }
+            $('#reportrange').daterangepicker({
+                startDate: start+1,
+                endDate: end,
+                ranges: {
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+            cb(start, end);
+        });
+        $(document).ready(function () {
+            Search();
+
+        });
+            function Search()
+            {
+                onBegin();
+                GetSupplierDashboardWidgetsData();
+                GetSupplierServiceDistribution();
+                GetSupplierCompleteOrders();
+                GetWorkersUtilizationList();
+                onComplete();
+            }
+        function GetSupplierDashboardWidgetsData()
+            {
+             $.ajax({
+                type: "POST",
+                url: '@Url.Action("GetSupplierDashboardWidgetsData")',
+                data: JSON.stringify({ StartDate: StartDate, EndDate: EndDate }),
+                dataType: "json",
+                 contentType: "application/json; charset=utf-8",
+                 success: function (response) {
+                     onBegin();
+                     if (response.Data) {
+                         $("#TotalOpenComplaints").text(response.Data.OpneComplain);
+                         $("#TotalCloseComplaints").text(response.Data.CloseComplain);
+                         $("#AverageClosingTime").text(response.Data.AverageClosingTime);
+                         $("#TotalTodayOrderInstallationUnit").text(response.Data.TotalTodayOrderInstallationUnit);
+                         $("#TotalTodayOrderInstallation").text(response.Data.TotalTodayOrderInstallation);
+                         $("#TotalTomorrowOrderInstallationUnit").text(response.Data.TotalTomorrowOrderInstallationUnit);
+                         $("#TotalTomorrowOrderInstallation").text(response.Data.TotalTomorrowOrderInstallation);
+                     }
+                     onComplete();
+                },
+                 error: function () {
+                }
+            });
+        }
+        function GetSupplierServiceDistribution()
+        {
+             $.ajax({
+                type: "POST",
+                url: '@Url.Action("GetSupplierServiceDistribution")',
+                 data: JSON.stringify({ StartDate: StartDate, EndDate: EndDate}),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                 success: function (response) {
+                     if (response.Data) {
+                         if (response.Data.OrderServicelist!=null)
+                         {
+                             $('#ServicesDistribution').remove(); // this is my <canvas> element
+                             $('#ServicesDistribution-container').append('<canvas id="ServicesDistribution" style="width: 100%;height:100%; min-height: 400px"></canvas>');
+                             loadServiceDistributionDoughnutChart(response.Data.OrderServicelist);
+                         }
+                     }
+                },
+                 error: function () {
+                }
+            });
+        }
+        function loadServiceDistributionDoughnutChart(values) {
+                var ServiceName = [];
+                var TotalServiceOrders = [];
+                $.each(values, function (index, data) {
+                    curPost = data;
+                    ServiceName.push(data.ServiceName);
+                    TotalServiceOrders.push(data.TotalServiceOrders);
+                });
+            var barColors = ["#1070CA", "#BB6BD9", "#F2C94C", "#219653", "#27AE60", "#6FCF97", "#56CCF2", "#9B51E0", "#2D9CDB", "#F2994A"];
+
+
+                new Chart("ServicesDistribution", {
+                    type: "doughnut",
+                    data: {
+                        labels: ServiceName,
+                        datasets: [{
+                            backgroundColor: barColors,
+                            data: TotalServiceOrders,
+                            hoverOffset: 4
+                        }],
+                    },
+                    options: {
+                            legend: {
+                            position: 'bottom',
+                            },
+                        cutoutPercentage: 75,
+                    }
+                });
+        }
+        function GetSupplierCompleteOrders()
+        {
+             $.ajax({
+                type: "POST",
+                url: '@Url.Action("GetSupplierCompleteOrders")',
+                 data: JSON.stringify({ StartDate: StartDate, EndDate: EndDate}),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                 success: function (response) {
+                     if (response.Data) {
+                         if (response.Data.MonthOrderlist!=null)
+                         {
+                             $('#CompleteOrders').remove(); // this is my <canvas> element
+                             $('#CompletedOrders-container').append('<canvas id="CompleteOrders" style="display: block;width: 100%;height:100%; min-height: 394px" class="chartjs-render-monitor"></canvas>');
+                             loadCompleteOrdersLineChart(response.Data.MonthOrderlist);
+                         }
+                     }
+                },
+                 error: function () {
+                }
+            });
+            }
+            function loadCompleteOrdersLineChart(values) {
+                const date = [];
+                const totalOrder = [];
+                const color = [];
+                $.each(values, function (index, data) {
+                    if (data.Order>0)
+                    {
+                        curPost = data;
+                        date.push(data.Day);
+                        totalOrder.push(data.Order);
+                        color.push('#1665D8');
+                    }
+                });
+                const data = {
+                    labels: date,
+                    datasets: [{
+                        data: totalOrder,
+                        backgroundColor: color,
+                        borderRadius: 25,
+                    }]
+                };
+                new Chart("CompleteOrders", {
+                    type: "bar",
+                    data: data,
+                    options: {
+                        legend: {
+                            display: false
+                        },
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true,
+                                    userCallback: function (label, index, labels) {
+                                        // when the floored value is the same as the value we have a whole number
+                                        if (Math.floor(label) === label) {
+                                            return label;
+                                        }
+                                    },
+                                },
+                                gridLines: {
+                                    // You can change the color, the dash effect, the main axe color, etc.
+                                    borderDash: [8, 3],
+                                    color: "#E4E7EB"
+                                }
+                            }],
+                            xAxes: [{
+                                maxBarThickness: 10,
+                                gridLines: {
+                                    display: false
+                                }
+                            }]
+                        },
+                    },
+                });
+        }
+            function GetWorkersUtilizationList()
+        {
+             $.ajax({
+                type: "POST",
+                url: '@Url.Action("GetSupplierInstallationWorkersUtilizationList")',
+                 data: JSON.stringify({ StartDate: StartDate, EndDate: EndDate}),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                 success: function (response) {
+                     if (response.Data) {
+                         if (response.Data.LabourList)
+                         {
+                             ReloadDataTable();
+                             loadWorkersUtilizationTable(response.Data.LabourList);// Redraw the DataTable
+                         }
+                     }
+                },
+                 error: function () {
+                }
+            });
+            }
+            function loadWorkersUtilizationTable(values) {
+            var html;
+                $.each(values, function (index, data) {
+                    debugger;
+                    curPost = data;
+                    html += '<tr>'
+                        + '<td>'
+                        + data.ServiceProvider + ''
+                        + '</td>'
+                                   +'<td>'
+                                         + data.Labour +''
+                                   +'</td>'
+                                   +'<td>'
+                                         +data.TodaysOrders+''
+                                   +'</td>'
+                                   +'<td>'
+                                            +data.TodayOrdersTotalUnit+''
+                                   +'</td>'
+                                   +'<td>'
+                                            +data.TotalOrders+''
+                                   +'</td>'
+                                   +'<td>'
+                                            +data.Performance +'%'
+                                   +'</td>'
+                        + '</tr>';
+                });
+                $("#InstallationWorkersUtilizationTableBody").html(html);
+                    $('#TableInstallationWorkersUtilization').DataTable({
+                        "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                        "bSortable": true,
+                        "bLengthChange": false,
+                        "bInfo": true,
+                        "bAutoWidth": false,
+                        "AutoWidth": false,
+                "language": {
+                    "paginate": {
+                        "previous": "«",
+                        "next": "»",
+                    },
+                    "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                    "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                    "emptyTable": false,
+                    "sEmptyTable": "@Translation.NoMatchingRecords",
+                },
+                    });
+        }
+            function ReloadDataTable() {
+            $('#TableInstallationWorkersUtilization').DataTable().destroy();
+            var html;
+                $('#TableInstallationWorkersUtilization').remove(); // this is my <canvas> element
+                html = '<table class= "table table-responsive-sm table-hover table-outline mb-0" style = "text-align:center" id = "TableInstallationWorkersUtilization">'
+                    + '<thead class="thead-light">'
+                    + '<tr>'
+                    + '<th>'
+                    + '@Translation.ServiceProvider'
+                    +'</th>'
+                    + '<th>'
+                    + '@Translation.Worker'
+                    +'</th> '
+                    + '<th>'
+                    + '@Translation.Todays_Orders'
+                    + '</th>'
+                    + '<th>'
+                    + '@Translation.Total_Units'
+                    +'</th>'
+                    +'<th>'
+                    + '@Translation.Total_Orders'
+                    +'</th>'
+                    +'<th>'
+                    + '@Translation.Performance'
+                +'</th>'
+                +'</tr>'
+                +'</thead>'
+                +'<tbody id ="InstallationWorkersUtilizationTableBody">'
+                +'</tbody>'
+                + '</table>';
+            $('#TableInstallationWorkersUtilization-container').append(html);
+        }
+    </script>
+
+}

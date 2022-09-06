@@ -1,0 +1,225 @@
+﻿@{
+    ViewBag.Title = Translation.CancelledOrders;
+    var UserGroupTypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+    var UserId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserId]);
+    var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupId]);
+    var ActtypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+}
+
+@using Almanea.BusinessLogic;
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+
+            <div class="card-body">
+                <div class="row" id="divSearch">
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="text" id="sSeller" class="form-control" placeholder="@Translation.SellerName / @Translation.SellerContact" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="text" id="sInvoice" class="form-control" placeholder="@Translation.InvoiceNo / @Translation.OrderNo" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="text" id="sCustomer" class="form-control" placeholder="@Translation.CustomerName / @Translation.CustomerContact" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="text" id="sDate" class="form-control datepickerall" placeholder="@Translation.InstallDate" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <select class="form-control select2" id="sLocation">
+                                    <option value="0">@Translation.Select  @Translation.Location</option>
+                                    @foreach (var item in cls_DropDowns.GetLocations(UserGroupId, UserGroupTypeId, ActtypeId))
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <select class="form-control select2" id="sStatus">
+                                    <option value="0">@Translation.SelectStatus</option>
+                                    @foreach (var item in cls_DropDowns.AllOrderStatus().Where(k => k.Value != ((int)OrderStatus.ReSchedule).ToString()))
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p>
+                    <input type="button" value="@Translation.Search" class="btn btn-primary pull-right" onclick="BindDataTable()" />
+                    <span class="ta-right f-right">
+                        <a onclick="Print();" title="Print" data-toggle="tooltip"><i class="fa fa-print"></i></a>
+                    </span>
+                </p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dataTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="10%">@Translation.OrderNo</th>
+                            @*<th width="12%">@Translation.InvoiceNo</th>*@
+                            <th width="14%">@Translation.OrderDate</th>
+                            <th width="20%">@Translation.Customer</th>
+                            <th width="17%">@Translation.InstallOn</th>
+                            <th width="16%">@Translation.OrderCost</th>
+                            <th width="14%">@Translation.Status</th>
+                            <th width="9%">@Translation.Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    <script>
+        @*window.setInterval(function () {
+            /// call your function here
+            if (@Session[cls_Defaults.Session_UserId] != null) {
+                BindDataTable();
+            }
+            else {
+                clearInterval();
+                window.location = '@Url.Action("Index", "Home")';
+            }
+        }, 30000);
+
+           $(window).bind("beforeunload", function () {
+             //Logic to delete the item
+               clearInterval();
+        });*@
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            async: true;
+            //List
+            BindDataTable();
+        });
+        $(document).keypress(function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if (keycode == '13') {
+                BindDataTable();
+            }
+        });
+        var oTable;
+        function BindDataTable(response) {
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+                    "bAutoWidth": false,
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("GetOrders2")",
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+                        aoData.push(
+                            { "name": "Seller", "value": $("#sSeller").val() },
+                            { "name": "Customer", "value": $("#sCustomer").val() },
+                            { "name": "InvoiceNo", "value": $("#sInvoice").val() },
+                            { "name": "InstallDate", "value": @ViewBag.Date },
+                            { "name": "Location", "value": @ViewBag.Location  },
+                            { "name": "Status", "value": @ViewBag.Status },
+                             { "name": "StatusId", "value": $("#sStatus").val() },
+                        );
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+                    },
+                    "aoColumns": [
+                        { "mData": "OrderNo", },
+                        //{ "mData": "Invoice", },
+                        { "mData": "AddedDate", },
+                        { "mData": "Customer", },
+                        { "mData": "InstallDate", "orderable": false },
+                        { "mData": "TotalAmount" },
+                        { "mData": "StatusText" },
+                        {
+                            "mData": "OrderId",
+                            "render": function (Id, type, full, meta) {
+                                    return '<a href="@Url.Action("Details")/' + Id + '" title="@Translation.View" data-toggle="tooltip"><i class="fa fa-eye"></i></a>';
+
+                            },
+                            "orderable": false
+                        },
+                    ],
+                    "order": [[1, "desc"]],
+                    "fnInitComplete": function (oSettings, json) {
+                    },
+                    "fnDrawCallback": function (oSettings) {
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                       "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                        "emptyTable": false,
+                        "sEmptyTable": "@Translation.NoMatchingRecords",
+                    },
+                });
+            }
+        }
+
+        var Reset = function () {
+            $('#divSearch').find('input[type=text]').val('');
+            $('#divSearch').find('select').val('0');
+            BindDataTable();
+        }
+    </script>
+    <script>
+        function Print() {
+             //xxxx
+
+            var url = "@Url.Action("Order", "Print")?TypeId=2&" +
+                "&Seller=" + $("#sSeller").val() + "&Customer=" + $("#sCustomer").val() +
+                "&InvoiceNo=" + $("#sInvoice").val() + "&InstallDate=" + $("#sDate").val() +
+                "&Location=" + $("#sLocation").val() + "&Status=" + $("#sStatus").val();
+
+            var win = window.open(url, '_blank');
+            win.focus();
+        }
+    </script>
+}
+
+
+

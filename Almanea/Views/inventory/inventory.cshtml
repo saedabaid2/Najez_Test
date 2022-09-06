@@ -1,0 +1,220 @@
+﻿@model  vm_ServicesMapper
+
+@{
+    ViewBag.Title = Translation.Inventory + " " + Translation.Edit;
+}
+
+<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+@using Almanea.Models;
+@using Almanea.BusinessLogic;
+
+<style>
+    .redClass {
+        background-color: #ea9f9f;
+    }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                @using (Ajax.BeginForm("Update", "Inventory", Model,
+
+                    new AjaxOptions
+                    {
+                        HttpMethod = "POST",
+                        OnSuccess = "onSuccess",
+                        OnBegin = "onBegin",
+                        OnComplete = "onComplete",
+                        OnFailure = "OnFailure",
+                    }, new { id = "frmAdd", @autocomplete = "off" }))
+                {
+
+                    @Html.AntiForgeryToken()
+                    <div class="row">
+                        <div class="row col-md-12">
+
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    @Translation.Labour
+                                    @Html.DropDownList("LabourId", new SelectList(ViewBag.LabourId2, "Value", "Text"), Translation.Select, new { @class = "form-control js-example-basic-multiple labours select2" })
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    @Translation.Items
+                                    @Html.DropDownList("ItemId", new SelectList(ViewBag.Items, "Value", "Text"), Translation.Select, new { @class = "form-control js-example-basic-multiple ItemId select2" })
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    @Translation.Quantity
+                                    <input type='number' id='quantity' value='1' name='quantity' class="form-control">
+                                </div>
+                            
+                            </div>
+                        </div>
+                        @*@Html.DropDownListFor(model => model.LabourId, new SelectList(ViewBag.Labours, "Value", "Text"), Translation.Select, new { @class = "form-control select2" })*@
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="col-lg-12">
+                                <label>Notify me when quantity is X Or less</label>
+                                <input name="notifytxt" id="notifytxt" type="text" style="width:50px;display:block" />
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12" style="margin-top: 50px;">
+                        <input type="submit" class="btn btn-primary pull-right" value="@Translation.Update" />
+                    </div>
+
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-items-center table-flush" id="dataTable">
+            <thead class="thead-light">
+                <tr>
+                    <th width="12%">@Translation.UpdatedDate</th>
+                    @*<th width="15%">@Translation.EndDate</th>*@
+                    <th width="11%">@Translation.Labour</th>
+                    <th width="10%">@Translation.ItemName</th>
+                    <th width="10%">@Translation.AvalInventory</th>
+
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="Stylesheet" type="text/css" />
+@section scripts{
+
+    <script type="text/javascript">
+        $(function () {
+            $('.select2').select2();
+            //$("#StartDate").datepicker({
+            //    numberOfMonths: 2,
+            //    onSelect: function (selected) {
+            //        var dt = new Date(selected);
+            //        dt.setDate(dt.getDate() + 1);
+            //        $("#StartDate").datepicker("option", "minDate", dt);
+            //    }
+            //});
+            //$("#EndDate").datepicker({
+            //    numberOfMonths: 2,
+            //    onSelect: function (selected) {
+
+            //        var dt = new Date(selected);
+            //        dt.setDate(dt.getDate());
+            //        //$("#EndDate").datepicker("option", "minDate", dt);
+            //        $("#EndDate").datepicker("setDate", dt);
+            //        $("#EndDate").val(selected); debugger;
+            //    }
+            //});
+            BindDataTable();
+
+        });
+             function onSuccess(response) {
+     onComplete();
+                 if (response.StatusId > 0) {
+                     debugger;
+                successPopup("@Translation.success_AddItem");
+
+                setTimeout(function () { window.location = '@Url.Action("Index")'; }, 3000);
+            }
+            else{
+                warningPopup(response.Message);
+            }
+        }
+          var oTable;
+        function BindDataTable(response) {
+            debugger;
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": false,
+                    "bLengthChange": false,
+                    "bInfo": true,
+                    "bAutoWidth": false,
+                    "AutoWidth": false,
+                    "createdRow": function (row, data, dataIndex) {
+                        debugger;
+                        var pattern = /Date\(([^)]+)\)/;
+                        var results = pattern.exec(data.EndDate);
+                        console.log(data.notifytxt);
+                        console.log(data.AvalQuantity);
+                        //
+                        if ((data.AvalQuantity) <= (data.notifytxt)) {
+                            $(row).addClass('redClass');
+                        }
+                    },
+                    "sAjaxSource": "@Url.Action("GetInventory", "Inventory")",
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+                    }
+                    ,
+                    "columnDefs": [{
+                        "targets": 0,
+                        "type": 'date',
+                    }],
+                    // data: response,
+                    "aoColumns": [
+                        {
+                            "mData": "StartDate",
+                            "render": function (Id, type, full, meta) {
+                                var pattern = /Date\(([^)]+)\)/;
+                                var results = pattern.exec(Id);
+                                var dt = new Date(parseFloat(results[1]));
+
+                                return (dt.getMonth() + 1) + "/" + dt.getDate() + "/" + dt.getFullYear();
+                            }
+
+                        },
+                        { "mData": "LabourId" },
+                        { "mData": "ItemId" },
+                        { "mData": "AvalQuantity" },
+                        //{
+                        //    "mData": "notifyme",
+                        //    "render": function (Id, type, full, meta) {
+                        //        return "<input type='submit' class='btn btn-primary pull-right' value=" + Id+" />";
+                        //    }}
+                    ],
+                    "order": [[1, "desc"]],
+                    "fnInitComplete": function (oSettings, json) {
+                    },
+                    "fnDrawCallback": function (oSettings) {
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                      "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                        "emptyTable": false,
+                        "sEmptyTable": "@Translation.NoMatchingRecords",
+                    },
+                });
+            }
+        }
+    </script>
+
+}

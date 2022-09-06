@@ -1,0 +1,307 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+@model vm_Order
+
+@using Almanea.Models;
+@using Almanea.BusinessLogic;
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+
+    @{
+        var culture = System.Threading.Thread.CurrentThread.CurrentUICulture.Name.ToLowerInvariant();
+
+        //Arabic
+        if (culture.Equals("ar"))
+        {
+            <link href="~/vendor/bootstrap/css/bootstrap-rtl.css" rel="stylesheet" type="text/css">
+            <link href="/vendor/ruang-admin.css" rel="stylesheet">
+            <link href="~/Content/Site-rtl.css" rel="stylesheet" />
+        }
+        else
+        {
+            <link href="/vendor/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css">
+            <link href="/vendor/ruang-admin.css" rel="stylesheet">
+            <link href="~/Content/Site.css" rel="stylesheet" />
+        }
+    }
+
+    <link href="/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+</head>
+<body>
+    <div class="table-responsive">
+        <table class="table align-items-center table-flush table-bordered">
+            <tr>
+                <td width="33%">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.SellerName, new { @class = "bmd-label-floating" })
+                        @Html.TextBoxFor(m => m.SellerName, new { @class = "form-control", @placeholder = Translation.ReqSellerName })
+                    </div>
+                </td>
+                <td width="33%">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.SellerContact, new { @class = "bmd-label-floating" })
+                        @Html.TextBoxFor(m => m.SellerContact, new { @class = "form-control numOnly", @placeholder = Translation.ReqSellerContact })
+                    </div>
+                </td>
+                <td width="33%">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.InvoiceNo, new { @class = "bmd-label-floating" })
+                        @Html.TextBoxFor(m => m.InvoiceNo, new { @class = "form-control", @placeholder = Translation.ReqInvoiceNo })
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <hr />
+        <table class="table align-items-center table-flush table-bordered">
+            <tr>
+                <td width="33%">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.CustomerName, new { @class = "bmd-label-floating" })
+                        @Html.TextBoxFor(m => m.CustomerName, new { @class = "form-control", @placeholder = Translation.ReqCustomerName })
+                    </div>
+                </td>
+                <td width="33%">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.LocationId, new { @class = "bmd-label-floating required" })
+                        @Html.TextBoxFor(m => m.Location, new { @class = "form-control", @placeholder = Translation.ReqCustomerName, @readonly = "readonly" })
+                    </div>
+                </td>
+                <td width="33%">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.CustomerContact, new { @class = "bmd-label-floating required" })
+                        @Html.TextBoxFor(m => m.CustomerContact, new { @class = "form-control numOnly", @placeholder = Translation.ReqCustomerContact, @readonly = "readonly" })
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td width="33%">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.InstallDate, new { @class = "bmd-label-floating" })
+                        @if (Model.PreferDate == 1)
+                        {
+                            <label>
+                                @Translation.PreferAsap
+                            </label>
+                        }
+                        else if (Model.PreferDate == 2)
+                        {
+                            <div class="col-md-6">
+                                <label>@Model.InstallDate</label>
+                            </div>
+                        }
+                    </div>
+                </td>
+                <td width="33%">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.PrefferTime, new { @class = "bmd-label-floating" })
+                        @if (Model.PrefferTime == 1)
+                        {
+                            <label>@Translation.MorningTime</label>
+                        }
+                        else if (Model.PrefferTime == 2)
+                        {
+                            <label>@Translation.EveningTime</label>
+                        }
+                        else
+                        {
+                            <label>@Model.PreferTiming</label>
+                        }
+                    </div>
+                </td>
+                <td width="33%"></td>
+            </tr>
+        </table>
+        <hr />
+
+        <table class="table align-items-center table-flush table-bordered" id="dataTable">
+            <thead class="thead-light">
+                <tr>
+                    <th width="25%">@Translation.Services</th>
+                    @*<th width="25%">@Translation.Unit</th>*@
+                    <th width="25%">@Translation.ItemCount</th>
+                    <th width="25%">@Translation.UnitPrice</th>
+                    <th width="15%">@Translation.Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (ViewBag.Services != null)
+                {
+                    foreach (var item in (List<vm_OrderServices>)ViewBag.Services)
+                    {
+                        if (item.IsActive)
+                        {
+                <tr>
+                    <td>
+                        @item.ServiceName
+                        <input type="hidden" id="hfService" value="@item.ServiceId" />
+                    </td>
+                    @*<td>
+                        @item.Unit
+                        <input type="hidden" id="hfUnit" value="@item.Unit" />
+                    </td>*@
+                    <td>
+                        @item.Quantity
+                        <input type="hidden" id="hfQuantity" value="@item.Quantity" />
+                    </td>
+                    <td>
+                        @(item.Price)
+                    </td>
+                    <td>
+                        @(item.Price * item.Quantity)
+                    </td>
+                </tr>
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+
+        <table class="table align-items-center table-flush table-bordered">
+            <tbody>
+                <tr>
+                    <td width="33%">&nbsp;</td>
+                    <td width="33%">
+                        <div class="form-group f-right">
+                            <label>
+                                @Translation.Vat&nbsp;(@ViewBag.Vat%)
+                            </label>
+
+                        </div>
+                    </td>
+                    <td width="33%">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Vat, new { @class = "form-control", @style = "width: 40%" })
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="table align-items-center table-flush table-bordered">
+            <tbody>
+                <tr>
+                    <td width="33%">&nbsp;</td>
+                    <td width="33%">
+                        <div class="form-group f-right">
+                            <label>
+                                @Translation.Total
+                            </label>
+
+                        </div>
+                    </td>
+                    <td width="33%">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.TotalAmount, new { @class = "form-control", @style = "width: 40%" })
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        @if (ViewBag.Additional != null && ((List<vm_AdditionalService>)ViewBag.Additional).Count > 0)
+        {
+            <hr />
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="form-label-group">
+                        <label>@Translation.AdditionalServices</label>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table align-items-center table-flush table-bordered" id="dtvAdditional">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th width="25%">@Translation.Services</th>
+                                    <th width="20%">@Translation.Quantity</th>
+                                    <th width="20%">@Translation.UnitPrice</th>
+                                    <th width="25%">@Translation.SpareParts</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in (List<vm_AdditionalService>)ViewBag.Additional)
+                                {
+                                    <tr>
+                                        <td>
+                                            @item.ServiceName
+                                        </td>
+                                        <td>
+                                            @item.Quantity
+                                        </td>
+                                        <td>
+                                            @item.Price
+                                        </td>
+                                        <td>
+                                            @item.SpareParts
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (ViewBag.History != null && ((List<vm_OrderHistoryList>)ViewBag.History).Count > 0)
+        {
+            <hr />
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="form-label-group">
+                        <label>@Translation.History</label>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table align-items-center table-flush table-bordered" id="dtHistory">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th width="15%">@Translation.ActivityDate</th>
+                                    <th width="20%">@Translation.NewStatus</th>
+                                    <th width="30%">@Translation.DoneBy</th>
+                                    <th width="30%">@Translation.Comments</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in (List<vm_OrderHistoryList>)ViewBag.History)
+                                {
+                                    <tr>
+                                        <td>
+                                            @item.ActivityDate
+                                        </td>
+                                        <td>
+                                            @item.NewStatus
+                                        </td>
+                                        <td>
+                                            @item.DoneBy
+                                        </td>
+                                        <td>
+                                            @item.Comments
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+
+    <script src="/vendor/jquery/jquery.min.js"></script>
+
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="/vendor/ruang-admin.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,214 @@
+﻿
+@model Almanea.Models.vm_GroupCompanies
+@using Almanea.BusinessLogic;
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+
+            <div class="card-body">
+                @using (Ajax.BeginForm("AddEditGroup", "User", null,
+                     new AjaxOptions
+                     {
+                         HttpMethod = "POST",
+                         OnSuccess = "onSuccess",
+                         OnBegin = "onBegin",
+                         OnComplete = "onComplete",
+                         OnFailure = "onComplete",
+                     }, new { id = "frmAdd" }))
+                {
+
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @*@Html.LabelFor(m => m.CompanyNameEN, new { @class = "bmd-label-floating required" })*@
+                                <label class="bmd-label-floating required">@Translation.NameInEnglish</label>
+                                @Html.TextBoxFor(m => m.CompanyNameEN, new { @class = "form-control", @placeholder = Translation.ReqCompanyNameEN })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.CompanyNameEN, "", new { @class = "valid-text" })
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                <label class="bmd-label-floating required">@Translation.NameInArabic</label>
+                                @*@Html.LabelFor(m => m.CompanyNameAR, new { @class = "bmd-label-floating required" })*@
+                                @Html.TextBoxFor(m => m.CompanyNameAR, new { @class = "form-control", @placeholder = Translation.ReqCompanyNameAR })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.CompanyNameAR, "", new { @class = "valid-text" })
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-4 col-sm-4 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Email, new { @class = "bmd-label-floating required" })
+                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @placeholder = Translation.ReqEmail })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
+                            @Html.LabelFor(m => m.Telephone, new { @class = "bmd-label-floating required" })
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">+966</span>
+                                </div>
+                                @Html.TextBoxFor(m => m.Telephone, new { @class = "form-control numOnly", @placeholder = Translation.MobileFormat })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Telephone, "", new { @class = "valid-text" })
+                        </div>
+                        @*<div class="col-lg-6 col-md-4 col-sm-4 col-xs-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Telephone, new { @class = "bmd-label-floating required" })
+                                    @Html.TextBoxFor(m => m.Telephone, new { @class = "form-control numOnly", @placeholder = Translation.MobileFormat })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Telephone, "", new { @class = "valid-text" })
+                            </div>*@
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-4 col-sm-4 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.UserGroupTypeId, new { @class = "bmd-label-floating required" })
+                                @Html.DropDownListFor(model => model.UserGroupTypeId, cls_DropDowns.DDL_UserGroupTypes(), Translation.Select, new { @class = "form-control" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.UserGroupTypeId, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-6 col-md-4 col-sm-4 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Fax, new { @class = "bmd-label-floating" })
+                                @Html.TextBoxFor(m => m.Fax, new { @class = "form-control", @placeholder = Translation.ReqFax })
+                            </div>
+                        </div>
+
+                       
+                    </div>
+                    <div class="row">
+
+                        <div id="divIsInternal" style="display:none;" class="col-lg-6 col-md-4 col-sm-4 col-xs-12">
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox small">
+                                    @Html.CheckBoxFor(m => m.IsInternal, new { @class = "custom-control-input" })
+                                    <label for="IsInternal" class="custom-control-label">@Translation.InternalTeamOnly</label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        @*<div id="divContract" style="display:none;" class="col-lg-6 col-md-4 col-sm-4 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Contract, new { @class = "bmd-label-floating" })
+                                @Html.TextBoxFor(m => m.Contract, new { @class = "form-control", @placeholder = Translation.ReqFax })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Contract, "", new { @class = "valid-text" })
+                        </div>*@
+                        <div class="col-lg-6 col-md-4 col-sm-4 col-xs-12">
+                            @if (Model != null)
+                            {
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group">
+                                        <div class="custom-control custom-checkbox small">
+                                            @Html.CheckBoxFor(m => m.Status, new { @class = "custom-control-input" })
+                                            <label for="Status" class="custom-control-label">@Translation.IsActive</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @Html.HiddenFor(m => m.UserGroupId)
+                            }
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(Translation.CompanyLogo, new { @class = "bmd-label-floating " })
+                                <div id="fileUpload" class="dropzone"></div>
+                                @Html.HiddenFor(m => m.CompanyLogo)
+                            </div>
+                        </div>
+
+                        @if (Model != null)
+                        {
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 mt-5">
+                                <div class="form-group" id="divImage">
+                                    @if (!string.IsNullOrEmpty(ViewBag.Logo))
+                                    {
+                                        <img src="@ViewBag.Logo?dummy=@cls_Defaults.GenerateCode(4)" style="max-height:150px;vertical-align:bottom;" />
+                                        <a href="javascript:void(0)" style="vertical-align:bottom;" onclick="DelImage(@Model.UserGroupId)">@Translation.Delete</a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <p class="mg-t-15">
+                        <input type="submit" class="btn btn-primary pull-right" value="@Translation.Submit" />
+                    </p>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+    <script>
+        Dropzone.autoDiscover = false;
+        var fileType = '.png,.jpg,.gif,.bmp,.jpeg';
+        var maxsize =   @cls_Defaults.Filesize.ToString();
+
+        $(document).ready(function () {
+            $('.selectpicker').select2({
+                minimumResultsForSearch: Infinity
+            });
+
+            dropUploader.autodropzone('fileUpload', fileType, "CompanyLogo", maxsize, "@cls_Defaults.CompanyLogo");
+
+             $("#UserGroupTypeId").change(function () {
+                 var id = $(this).val();
+
+                 if (id == "1") {
+                    // $('#divContract').show();
+                     $('#divIsInternal').show();
+                 }
+                 else {
+                    // $('#divContract').hide();
+                     $('#divIsInternal').hide();
+                 }
+            });
+        });
+
+        function onSuccess(response) {
+            if (response.StatusId > 0) {
+                successPopup(response.Message);
+
+                setTimeout(function () { window.location = '@Url.Action("Groups")'; }, 3000);
+            }
+            else if (response.Message != '' && response.Message != null) {
+                warningPopup(response.Message);
+            }
+        }
+
+        var DelImage = function (Id) {
+            onBegin();
+            $.post("@Url.Action("DelImgGroup")/" + Id, function (response) {
+                if (response.StatusId > 0) {
+                    $("#divImage").remove();
+                }
+                onComplete();
+            });
+        }
+    </script>
+
+    @if (Model != null && Model.UserGroupTypeId == 1)
+    {
+        <script>
+           // $('#divContract').show();
+            $('#divIsInternal').show();
+        </script>
+    }
+}
+
+
+

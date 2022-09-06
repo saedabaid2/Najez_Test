@@ -1,0 +1,119 @@
+﻿
+
+@model List<Almanea.Models.vm_OrderServices>
+
+@using Almanea.BusinessLogic
+@using Almanea.Models
+
+<div id="frmAddService">
+    <div class="row" id="divNewService">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            <div class="form-group">
+                <label class="bmd-label-floating required">@Translation.Services</label>
+                <select id="sAddService" class="form-control select2">
+                    <option value="">@Translation.Select</option>
+                    @foreach (var item in cls_DropDowns.GetService())
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+            <label>@Translation.ItemCount</label>
+            <div class="input-group">
+                <input type="text" class="numOnly form-control-danger" id="sAddCount" style="width: 60%" />
+                &nbsp;
+                <div class="input-group-append">
+                    <input type="button" value="+" class="btn btn-outline-primary" id="btnAddService" />
+                </div>
+            </div>
+        </div>
+    </div>
+    @{
+        decimal oldVat = 0;
+        decimal oldTotal = 0;
+    }
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush table-bordered" id="dtServices">
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="25%">@Translation.Services</th>
+                            <th width="20%" class="quantity">@Translation.ItemCount</th>
+                            <th width="20%">@Translation.UnitPrice</th>
+                            <th width="20%">@Translation.Total</th>
+                            <th width="15%"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            &nbsp;
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+            <div class="form-group f-right">
+                @Translation.Quantity
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+            <div class="form-group">
+                <input type="text" id="lblQuantity" name="Quantity" class="form-control" value="" readonly />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            &nbsp;
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+            <div class="form-group f-right">
+                @Translation.SubTotal
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+            <div class="form-group">
+                <input type="text" id="SubTotal" class="form-control" value="" readonly />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            &nbsp;
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+            <div class="form-group f-right">
+                @Translation.Vat&nbsp;@ViewBag.Vat %
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+            <div class="form-group">
+                <input type="text" id="Vat" class="form-control" value="@(string.Format("{0:0.00}", oldVat))" readonly />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            &nbsp;
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+            <div class="form-group f-right" ">
+                @Translation.GrandTotal
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+            <div class="form-group">
+                <input type="text" id="TotalAmount" class="form-control" value="@(string.Format("{0:0.00}",oldTotal))" readonly />
+            </div>
+        </div>
+    </div>
+
+</div>
+<p class="mg-t-15">
+    <input type="button" class="btn btn-primary pull-right" id="btnChangeSubmit" value="@Translation.Submit" />
+</p>

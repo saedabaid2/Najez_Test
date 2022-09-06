@@ -1,0 +1,333 @@
+﻿
+@{
+    ViewBag.Title = Translation.EditUser;
+}
+
+@model Almanea.Models.vm_User
+
+@using Almanea.BusinessLogic;
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+
+            <div class="card-body">
+                @using (Ajax.BeginForm("AddEditUser", "Provider", null,
+                                     new AjaxOptions
+                                     {
+                                         HttpMethod = "POST",
+                                         OnSuccess = "onSuccess",
+                                         OnBegin = "onBegin",
+                                         OnComplete = "onComplete",
+                                         OnFailure = "OnFailure",
+                                     }, new { id = "frmAdd" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.UserGroupTypeId, new { @class = "bmd-label-floating required" })
+                                <select class="form-control select2" id="UserGroupTypeId" name="UserGroupTypeId" disabled>
+                                    <option value="@ViewBag.UserGroupTypeID " selected>@Translation.ServiceProvider</option>
+
+                                </select>
+                            </div>
+                            @Html.ValidationMessageFor(m => m.UserGroupTypeId, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.UserGroupId, new { @class = "bmd-label-floating required" })
+                                <select class="form-control select2" id="UserGroupId" name="UserGroupId" disabled>
+                                    <option value="@ViewBag.UserGroupID" selected>@ViewBag.UserGroup</option>
+                                </select>
+                            </div>
+                            @Html.ValidationMessageFor(m => m.UserGroupId, "", new { @class = "valid-text" })
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.AccountTypeId, new { @class = "bmd-label-floating required" })
+                                @if (ViewBag.UserGroup != null)
+                                {
+                                    @Html.DropDownListFor(model => model.AccountTypeId, new SelectList(ViewBag.AccountType, "Value", "Text"), Translation.Select, new { @class = "form-control selectpicker" })
+                                }
+                                else
+                                {
+                                    @Html.DropDownListFor(model => model.AccountTypeId, cls_DropDowns.DDL_AccountTypes(0), Translation.Select, new { @class = "form-control selectpicker" })
+                                }
+                            </div>
+                            @Html.ValidationMessageFor(m => m.AccountTypeId, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Email, new { @class = "bmd-label-floating required" })
+                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @placeholder = Translation.ReqEmail })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "valid-text" })
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.FirstName, new { @class = "bmd-label-floating required" })
+                                @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", @placeholder = Translation.ReqFirstName })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.LastName, new { @class = "bmd-label-floating required" })
+                                @Html.TextBoxFor(m => m.LastName, new { @class = "form-control", @placeholder = Translation.ReqLastName })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "valid-text" })
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
+                            @Html.LabelFor(m => m.MobileNo, new { @class = "bmd-label-floating required" })
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">+966</span>
+                                </div>
+                                @Html.TextBoxFor(m => m.MobileNo, new { @class = "form-control numOnly", @placeholder = Translation.MobileFormat })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.MobileNo, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.IqaamaNo, new { @class = "bmd-label-floating" })
+                                @Html.TextBoxFor(m => m.IqaamaNo, new { @class = "form-control", @placeholder = Translation.ReqIqama })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.IqaamaNo, "", new { @class = "valid-text" })
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-34col-xs-6">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.ProfilePic, new { @class = "bmd-label-floating" })
+                                <div id="fileUpload" class="dropzone">
+                                    @if (Model != null)
+                                    {
+                                        if (!string.IsNullOrEmpty(ViewBag.Logo))
+                                        {
+                                            <div class="form-group" id="divImage">
+                                                <img src="@ViewBag.Logo?dummy=@cls_Defaults.GenerateCode(4)" style="max-height:150px;" onerror="src='/Images/NoImage.jpg'" />
+                                                <a href="javascript:void(0)" style="vertical-align:bottom;" onclick="DelImage(@Model.UserId)">@Translation.Delete</a>
+                                            </div>
+                                        }
+                                    }
+
+                                </div>
+                                @Html.HiddenFor(m => m.ProfilePic)
+                            </div>
+                        </div>
+
+                        @if (Model != null)
+                        {
+                            @*if (!string.IsNullOrEmpty(ViewBag.Logo))
+            {
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 mt-5">
+                    <div class="form-group" id="divImage">
+                        <img src="@ViewBag.Logo?dummy=@cls_Defaults.GenerateCode(4)" style="max-height:150px;" onerror="src='/Images/NoImage.jpg'" />
+                        <a href="javascript:void(0)" style="vertical-align:bottom;" onclick="DelImage(@Model.UserId)">@Translation.Delete</a>
+                    </div>
+                </div>
+
+            }*@
+                            <div class="col-md-1" style="margin-left:22px;">
+                                <div class="form-group" style="padding-bottom:3%">
+                                    @*@if (string.IsNullOrEmpty(ViewBag.Logo))
+                    {*@
+                                    <label>&nbsp;</label>
+                                    @*}*@
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-sm-34col-xs-12">
+                                            <div class="custom-checkbox">
+                                                @Html.CheckBoxFor(m => m.StatusId, new { @class = "custom-control-input" })
+                                                <label for="StatusId" class="custom-control-label" style="position: absolute;left:5%">@Translation.IsActive</label>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-34col-xs-12">
+                                <div class="custom-checkbox">
+                                    @if (Model.LabourIsDriver == true)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" name="LabourIsDriver" id="LabourIsDriver" checked />
+                                        <label for="LabourIsDriver" id="LabourIsDriverlabel" class="custom-control-label" style="position: absolute; display: block; top: 12%;">@Translation.IsLabouradriveralso</label>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" name="LabourIsDriver" id="LabourIsDriver" value="false" style="display:none" />
+                                        <label for="LabourIsDriver" id="LabourIsDriverlabel" class="custom-control-label" style="position: absolute; display: block; top: 12%;">@Translation.IsLabouradriveralso</label>
+                                    }
+                                </div>
+
+
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-34col-xs-6">
+                                <div class="form-group">
+
+                                    @Html.Label("InActive Dates", new { @class = "bmd-label-floating" })
+                                    <input type="text" id="LaborBlockDate" name="LaborBlockDate" class="form-control" placeholder="@Translation.SelectBlockDate" autocomplete="off" />
+
+                                </div>
+                            </div>
+
+                            @Html.HiddenFor(m => m.UserId)
+                        }
+                    </div>
+                    <p class="mg-t-15">
+                        <input type="submit" class="btn btn-primary pull-right" value="@Translation.Submit" />
+                    </p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <link href="~/Content/css/notification/notification.css" rel="stylesheet" />
+    <script src="~/Scripts/js/notify.js"></script>
+    <script src="~/Scripts/jquery-ui.multidatespicker.js"></script>
+    <script>
+
+        Dropzone.autoDiscover = false;
+        var fileType = '.png,.jpg,.gif,.bmp,.jpeg,.pdf';
+        var maxsize =   @cls_Defaults.Filesize.ToString();
+
+        var currentAccountTypeId = @Model.AccountTypeId;
+
+        $(document).ready(function () {
+
+            var mdate = $('#LaborBlockDate').multiDatesPicker({
+                   dateFormat: "dd/mm/yy",
+                   minDate: 1,
+            //addDates: arrayDate,
+            showButtonPanel: true,
+            closeText: 'Clear',
+            onClose: function (dateText, obj) {
+                if ($(window.event.srcElement).hasClass('ui-datepicker-close'))
+                    $("#LaborBlockDate").val('');
+            }
+        });
+
+            var array ='@ViewBag.BlockDate'.split(',');
+        var arrayDate = [];
+            if (array != "") {
+                for (var i = 0; i < array.length; i++) {
+                    arrayDate.push(array[i].trim());
+                };
+
+                mdate.multiDatesPicker({ addDates: arrayDate });
+            }
+            else {
+                mdate.multiDatesPicker({ addDates: arrayDate });
+            }
+
+
+
+            $('.selectpicker').select2({
+                minimumResultsForSearch: Infinity
+            });
+
+            $("#LabourIsDriver").change(function () {
+                if (this.checked) {
+                    $("#LabourIsDriver").val("true");
+                }
+                else {
+                    $("#LabourIsDriver").val("false");
+                }
+
+            });
+
+            var LabourIsDriverCheckBox = document.getElementById("LabourIsDriver");
+            var LabourIsDriverlabel = document.getElementById("LabourIsDriverlabel");
+
+            if (currentAccountTypeId == 10) {
+                LabourIsDriverCheckBox.style.display = "block";
+                LabourIsDriverlabel.style.display = "block";
+            }
+            else {
+                LabourIsDriverCheckBox.style.display = "none";
+                LabourIsDriverlabel.style.display = "none";
+            }
+
+            $("#AccountTypeId").change(function () {
+                var DropVal = this.value;
+
+                if (DropVal == "10" && currentAccountTypeId==10) {
+                    LabourIsDriverCheckBox.style.display = "block";
+                    LabourIsDriverlabel.style.display = "block";
+                }
+                else {
+                    LabourIsDriverCheckBox.style.display = "none";
+                    LabourIsDriverlabel.style.display = "none";
+                }
+
+            });
+
+
+            $('#UserGroupTypeId').change(function () {
+                $.get("@Url.Action("BindUserGroup", "User")",
+                    { Id: $(this).val() }, function (data) {
+                        $("#UserGroupId").find('option').not(':first').remove();
+                        //$("#UserGroupId").append("<option value='0'> @Translation.Select </option>")
+                        $.each(data, function (index, row) {
+                            $("#UserGroupId").append("<option value='" + row.Value + "'>" + row.Text + "</option>")
+                        });
+                    });
+                 $.get("@Url.Action("BindAccountType", "User")",
+                    { Id: $(this).val() }, function (data) {
+                        $("#AccountTypeId").find('option').not(':first').remove();
+                        $.each(data, function (index, row) {
+                            $("#AccountTypeId").append("<option value='" + row.Value + "'>" + row.Text + "</option>")
+                        });
+                });
+
+            });
+
+        });
+        if ($("#ProfilePic").val() == null || $("#ProfilePic").val() == "") {
+               dropUploader.autodropzone('fileUpload', fileType, "ProfilePic", maxsize, "@cls_Defaults.ProfilePic");
+
+        }
+        function onSuccess(response) {
+            onComplete();
+            if (response.StatusId > 0) {
+                successPopup("@Translation.success_UpdateInfo");
+
+                setTimeout(function () { window.location = '@Url.Action("GetUserList", "Provider")'; }, 3000);
+            }
+            else if (response.Message = '') {
+                warningPopup(response.Message);
+            }
+        }
+
+        var DelImage = function (Id) {
+            onBegin();
+            $.post("@Url.Action("DelImgUser","User")/" + Id, function (response) {
+
+                if (response.StatusId > 0) {
+                    $("#divImage").remove();
+                    dropUploader.autodropzone('fileUpload', fileType, "ProfilePic", maxsize, "@cls_Defaults.ProfilePic");
+                }
+                onComplete();
+            });
+        }
+        function OnFailure(response) {
+            warningPopup("Something wrong!");
+        }
+    </script>
+}
+
+

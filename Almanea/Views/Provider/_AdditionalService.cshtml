@@ -1,0 +1,203 @@
+﻿
+
+@using Almanea.BusinessLogic
+@using Almanea.Models
+@{
+    var culture = System.Threading.Thread.CurrentThread.CurrentUICulture.Name.ToLowerInvariant();
+}
+    <div id="frmAdditional">
+        <div class="row">
+            <div class="col-lg-3 col-md-3">
+                <label class="bmd-label-floating required">@Translation.Categories</label>
+                <div class="input-group">
+                    <select id="sAddCategory" class="form-control select2">
+                        <option value="">@Translation.Select</option>
+                        @foreach (var item in cls_DropDowns.GetSupplierCategoryList())
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3">
+                <div class="form-group">
+                    <label class="bmd-label-floating">@Translation.Services</label>
+                    <select id="sAdditionalWork" class="form-control select2">
+                        @*<option value="">@Translation.Select</option>*@
+                        @*@foreach (var item in cls_DropDowns.GetAdditionalWorks())
+                            {
+                                <option value="@item.AdditionalWorkId" data-price="@item.Price">@item.AdditionalWorkNameAR</option>
+                            }*@
+                    </select>
+                    @*<input type="text" class="form-control" id="nServiceName" />*@
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-2">
+                <div class="form-group">
+                    <label>@Translation.Quantity</label>
+                    <input type="text" class="form-control numOnly" id="nQuantity" value="0" />
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3">
+                <div class="form-group">
+                    <label>@Translation.HandyWorkPrice</label>
+                    <input type="text" class="form-control currencyOnly" id="nPrice" value="0" readonly="readonly" />
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3">
+                <div class="form-group">
+                    <label>@Translation.SpareParts</label>
+                    <input type="text" class="form-control" id="nParts" value="0" readonly="readonly" />
+                </div>
+            </div>
+            <div class="col-lg-1 col-md-1 align-self-center">
+                <input type="button" class="btn btn-dark mt-auto" value="@Translation.AddNew" id="btnAdditional" />
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush table-bordered" id="dtAdditional">
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="25%">@Translation.Services</th>
+                            <th width="20%">@Translation.Quantity</th>
+                            <th width="20%">@Translation.HandyWorkPrice</th>
+                            <th width="25%">@Translation.SpareParts</th>
+                            <th width="10%"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            <div class="row">
+                <div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <label>@Translation.InvoiceImage</label>
+
+                    <input type="file" id="InvoiceImage" />
+                </div>
+
+                <div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <label>@Translation.CustomerSignOff</label>
+
+                    <input type="file" id="CustomerSignOff" />
+                </div>
+
+            </div>
+            <div class="row">
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div class="form-group">
+                        <label class="bmd-label-floating">@Translation.Comments</label>
+                        @*<textarea id="Comments" name="Comments" class="form-control" style="resize:none;"></textarea>*@
+                        @Html.TextArea("CommentsText", new { @class = "form-control", style = "resize:none;" })
+                        <input type="button" class="btn btn-primary pull-right" id="btnAdditionalSubmit" value="@Translation.Submit" />
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+            <div class="form-group f-right">
+                @Translation.SubTotal
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+            <div class="form-group" style="margin-bottom:0px;">
+                <input type="text" id="TotalSub" class="form-control" value="" readonly />
+            </div>
+            <div class="form-group" style="margin-bottom:0px;">
+                <input type="text" id="TotalVat" class="form-control" value="" readonly />
+            </div>
+            <div class="form-group" style="margin-bottom:0px;">
+                <input type="text" id="TotalAdd" class="form-control" value="" readonly />
+            </div>
+
+
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            &nbsp;
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+            <div class="form-group float-right">
+                @Translation.Vat @ViewBag.Vat %
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+            
+        </div>
+    </div>
+    @*<div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            &nbsp;
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+            <div class="form-group float-right">
+                @Translation.Total
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+          
+        </div>
+    </div>*@
+
+
+    @*<p class="mg-t-15">
+    </p>*@
+<style>
+    #secondModalBody.modal-body {
+        overflow-y: auto;
+    }
+    hr{
+        margin:0px;
+    }
+</style>
+    <script>
+        $("#sAdditionalWork").select2();
+          lang = '@culture';
+        $("#sAddCategory").change(function () {
+            $.getJSON('/Provider/GetAdditionalServices?cat=' + $("#sAddCategory").val(), function (result) {
+                var ddl = $('#sAdditionalWork');
+                var s = '';
+                ddl.empty();
+                debugger;
+                s += '<option value=>--select--</option>';
+                if (lang == 'ar') {
+                    for (var i = 0; i < result.result.length; i++) {
+
+                        s += '<option data-price="' + result.result[i].Price + '" value="' + result.result[i].AdditionalWorkId + '">' + result.result[i].AdditionalWorkNameAR + '</option>';
+                    }
+                }
+                else {
+                    for (var i = 0; i < result.result.length; i++) {
+
+                        s += '<option data-price="' + result.result[i].Price + '" value="' + result.result[i].AdditionalWorkId + '">' + result.result[i].AdditionalWorkNameEN + '</option>';
+
+                    }
+                }
+                $("#sAdditionalWork").html(s);
+
+
+            });
+        });
+        $('#sAdditionalWork').change(function (e) {
+
+            if ($('#sAdditionalWork option:selected').attr("data-price")) {
+                $("#nPrice").val(Number($('#sAdditionalWork option:selected').attr("data-price")));
+            }
+            else {
+                $("#nPrice").val(0);
+            }
+        });
+    </script>

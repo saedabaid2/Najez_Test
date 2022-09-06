@@ -1,0 +1,100 @@
+﻿@model Almanea.Category
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<p>
+    <a href="@Url.Action("Index")" class="btn btn-secondary float-right">Back to List</a>
+
+</p>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="card-body">
+
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+
+                            <div class="form-group">
+                                @Html.Label(Translation.CategoryInEnglish, htmlAttributes: new { @class = "control-label col-md-3" })
+
+                                @Html.EditorFor(m => m.NameEn, new { htmlAttributes = new { @class = "form-control", placeholder = Translation.EnterCategoryInEnglish, required = "required", title = Translation.EnterCategoryInEnglish } })
+                                @Html.ValidationMessageFor(m => m.NameEn, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+
+                            <div class="form-group">
+                                @Html.Label(Translation.CategoryInArabic, htmlAttributes: new { @class = "control-label col-md-3" })
+
+                                @Html.EditorFor(m => m.Name, new { htmlAttributes = new { @class = "form-control", placeholder = Translation.EnterCategoryInArabic, required = "required", title = Translation.EnterCategoryInArabic } })
+                                @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(Translation.DescriptioninEnglish, htmlAttributes: new { @class = "control-label col-md-3" })
+
+                                @Html.EditorFor(m => m.DescriptionEn, new { htmlAttributes = new { @class = "form-control", placeholder = Translation.EnterDescriptionInEnglish, required = "required", title = Translation.EnterDescriptionInEnglish } })
+                                @Html.ValidationMessageFor(m => m.DescriptionEn, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(Translation.DescriptioninArabic, htmlAttributes: new { @class = "control-label col-md-3" })
+
+                                @Html.EditorFor(m => m.Description, new { htmlAttributes = new { @class = "form-control", placeholder = Translation.EnterDescriptionInArabic, required = "required", title = Translation.EnterDescriptionInArabic } })
+                                @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(Translation.SortOrder, htmlAttributes: new { @class = "control-label col-md-3" })
+                                
+                                <input type="text" name="SortOrder" id="SortOrder" value="@Model.SortOrder" class="form-control" placeholder="@Translation.EnterSortOrderQuantity" required="required" title="@Translation.EnterSortOrderQuantity">
+                                @*@Html.EditorFor(m => m.SortOrder, new { htmlAttributes = new { @class = "form-control", placeholder = Translation.EnterSortOrderQuantity, required = "required", title = Translation.EnterSortOrderQuantity } })*@
+                                @Html.ValidationMessageFor(m => m.SortOrder, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(Translation.Active, htmlAttributes: new { @class = "control-label col-md-2" })
+
+                                <div class="checkbox">
+                                    @Html.EditorFor(model => model.Active)
+                                    @Html.ValidationMessageFor(model => model.Active, "", new { @class = "text-danger" })
+                                </div>
+                                @Html.HiddenFor(x => x.UserGroupId)
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="mg-t-15">
+                        <input type="submit" class="btn btn-primary pull-right" value="@Translation.Submit" />
+                    </p>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>

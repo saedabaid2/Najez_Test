@@ -1,0 +1,251 @@
+﻿
+@{
+    ViewBag.Title = Translation.AddUser;
+}
+
+@model Almanea.Models.vm_User
+
+@using Almanea.BusinessLogic;
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+
+            <div class="card-body">
+                @using (Ajax.BeginForm("AddEditUser", "Provider", Model,
+                                     new AjaxOptions
+                                     {
+                                         HttpMethod = "POST",
+                                         OnSuccess = "onSuccess",
+                                         OnBegin = "onBegin",
+                                         OnComplete = "onComplete",
+                                         OnFailure = "OnFailure",
+                                     }, new { id = "frmAdd", @autocomplete = "off" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.UserGroupTypeId, new { @class = "bmd-label-floating required" })
+                                <select class="form-control select2" id="UserGroupTypeId" name="UserGroupTypeId" disabled>
+                                    <option value="@ViewBag.UserGroupTypeID " selected>Service Provide</option>
+
+                                </select>
+                            </div>
+                            @Html.ValidationMessageFor(m => m.UserGroupTypeId, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.UserGroupId, new { @class = "bmd-label-floating required" })
+                                <select class="form-control select2" id="UserGroupId" name="UserGroupId" disabled>
+                                    <option value="@ViewBag.UserGroupID" selected>@ViewBag.UserGroup</option>
+                                </select>
+                            </div>
+                            @Html.ValidationMessageFor(m => m.UserGroupId, "", new { @class = "valid-text" })
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-4 col-sm-4 col-xs-12">
+                            <div class="form-group">
+                                <div class="form-label-group">
+                                    @Html.LabelFor(m => m.AccountTypeId, new { @class = "bmd-label-floating required" })
+                                    <select class="form-control select2" id="AccountTypeId" name="AccountTypeId">
+                                        <option value="0">@Translation.Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                            @Html.ValidationMessageFor(m => m.AccountTypeId, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Email, new { @class = "bmd-label-floating required" })
+                                <input type="text" name="Email" id="Email" class="form-control" placeholder="@Translation.ReqEmail" />
+
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "valid-text" })
+                        </div>
+                    </div>
+                    <div class="row">
+
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.FirstName, new { @class = "bmd-label-floating required" })
+                           <input type="text" name="FirstName" id="FirstName" class="form-control" placeholder="@Translation.ReqFirstName" />
+                            </div>
+                            @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.LastName, new { @class = "bmd-label-floating required" })
+                                <input type="text" name="LastName" id="LastName" class="form-control" placeholder="@Translation.ReqLastName" />
+
+                            </div>
+                            @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "valid-text" })
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
+                            @Html.LabelFor(m => m.MobileNo, new { @class = "bmd-label-floating required", @id = "lblmobile" })
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">+966</span>
+                                </div>
+                                <input type="text" name="MobileNo" class="form-control numOnly" id="MobileNo" placeholder="@Translation.MobileFormat" />
+
+                            </div>
+                            @Html.ValidationMessageFor(m => m.MobileNo, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(Translation.IqaamaNo, new { @class = "bmd-label-floating required" })
+                                @*@Html.LabelFor(m => m.IqaamaNo, new { @class = "bmd-label-floating" })*@
+                                <input type="text" name="IqaamaNo" class="form-control numOnly" id="IqaamaNo" placeholder="@Translation.IqaamaNoPlaceHolder" />
+                            </div>
+                            @Html.ValidationMessageFor(m => m.IqaamaNo, "", new { @class = "valid-text" })
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Password, new { @class = "bmd-label-floating required" })
+                                <input type="password" name="Password" class = "form-control" id="Password" placeholder="@Translation.ReqPassword" />
+
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.ConfirmPassword, new { @class = "bmd-label-floating required" })
+                                @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", @placeholder = Translation.ReqPassword })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "valid-text" })
+
+
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.ProfilePic, new { @class = "bmd-label-floating" })
+                                <div id="fileUpload" class="dropzone"></div>
+                                <input type="hidden" name="ProfilePic" id="ProfilePic" />
+                            </div>
+                        </div>
+                        @*<div class="custom-checkbox" id="LabourIsDriverCheckBox" style="display:none">
+                                <input type="checkbox" class="form-group" name="LabourIsDriver" id="LabourIsDriver" value="" />
+                                <label for="LabourIsDriver" style="font-size:large"><b>Is Labour a driver also?</b></label>
+                            </div>*@
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group" style="padding-bottom:3%">
+                                    <label>&nbsp;</label>
+                                <div class="custom-checkbox" id="LabourIsDriverCheckBox" style="display:none">
+                                    <input type="checkbox" class="custom-control-input" name="LabourIsDriver" id="LabourIsDriver" value="" />
+                                    <label for="LabourIsDriver" id="LabourIsDriverlabel" class="custom-control-label" style="position:absolute;left:5%">@Translation.IsLabouradriveralso</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="mg-t-15">
+                        <input type="submit" class="btn btn-primary pull-right" value="@Translation.Submit" />
+                    </p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <link href="~/Content/css/notification/notification.css" rel="stylesheet" />
+    <script src="~/Scripts/js/notify.js"></script>
+
+    <script>
+
+        Dropzone.autoDiscover = false;
+        var fileType = '.png,.jpg,.gif,.bmp,.jpeg,.pdf';
+        var maxsize =   @cls_Defaults.Filesize.ToString();
+
+        $(document).ready(function () {
+            $('.selectpicker').select2({
+                minimumResultsForSearch: Infinity
+            });
+
+            dropUploader.autodropzone('fileUpload', fileType, "ProfilePic", maxsize, "@cls_Defaults.ProfilePic");
+
+            
+
+
+            $("#LabourIsDriver").change(function () {
+                if (this.checked) {
+                    $("#LabourIsDriver").val("true");
+                }
+                else {
+                    $("#LabourIsDriver").val("false");
+                }
+
+            });
+            $("#AccountTypeId").change(function () {
+                var DropVal = this.value;
+                var LabourIsDriverCheckBox = document.getElementById("LabourIsDriverCheckBox");
+
+                if (DropVal == "10") {
+                    LabourIsDriverCheckBox.style.display = "block";
+                }
+                else {
+                    $("#LabourIsDriver").prop('checked', false);
+                    LabourIsDriverCheckBox.style.display = "none";
+                }
+
+            });
+            
+
+      $.get("@Url.Action("BindAccountType", "Provider")",
+                    { Id: 1 }, function (data) {
+                        $("#AccountTypeId").find('option').not(':first').remove();
+                        $.each(data, function (index, row) {
+                            $("#AccountTypeId").append("<option value='" + row.Value + "'>" + row.Text + "</option>")
+                        });
+                    });
+        });
+
+ function onSuccess(response) {
+     onComplete();
+     if (response.StatusId > 0) {
+                successPopup("@Translation.success_AddUser");
+
+                setTimeout(function () { window.location = '@Url.Action("GetUserList")'; }, 3000);
+            }
+            else{
+                warningPopup(response.Message);
+            }
+        }
+
+      function OnFailure(response) {
+            warningPopup("Something wrong!");
+        }
+
+
+
+        var DelImage = function (Id) {
+            onBegin();
+            $.post("@Url.Action("DelImgUser")/" + Id, function (response) {
+
+                if (response.StatusId > 0) {
+                    $("#divImage").remove();
+                }
+                onComplete();
+            });
+        }
+    </script>
+}
+
+

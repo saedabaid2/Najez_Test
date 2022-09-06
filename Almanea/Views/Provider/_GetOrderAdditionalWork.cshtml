@@ -1,0 +1,31 @@
+﻿
+@model List<Almanea.Models.vm_OrderAdditionalWork>
+
+
+@using (Ajax.BeginForm("", "", null,
+                                  new AjaxOptions
+                                  {
+                                      HttpMethod = "POST",
+                                      OnSuccess = "onVerify",
+                                  }, new { id = "frmOrderAdditionalWork" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <ul>
+                @foreach (var item in Model)
+                {
+                    <li>
+                        @item.AdditionalWorkNameEN
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+    @*<p class="mg-t-15">
+        <input type="submit" class="btn btn-primary pull-right" value="@Translation.Submit" />
+    </p>*@
+}
+
+

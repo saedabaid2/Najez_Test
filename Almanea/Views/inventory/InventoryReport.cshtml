@@ -1,0 +1,164 @@
+﻿@using Almanea.BusinessLogic;
+@model Almanea.Models.vm_InventoryMaster
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+
+            <div class="card-body">
+                <div class="row" id="divSearch">
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="text" id="Date" class="form-control datepicker" placeholder="@Translation.StartDate/@Translation.EndDate" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                @*<input type="text" id="Labour" class="form-control " placeholder="@Translation.Labour" />*@
+                                @Html.DropDownListFor(model => model.LabourId, new SelectList(ViewBag.Labours, "Value", "Text"), Translation.Select, new { @class = "form-control select2" })
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <p>
+                    <input type="button" value="@Translation.Search" class="btn btn-primary pull-right" onclick="BindDataTable()" />
+                    @*<span class="ta-right f-right">
+                            <a onclick="Print();" title="Print" data-toggle="tooltip"><i class="fa fa-print"></i></a>
+                        </span>*@
+                </p>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dataTable">
+                    <thead class="thead-light">
+                        <tr>
+                            @*<th width="05%"></th>*@
+                            <th width="10%">@Translation.Labour</th>
+                            <th width="10%">@Translation.StartDate</th>
+                            <th width="15%">@Translation.EndDate</th>
+                            <th width="20%">@Translation.Items</th>
+                            <th width="10%">@Translation.Quantity</th>
+                            <th width="8%">@Translation.Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            async: true;
+            //List
+            BindDataTable();
+        });
+        $(document).keypress(function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if (keycode == '13') {
+                BindDataTable();
+            }
+        });
+            var oTable;
+        function BindDataTable(response) {
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("GetInventoryMaster")",
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+                        aoData.push(
+                            { "name": "Date", "value": $("#Date").val() },
+                            { "name": "LabourId", "value": $("#LabourId").val() }
+                        );
+                        debugger;
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+                    },
+                    // data: response,
+                    "aoColumns": [
+                        { "mData": "LabourId" },
+                        //{ "mData": "Invoice", },
+
+                            {
+                                "mData": "StartDate",
+                                "render": function (Id, type, full, meta) {
+                                    var pattern = /Date\(([^)]+)\)/;
+                                    var results = pattern.exec(Id);
+                                    var dt = new Date(parseFloat(results[1]));
+
+                                    return (dt.getMonth() + 1) + "/" + dt.getDate() + "/" + dt.getFullYear();
+                                }
+                                 ,"orderable": true
+                            },
+                            {
+                                "mData": "EndDate",
+                                "render": function (Id, type, full, meta) {
+                                    var pattern = /Date\(([^)]+)\)/;
+                                    var results = pattern.exec(Id);
+                                    var dt = new Date(parseFloat(results[1]));
+
+                                    return (dt.getMonth() + 1) + "/" + dt.getDate() + "/" + dt.getFullYear();
+                                }
+                                ,
+                                "orderable": true
+                            },
+                        { "mData": "ItemId" },
+                        { "mData": "Quantity" },
+                        {
+                          "mData": "Id",
+                           "render": function (Id, type, full, meta) {
+                               debugger;
+                                var str = '';
+                                if (Id != '-1')
+                                str += '<a href="/inventory/Details/' + Id + '" /*title="@Translation.Edit" data-toggle="tooltip"*/><i class="fa fa-edit"></i></a>';
+                               else
+                                str += '<span>No Inventory Items</span>';
+
+                               return str;
+                            },
+                            "orderable": false
+                        }
+                    ],
+
+                    "fnInitComplete": function (oSettings, json) {
+                    },
+                    "fnDrawCallback": function (oSettings) {
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                        "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "emptyTable": false,
+                        "infoEmpty": "@Translation.NoMatchingRecords",
+                    },
+                });
+            }
+
+
+        }
+    </script>
+}

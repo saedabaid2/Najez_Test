@@ -1,0 +1,175 @@
+﻿@model  vm_Item
+
+@{
+    ViewBag.Title = Translation.Items + " " + Translation.Edit;
+}
+
+
+@using Almanea.Models;
+@using Almanea.BusinessLogic;
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                @using (Ajax.BeginForm("AddItem", "Provider", Model,
+
+                           new AjaxOptions
+                           {
+                               HttpMethod = "POST",
+                               OnSuccess = "onSuccess",
+                               OnBegin = "onBegin",
+                               OnComplete = "onComplete",
+                               OnFailure = "OnFailure",
+                           }, new { id = "frmAdd", @autocomplete = "off" }))
+                {
+
+                    @Html.AntiForgeryToken()
+
+                <div class="row">
+                    @*@Html.HiddenFor(m => m.ServiceId)*@
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.Label(Translation.ItemNameArabic, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.name, new { @class = "form-control", type = "text" })
+                            <div class="">
+                                <input type="submit" class="add btn btn-primary" name="add" value="@Translation.AddItem" />
+                            </div>
+                        </div>
+                        @Html.ValidationMessageFor(m => m.name, "", new { @class = "valid-text" })
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.Label(Translation.ItemNameEnglish, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.name_en, new { @class = "form-control", type = "text" })
+                          
+                        </div>
+                        @Html.ValidationMessageFor(m => m.name_en, "", new { @class = "valid-text" })
+                    </div>
+                </div>
+                    <div class="row">
+                        <label>@Translation.Items</label>
+                        <div class="col-md-12 laboursContainer">
+
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table align-items-center table-flush" id="dataTable">
+                            <thead class="thead-light">
+                                <tr>
+                                    @*<th width="05%"></th>*@
+                                    <th width="10%">@Translation.ItemNo</th>
+                                    <th width="10%">@Translation.ItemNameArabic</th>
+                                    <th width="10%">@Translation.ItemNameEnglish</th>
+                                   <th width="15%">@Translation.Action</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            async: true;
+            //List
+            BindDataTable();
+        });
+        var oTable;
+         function BindDataTable(response) {
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+                    "bAutoWidth": false,
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("GetItems")",
+                    "aoColumns": [
+                        { "mData": "id", },
+                        { "mData": "name"},
+                        { "mData": "name_en"},
+                                 {
+                                     "mData": "id",
+                                     "render": function (Id, type, full, meta) {
+                                         debugger;
+                                         return '<a onclick=DeleteItem(' + Id + ')  title="@Translation.Delete" ><i  class="fa fa-trash"></i></a>&nbsp;';
+                                               },
+                            "orderable": false
+                        },
+                    ],
+                    "order": [[0, "desc"]],
+                    "fnInitComplete": function (oSettings, json) {
+                    },
+                    "fnDrawCallback": function (oSettings) {
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                        "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                        "emptyTable": false,
+                        "sEmptyTable": "@Translation.NoDataFound",
+                    },
+                });
+            }
+        }
+         function onSuccess(response) {
+     onComplete();
+     if (response.StatusId > 0) {
+                successPopup("@Translation.success_AddItem");
+
+                setTimeout(function () { window.location = '@Url.Action("additem")'; }, 3000);
+            }
+            else{
+                warningPopup(response.Message);
+            }
+        }
+        function DeleteItem(id) {
+            if (confirm("Are You sure to delete this record..?")) {
+                $.ajax({
+
+                    type: 'POST',
+                    //url: "/Products/delete/" + id,
+                    url: '@Url.Action("DeleteItem", "provider")/' + id,
+                    datatype: 'JSON',
+                    //data: JSON.stringify({ id: id }),
+                    success: function (response) {
+
+                            window.location.reload();
+                            //$("#myModal").modal('hide');
+
+                    },
+                    error: function (msg) {
+                        alert(msg.responseText);
+                    }
+
+                });
+            }
+        }
+
+
+      function OnFailure(response) {
+            warningPopup("Something wrong!");
+        }
+    </script>
+
+}

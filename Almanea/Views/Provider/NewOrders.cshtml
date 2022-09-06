@@ -1,0 +1,556 @@
+﻿
+@{
+    ViewBag.Title = Translation.OrdersList;
+    var UserGroupTypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+    var UserId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserId]);
+    var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupId]);
+    var ActtypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+    var OrderParemeters = (IList<Almanea.Models.vm_page_details>)ViewBag.ShowHideP;
+    var OrderColumns = (IList<Almanea.Models.vm_page_details>)ViewBag.ShowHideC;
+}
+
+@using Almanea.BusinessLogic;
+<style>
+    .Actionbutton {
+        background: none !important;
+        border: none;
+        padding: 0 !important;
+        /*optional*/
+        font-family: arial, sans-serif;
+        /*input has OS specific font-family*/
+        color: #458f8e;
+        text-decoration: underline;
+        cursor: pointer;
+        outline: none;
+    }
+</style>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+
+            <div class="card-body">
+                <div class="row" id="divSearch">
+                    <div class="col-xl-4 col-sm-6 col-md-4 @(OrderParemeters[0].Target ==0 ? "hidden" : "show")">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="text" id="sSeller" class="form-control" placeholder="@Translation.SellerName / @Translation.SellerContact" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-4 @(OrderParemeters[1].Target ==0 ? "hidden" : "show")">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="text" id="sInvoice" class="form-control" placeholder="@Translation.InvoiceNo / @Translation.OrderNo" />
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-4 @(OrderParemeters[2].Target ==0 ? "hidden" : "show")">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="text" id="sCustomer" class="form-control" placeholder="@Translation.CustomerName / @Translation.CustomerContact" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-4 @(OrderParemeters[3].Target ==0 ? "hidden" : "show")">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="text" id="sDate" value="@Model.Date" class="form-control datepickerall" placeholder="@Translation.InstallDate" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-4 @(OrderParemeters[4].Target ==0 ? "hidden" : "show")">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <select class="form-control select2" id="sLocation">
+                                    <option value="0">@Translation.Select  @Translation.Location</option>
+                                    @foreach (var item in cls_DropDowns.GetLocations(UserGroupId, UserGroupTypeId, ActtypeId))
+                                    {
+                                        if (Model.LocationId == Convert.ToInt32(item.Value))
+                                        {
+                                            <option value="@item.Value" selected>@item.Text</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-4  @(OrderParemeters[5].Target ==0 ? "hidden" : "show")">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <select class="form-control select2" id="sStatus" name="sStatus">
+                                    <option value="0">@Translation.SelectStatus</option>
+                                    @foreach (var item in cls_DropDowns.AllOrderStatus().Where(k => k.Value != ((int)OrderStatus.ReSchedule).ToString()))
+                                    {
+                                        if (item.Value != "1")
+                                        {
+                                            if (Model.StatusId == Convert.ToInt32(item.Value))
+                                            {
+                                                <option value="@item.Value" selected>@item.Text</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+
+
+                                        }
+                                        else
+                                        {
+                                            if (Model.StatusId == Convert.ToInt32(item.Value))
+                                            {
+                                                <option value="@item.Value" selected>@item.Text</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-4  @(OrderParemeters[6].Target ==0 ? "hidden" : "show")">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                @Html.DropDownList("Direction", new SelectList(ViewBag.DirectionList, "Id", "DirectionName"), @Translation.SelectDirection, new { @class = "form-control select2 direction" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p>
+                    <input type="button" value="@Translation.Search" class="btn btn-primary pull-right" onclick="BindDataTable()" />
+                    <span class="ta-right f-right">
+                        <a onclick="Print();" title="Print" data-toggle="tooltip"><i class="fa fa-print"></i></a>
+                    </span>
+
+
+                    @*@if (Session[cls_Defaults.Session_AccountTypeId].ToString() == "1" || Session[cls_Defaults.Session_AccountTypeId].ToString()=="15" || Session[cls_Defaults.Session_AccountTypeId].ToString()=="6" )
+                        {*@
+                    @*@if (ViewBag.autodispatch==true)
+                        {
+                        <input type="button" id="btn-autodispth" value="@Translation.autodispatched" class="btn btn-primary pull-right" onclick="AutoDispatch()" />
+                         }*@
+                    @*}*@
+
+                </p>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dataTable">
+                    <thead class="thead-light">
+                        <tr>
+                            @*<th width="05%"></th>*@
+                            <th width="10%">@Translation.OrderNo</th>
+                            @*<th width="12%">@Translation.InvoiceNo</th>*@
+                            <th width="10%">@Translation.OrderDate</th>
+                            <th width="15%">@Translation.Customer</th>
+                            <th width="20%">@Translation.InstallOn</th>
+                            <th width="10%">@Translation.Location</th>
+                            <th width="10%">@Translation.Direction</th>
+                            <th width="10%">@Translation.Quantity</th>
+                            @*<th width="08%">@Translation.Unit</th>*@
+                            <th width="14%">@Translation.OrderCost</th>
+                            <th width="10%">@Translation.Status</th>
+
+                            <th width="15%">@Translation.Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        window.setInterval(function () {
+            /// call your function here
+            if (@Session[cls_Defaults.Session_UserId] != null) {
+                //BindDataTable();
+            }
+            else {
+                clearInterval();
+                window.location = '@Url.Action("Index", "Home")';
+            }
+        }, 30000);
+
+           $(window).bind("beforeunload", function () {
+             //Logic to delete the item
+               clearInterval();
+        });
+    </script>
+    <script>
+         var  autodispathc = 0;
+        var statusId = 0;
+        $(document).ready(function () {
+            async: true;
+            //List
+
+            BindDataTable();
+
+            if (autodispathc == 0) {
+                 console.log("true 0", autodispathc);
+                $("#btn-autodispth").attr('disabled', 'true');
+                $("#btn-autodispth").addClass('btn-warning');
+            }
+
+            if (autodispathc == 1) {
+                 console.log("true 1", autodispathc);
+                $("#btn-autodispth").removeAttr('disabled');
+            }
+            console.log("true false", autodispathc);
+        });
+        $(document).keypress(function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if (keycode == '13') {
+                BindDataTable();
+            }
+        });
+        var oTable;
+        function BindDataTable(response) {
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("GetNewOrders")",
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+                        debugger;
+                        statusId = aoData.StatusId;
+                        aoData.push(
+                            { "name": "Seller", "value": $("#sSeller").val() },
+                            { "name": "Customer", "value": $("#sCustomer").val() },
+                            { "name": "InvoiceNo", "value": $("#sInvoice").val() },
+                            { "name": "InstallDate", "value": $("#sDate").val() },
+                            { "name": "Location", "value": $("#sLocation").val() },
+                            { "name": "StatusId", "value": $("#sStatus").val() },
+                            { "name": "Direction", "value": $("#Direction option:selected").val() },
+                        );
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+                    },
+                    // data: response,
+                    "aoColumns": [
+                       //{ "mData": null, className: 'checks', defaultContent:"<input type='checkbox' class='i-checks' name ='input[]'>" },
+                        //{
+
+                        //    "mData": "OrderId",
+                        //  // "mData": "Status",
+                        //    "render": function (Id, type, row) {
+                        //       // console.log("ali row ",row);
+                        //        if (row.Status == 1) {
+
+                        //            this.autodispathc = 1;
+                        //            $("#btn-autodispth").removeAttr('disabled');
+                        //            $("#btn-autodispth").removeClass('btn-warning');
+                        //            console.log("true 10", autodispathc);
+                        //            return '<input class="CheckBox" type="checkbox" value="' + row.OrderId + '"/>'
+                        //        }
+                        //        else {
+                        //            return ''
+                        //        }
+                        //        }
+                        //    },
+                        { "mData": "OrderNo", },
+                        //{ "mData": "Invoice", },
+                        { "mData": "AddedDate", },
+                        { "mData": "Customer", },
+                        { "mData": "InstallDate" , "orderable": false },
+                        { "mData": "Location" },
+                        { "mData": "Direction", },
+                        { "mData": "Quantity", },
+                     /*   { "mData": "Unit", },*/
+                        { "mData": "TotalAmount" },
+                        {
+                            "mData": "StatusText",
+                             "render": function (Id, type, full, meta) {
+                                debugger;
+                                 return '<span>' + Id+'</span>';
+                                    //+ '<a href="javascript:void(0)" onclick="AssignDriver(\'' + Id + '\')" title="Assign Driver" data-toggle="tooltip"><i class="fa fa-id-card"></i></a>'
+                                    //+ '<a href="javascript:void(0)" onclick="AssignLabour(\'' + Id + '\')" title="Assign Driver" data-toggle="tooltip"><i class="fas fa-user-tie"></i></a>';
+
+                            }
+
+                        },
+                        {
+                            "mData": "OrderId",
+                            "render": function (Id, type, full, meta) {
+                                debugger;
+                                return '<a href="@Url.Action("Details")/' + Id + '" title="@Translation.Edit" data-toggle="tooltip"><i class="fa fa-edit"></i></a>';
+                                    //+ '<a href="javascript:void(0)" onclick="AssignDriver(\'' + Id + '\')" title="Assign Driver" data-toggle="tooltip"><i class="fa fa-id-card"></i></a>'
+                                    //+ '<a href="javascript:void(0)" onclick="AssignLabour(\'' + Id + '\')" title="Assign Driver" data-toggle="tooltip"><i class="fas fa-user-tie"></i></a>';
+
+                            },
+                            "orderable": false
+                        },
+
+                    ],
+                    "order": [[1, "desc"]],
+                    'rowCallback': function(row, data, dataIndex){
+         // Get row ID
+         var rowId = data[0];
+
+         // If row ID is in the list of selected row IDs
+         if($.inArray(rowId, rows_selected) !== -1){
+            $(row).find('input[type="checkbox"]').prop('checked', true);
+            $(row).addClass('selected');
+         }
+      },
+                    "fnInitComplete": function (oSettings, json) {
+                    },
+                    "fnDrawCallback": function (oSettings) {
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                        "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "emptyTable": false,
+                        "infoEmpty": "@Translation.NoMatchingRecords",
+                    },
+                });
+            }
+
+
+        }
+
+        var rows_selected = [];
+          // Handle click on checkbox
+   $('#dataTable tbody').on('click', 'input[type="checkbox"]', function(e){
+      var $row = $(this).closest('tr');
+
+      // Get row data
+      var data = oTable.row($row).data();
+       //console.log("ali data1",data.OrderId);
+      // Get row ID
+       var rowId = data[0];
+       //console.log("ali data2",rowId);
+
+      // Determine whether row ID is in the list of selected row IDs
+      var index = $.inArray(data.OrderId, rows_selected);
+
+      // If checkbox is checked and row ID is not in list of selected row IDs
+      if(this.checked && index === -1){
+         rows_selected.push(data.OrderId);
+
+      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
+      } else if (!this.checked && index !== -1){
+         rows_selected.splice(index, 1);
+      }
+
+      if(this.checked){
+         $row.addClass('selected');
+      } else {
+         $row.removeClass('selected');
+       }
+       console.log("ali data",rows_selected);
+      // Update state of "Select all" control
+      //updateDataTableSelectAllCtrl(table);
+
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+   });
+
+
+
+
+function AutoDispatch() {
+
+    //var pid = $('.patientId').attr('id');
+    //var tid = "";
+    //var tval = "";
+    //var tpid = "";
+    //var tests = [];
+
+    //$("table > tbody > tr").each(function () {
+    //     testId = $(this).find('.tid').val();
+
+    //     if (typeof (testId) != "undefined") {
+    //         tid = testId;
+    //     }
+
+    //     var rowText = ""
+
+    //     $(this).find('td').each(function () {
+    //         tpid = $(this).find('.tpId').val();
+    //         tval = $(this).find('.result').val();
+
+    //         if (typeof (tpid) != "undefined") {
+    //             tests.push({ PatientId: pid, TestId: tid, TestParameterId: tpid, TestValue: tval });
+    //         }
+    //     });
+    // });
+   // var url = "";
+     // alert(JSON.stringify(tests));
+    if (rows_selected.length==0) {
+        warningPopup('Please select the order !!');
+        return;
+    }
+
+     $.ajax({
+                type: "POST",
+                url:'@Url.Action("AutoDispatch")',
+                data: JSON.stringify(rows_selected),
+                contentType: "application/json",
+
+                success: function (response) {
+                    //alert(response);
+                    onComplete();
+
+                                if (response.StatusId > 0 && response.StatusId != 424) {
+                                    //Success Message
+                                    successPopup("@Translation.success_NewOrder");
+                                    BindDataTable();
+                                    setTimeout(function () { window.location = '@Url.Action("NewOrders")'; }, 3000);
+                                }
+                                else {
+                                    //warningPopup('response.Message');
+                                    successPopup("Order Autodispatched sucess");
+                                    BindDataTable();
+                                }
+
+
+                },
+                error: function (e) {
+                    alert('Error' + JSON.stringify(e));
+                }
+    });
+}
+
+        var Reset = function () {
+            $('#divSearch').find('input[type=text]').val('');
+            $('#divSearch').find('select').val('0');
+            BindDataTable();
+        }
+
+        function Print() {
+
+            var url = "@Url.Action("Order", "Print")?TypeId=1&" +
+                "&Seller=" + $("#sSeller").val() + "&Customer=" + $("#sCustomer").val() +
+                "&InvoiceNo=" + $("#sInvoice").val() + "&InstallDate=" + $("#sDate").val() +
+                "&Location=" + $("#sLocation").val() + "&Status=" + $("#sStatus").val() + "&Direction=" + $("#Direction option:selected").val();
+
+            var win = window.open(url, '_blank');
+            win.focus();
+        }
+            var enumOrder =@(Html.EnumToString<OrderStatus>())
+        function AssignDriver(orderId)
+        {
+             $.ajax({
+                type: "POST",
+                url: '@Url.Action("CheckOrderStatus")',
+                 data: '{Id: ' + JSON.stringify(orderId) + '}',
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                 success: function (response) {
+                     if (response.StatusId > 0 && response.StatusId >= enumOrder.Reserved) {
+                         $("#myModalBody").load("@Url.Action("AssignDriver")/" + orderId +"", function () {
+                                        $("#myModal").modal('show');
+                                        modalSize('content');
+                                        $.validator.unobtrusive.parse($("#frmVerify"))
+                                        $("#myModalLabel").text("Assign Driver");
+                                    });
+                     }
+                     else if (response.StatusId == enumOrder.ReceivedFromWarehouse)
+                     {
+                         warningPopup("Order received from warehouse can not assign the driver");
+                     }
+                     else if (response.StatusId == enumOrder.Job_in_Progress) {
+                         warningPopup("Work start on order can not assign the driver");
+                     }
+                     else if (response.StatusId == enumOrder.Finish) {
+                         warningPopup("Order finish can not assign the driver");
+                     }
+                     else if (response.StatusId == enumOrder.NewOrder) {
+                         warningPopup("Please reserved the order for assign driver");
+                     }
+                     else if (response.StatusId == enumOrder.Rejected) {
+                         warningPopup("Order is rejected can not assign the driver");
+                     }
+                },
+                 error: function () {
+                }
+            });
+        }
+         function AssignLabour(orderId)
+        {
+
+             $.ajax({
+                type: "POST",
+                url: '@Url.Action("CheckOrderStatus")',
+                 data: '{Id: ' + JSON.stringify(orderId) + '}',
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                 success: function (response) {
+                     if (response.StatusId > 0 && response.StatusId != enumOrder.Job_in_Progress && response.StatusId != enumOrder.Rejected && response.StatusId >= enumOrder.Reserved) {
+                    $("#myModalBody").load("@Url.Action("AssignLabour")/"+orderId+"", function () {
+                                        $("#myModal").modal('show');
+                                        modalSize('content');
+                                        $.validator.unobtrusive.parse($("#frmVerify"))
+                                        $("#myModalLabel").text("Assign Labour");
+                 });
+                     }
+                     else if (response.StatusId == enumOrder.Job_in_Progress) {
+                         warningPopup("Work start on order can not assign the labour");
+                     }
+                     else if (response.StatusId == enumOrder.NewOrder) {
+                         warningPopup("Please reserved the order for assign labour");
+                     }
+                     else if (response.StatusId == enumOrder.Rejected) {
+                         warningPopup("Order is rejected can not assign the labour");
+                     }
+                },
+                 error: function () {
+                }
+            });
+        }
+
+        function onStatus(response) {
+            if (response.StatusId > 0) {
+                successPopup("@Translation.success_Update");
+                $("#myModal").modal('hide');
+                setTimeout(function () { window.location = window.location.href; }, 3000);
+            }
+            else {
+                 warningPopup(response.Message);
+            }
+        }
+
+
+    </script>
+
+
+
+    @if (ViewBag.Message != null)
+    {
+        <script>
+            warningPopup("@ViewBag.Message");
+        </script>
+    }
+}
+
+

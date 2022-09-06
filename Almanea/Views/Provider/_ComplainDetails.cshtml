@@ -1,0 +1,56 @@
+﻿
+@model Almanea.Models.vm_ComplainResponse
+@using Almanea.BusinessLogic
+
+<div class="row">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <div class="form-group">
+            <label>@Translation.ComplainId</label>
+            @Html.TextBoxFor(m => m.ComplainId, new { @class = "form-control", @readonly = "readonly" })
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Comments, new { @class = "bmd-label-floating" })
+            @Html.TextAreaFor(m => m.Comments, new { @class = "form-control", @style = "resize:none;", @readonly = "readonly" })
+        </div>
+    </div>
+</div>
+
+<form id="frmUpdate">
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Response, new { @class = "bmd-label-floating required" })
+                @Html.TextAreaFor(m => m.Response, new { @class = "form-control", @style = "resize:none;" })
+            </div>
+            @Html.ValidationMessageFor(m => m.Response, "", new { @class = "valid-text" })
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            @Html.HiddenFor(m => m.ComplainId)
+        </div>
+    </div>
+    <p>
+        @{
+            var userGroupType = Convert.ToInt32(Session[cls_Defaults.Session_UserGroupTypeId]);
+
+            if (userGroupType == (int)enumGroupType.Admin && Model.StatusId == (int)enumComplainStatus.New)
+            {
+                <input type="button" class="btn btn-primary pull-right" id="btnAssign" value="@Translation.AssignSp" onclick="SubmitComplain(2);" />
+
+                <input type="button" class="btn btn-success pull-right" id="btnResolve" value="@Translation.Resolve" onclick="SubmitComplain(3);" />
+
+                <input type="button" class="btn btn-danger pull-right" id="btnReject" value="@Translation.Reject" onclick="SubmitComplain(4);" />
+            }
+            else if (userGroupType == (int)enumGroupType.Provider && Model.StatusId == (int)enumComplainStatus.Verifying)
+            {
+                <input type="button" class="btn btn-success pull-right" id="btnResolve" value="@Translation.Resolve" onclick="SubmitComplain(3);" />
+
+                <input type="button" class="btn btn-danger pull-right" id="btnReject" value="@Translation.Reject" onclick="SubmitComplain(4);" />
+            }
+        }
+
+    </p>
+</form>

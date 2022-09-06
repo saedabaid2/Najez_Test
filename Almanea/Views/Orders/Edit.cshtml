@@ -1,0 +1,706 @@
+﻿
+@{
+    /**/
+
+    ViewBag.Title = Translation.EditOrder;
+
+    var UserGroupTypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+    var UserId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserId]);
+    var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupId]);
+    var ActtypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+}
+
+@model Almanea.Models.vm_Order
+@using Almanea.BusinessLogic;
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+
+            <div class="card-body">
+
+                <form id="frmAdd" autocomplete="off">
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.SellerName, new { @class = "bmd-label-floating required" })
+                                @Html.TextBoxFor(m => m.SellerName, new { @class = "form-control", @placeholder = Translation.ReqSellerName })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.SellerName, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            @Html.LabelFor(m => m.SellerContact, new { @class = "bmd-label-floating required" })
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">+966</span>
+                                </div>
+                                @Html.TextBoxFor(m => m.SellerContact, new { @class = "form-control numOnly", @placeholder = Translation.MobileFormat })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.SellerContact, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.InvoiceNo, new { @class = "bmd-label-floating required" })
+                                @Html.TextBoxFor(m => m.InvoiceNo, new { @class = "form-control", @placeholder = Translation.ReqInvoiceNo })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.InvoiceNo, "", new { @class = "valid-text" })
+                        </div>
+                    </div>
+                    <hr class="thick" />
+
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.CustomerName, new { @class = "bmd-label-floating required" })
+                                @Html.TextBoxFor(m => m.CustomerName, new { @class = "form-control", @placeholder = Translation.ReqCustomerName })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.CustomerName, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.LocationId, new { @class = "bmd-label-floating required" })
+                                @Html.DropDownListFor(model => model.LocationId, cls_DropDowns.GetLocations(UserGroupId, UserGroupTypeId, ActtypeId), Translation.Select, new { @class = "form-control select2" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.LocationId, "", new { @class = "valid-text" })
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            @Html.LabelFor(m => m.CustomerContact, new { @class = "bmd-label-floating required" })
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">+966</span>
+                                </div>
+                                @Html.TextBoxFor(m => m.CustomerContact, new { @class = "form-control numOnly", @placeholder = Translation.MobileFormat })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.CustomerContact, "", new { @class = "valid-text" })
+                        </div>
+
+                    </div>
+                    <div class="row">
+
+                        @if ((bool)ViewBag.AllowAsap == true)
+                        {
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                @Html.LabelFor(m => m.InstallDate, new { @class = "bmd-label-floating required" })
+                                <div class="row">
+                                    @*<div class="col-md-12">
+                                            <div class="custom-radio">
+                                                <label>
+                                                    @Html.RadioButton("PreferDate", 1, Model.PreferDate == 1, new { @class = "check-mark" })&nbsp;@Translation.PreferAsap
+                                                </label><br />
+                                                <label>
+                                                    @Html.RadioButton("PreferDate", 2, Model.PreferDate == 2, new { @class = "check-mark" })&nbsp;@Translation.PreferSpecific
+                                                </label>
+                                            </div>
+                                        </div>*@
+                                    <div class="col-md-8" id="divInstallDate" style="@(Model.PreferDate == 1 ? "display:none;" : "")">
+                                        <div class="input-group">
+                                            @Html.TextBoxFor(m => m.InstallDate, new { @class = "form-control datepicker" })
+
+                                            <div class="input-group-append">
+                                                <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.InstallDate, "", new { @class = "valid-text" })
+                                        @*@Html.HiddenFor(m => m.PreferDate)*@
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.PrefferTime, new { @class = "bmd-label-floating required" })
+                                <div class="custom-radio">
+                                    <label>
+                                        <input type="radio" name="PrefferTime" value="1" @(Model.PrefferTime == 1 ? "checked" : "")>&nbsp;@Translation.MorningTime
+                                    </label><br />
+                                    <label>
+                                        <input type="radio" name="PrefferTime" value="2" @(Model.PrefferTime == 2 ? "checked" : "")>&nbsp;@Translation.EveningTime
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                <label>@Translation.SMSLanguage</label>
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" id="IsArabic" class="custom-control-input" @(Model.SmsInArabic ? "checked" : "") />
+                                    <label for="IsArabic" class="custom-control-label">@Translation.Arabic</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            @Html.LabelFor(m => m.AlternateMobile, new { @class = "bmd-label-floating" })
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">+966</span>
+                                </div>
+                                @Html.TextBoxFor(m => m.AlternateMobile, new { @class = "form-control numOnly", @placeholder = Translation.MobileFormat })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.AlternateMobile, "", new { @class = "valid-text" })
+                        </div>
+                        @if (Model.Status == 1)
+                        {
+
+
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Comments, new { @class = "bmd-label-floating " })
+                                    @Html.TextBoxFor(m => m.Comments, new { @class = "form-control", @placeholder = Translation.Comments })
+
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <hr class="thick" />
+                    @Html.Partial("_OrderServices", new ViewDataDictionary { { "Services", ViewBag.Services }, { "Vat", ViewBag.Vat } })
+                    <div class="row mt-5">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            &nbsp;
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group" style="text-align:right;">
+                                @Translation.Quantity
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group">
+                                <input type="hidden" id="hdnquantity" value="@ViewBag.Quantity" />
+
+                                @*@Html.TextBox("Quantity", 0, new { @class = "form-control", @readonly = "true", @value =ViewBag.Quantity })*@
+                                @Html.TextBoxFor(m => m.Quantity, new { @class = "form-control", @readonly = "true" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row ">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            &nbsp;
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group" style="text-align:right;">
+                                @Translation.SubTotal
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.ServiceTotal, new { @class = "form-control", @readonly = "true" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            &nbsp;
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group" style="text-align:right;">
+                                @Translation.Vat&nbsp;(@ViewBag.Vat%)
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.ServiceVat, new { @class = "form-control", @readonly = "true" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            &nbsp;
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group" style="text-align:right;">
+                                @Translation.GrandTotal
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.TotalAmount, new { @class = "form-control", @readonly = "true" })
+                            </div>
+                        </div>
+                    </div>
+                    <b><span id="spnclor" style="color:red;"></span></b>
+                    @if (Model.Status == (int)OrderStatus.NewOrder || Model.Status == (int)OrderStatus.AssignDriver || Model.Status == (int)OrderStatus.AssignLabour || Model.Status == (int)OrderStatus.AppointmentConfirmed)
+                    {
+                        <p class="mg-t-15">
+                            <input type="submit" class="btn btn-primary pull-right" value="@Translation.Submit" id="btnsubmitorder" />
+
+                            <input type="button" class="btn btn-danger pull-right" value="@Translation.Delete" onclick="Delete();" />
+                        </p>
+                    }
+
+                    @Html.HiddenFor(m => m.OrderId)
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+    <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet" />
+
+  
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
+
+    <link href="~/Content/Site.css" rel="stylesheet" />
+
+    <script>
+        var array = '@ViewBag.BlockDate'.split(',');
+        var arrayDate = [];
+        for (var i = 0; i < array.length; i++)
+        {
+            arrayDate.push(array[i].trim());
+        };
+        $("#InstallDate").datepicker({
+            minDate: 1,
+            beforeShowDay: function (date) {
+                    var show = true;
+                if (date.getDay() == 5) {
+                    show = false
+                }
+
+                var string = jQuery.datepicker.formatDate('dd/mm/yy', date);
+                if ((arrayDate.indexOf(string) == -1) == false) {
+                    show = false
+                }
+                    return [show];
+                }, dateFormat: 'dd/mm/yy',
+            onSelect: function (dateText, inst) {
+                var date = $(this).val();
+                var time = $('#time').val();
+                $('.overlay').show();
+               // alert('on select triggered');
+              //  $("#start").val(date + time.toString(' HH:mm').toString());
+                //ShowOrderQuantity();
+                $('.overlay').hide();
+
+
+                     var data = new FormData(document.getElementById("frmAdd"));
+                             data.append('date', date);
+                             $.ajax({
+                                 url: "@Url.Action("checkblockdate")",
+                                 type: 'POST',
+                                 data: data,
+                                 dataType: 'json',
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+        success: function (response2) {
+
+            if (response2.Message == "No SP available") {
+             //   warningPopup("No Service provider available for this day! please choose another day")
+                $('#spnclor').html('@Translation.NoserviceProvideravailable');
+                $('#btnsubmitorder').hide();
+
+                //show = false
+            }
+            else {
+                $('#btnsubmitorder').show();
+                $('#spnclor').html('');
+            }
+
+            onComplete();
+
+
+
+
+
+        }
+
+
+    });
+
+
+
+            }
+        });
+        function ShowOrderQuantity() {
+            var d = $("#InstallDate").val();
+
+              $.get("@Url.Action("EdiInstallationDate", "Orders")",
+                     { Id: $('#Quantity').val(), previous: $('#hdnquantity').val(), sDate: d }, function (data) {
+                         if (data.order == true) {
+                             $('#btnsubmitorder').show();
+
+                         }
+                         else {
+                             $('#btnsubmitorder').hide();
+
+                             warningPopup("@Translation.NoserviceProvideravailable");
+
+                         }
+                    });
+        }
+        $(document).ready(function () {
+
+            $('.select2').select2();
+            //$('#btnsubmitorder').hide();
+            $('input[name="PreferDate"]').on('click', function () {
+                var status = $(this).val();
+                if (status == '2') {
+                    $('#divInstallDate').show();
+                }
+                else {
+                    $('#divInstallDate').hide();
+                    $('#InstallDate').val('');
+                }
+            });
+        });
+    </script>
+
+    <script>
+        var $vatPerc = parseInt(@ViewBag.Vat);
+
+        var $vat = 0;
+        var $total = 0;
+        var $total$vat = 0;
+
+        function CalculateVat() {
+            $total = 0;
+
+            $("#dtServices > tbody").find('tr').each(function () {
+                $total += parseFloat($(this).find('#hfPrice').val());
+            });
+
+            $vat = $total * ($vatPerc / 100);
+            $total$vat = $total + $vat;
+
+            if ($total$vat == undefined || $total$vat == null || $total$vat == NaN) {
+                $vat = 0;
+                $total$vat = 0;
+                $total = 0;
+            }
+            $('#ServiceTotal').val($total.toFixed(2));
+            $('#ServiceVat').val($vat.toFixed(2));
+            $('#TotalAmount').val($total$vat.toFixed(2));
+
+        }
+    </script>
+
+    <script>
+        var dtServices;
+        var $Quantity = $('#Quantity').val();
+        $(document).ready(function () {
+            $('#spnclor').html('');
+            dtServices = $('#dtServices').DataTable({
+                "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                "bSearchable": false,
+                "bSortable": false,
+                "bInfo": false,
+                "bLengthChange": false,
+                "AutoWidth": true,
+                "bPaginate": false,
+                 "language": {
+                    "paginate": {
+                        "previous": "«",
+                        "next": "»",
+                    },
+                     "sEmptyTable": "@Translation.NoMatchingRecords",
+                    "emptyTable": false
+                },
+            });
+
+            $('#btnAddService').on('click', function () {
+                onBegin();
+                var AddRow = true;
+                var $service = $('#sAddService').val();
+                var $addcount = $('#sAddCount').val();
+                var $unit = $('#sUnit').val();
+            //  var  $Quantity=  $('#Quantity').val();
+                if ($service === "" || $addcount === "") {
+                    warningPopup("@Translation.error_detailMissing");
+
+                    AddRow = false;
+                }
+                else { //Check service already exists
+                    $("#dtServices > tbody").find('tr').each(function () {
+
+                        var $role = $(this).attr('role');
+                        if (typeof $role !== typeof undefined && $role !== false) {
+                            var $txtService = $(this).find("#hfService").val();
+
+                            if ($txtService === $service.split('_')[0]) {
+                               warningPopup("@Translation.ServiceAlreadyAdded");
+
+                                AddRow = false;
+                            }
+                        }
+                    });
+                }
+
+                if (AddRow === true) {
+                    var $serviceId = $service.split('_')[0];
+                    var $servicePrice = $service.split('_')[1];
+
+                    var $price = $servicePrice * $addcount;
+                    var $itemVat = $price * ($vatPerc / 100);
+
+                    dtServices.row.add([
+                        $("#sAddService option:selected").html(),
+                        $unit,
+                        $addcount,
+                        $servicePrice,
+                        $price,
+                        '<input type="hidden" id="hfService" value="' + $serviceId + '"  />' +
+                        '<input type="hidden" id="hfUnit" value="0"  />' +
+                        '<input type="hidden" id="hfQuantity" value="' + $addcount + '"  />' +
+                        '<input type="hidden" id="hfPrice" value="' + $price + '"  />' +
+                        '<input type="hidden" id="hfVat" value="' + $itemVat + '"  />' +
+                        '<input type="hidden" id="hfServicePrice" value="' + $servicePrice + '"  />' +
+                        '<input type="button" class="btn btn-danger delete" value="X" />'
+                    ]).node().id = 'tr_0';
+
+                    dtServices.draw(false);
+
+                    CalculateVat();
+
+                    $('#frmService').find('#sAddService').val('');
+                    $('#frmService').find('input[type=text]').val('');
+                    $("#sAddService").val('').trigger('change');
+
+                    //$Quantity = Number($Quantity)+ Number($addcount);
+                    //$('#Quantity').val($Quantity);
+                    var sum = 0;
+                    $("#dtServices > tbody").find('tr').each(function () {
+                        sum += Number($(this).find('#hfQuantity').val());
+                    });
+                    $('#Quantity').val(sum)
+                    ShowOrderQuantity();
+                    onComplete();
+                }
+                else {
+                    onComplete();
+                }
+
+            });
+
+            $("#dtServices").delegate("input.quantity", "change", function (e) {
+
+                var $this = $(this)
+                //Disable textbox to prevent multiple submit
+                $this.attr("disabled", "disabled");
+
+                //Do Stuff, submit, etc..
+                var $row = $(this).closest("TR");
+
+                var $price = $row.find('#hfServicePrice').val();
+                var $quantity = $row.find('#hfQuantity').val();
+
+                var price = parseFloat($price) * parseInt($quantity);
+                //Table rows
+                $row.find('#hfPrice').val(price);
+                $row.find('td:nth-child(4)').html(price);
+
+                CalculateVat();
+
+                $this.removeAttr("disabled");
+                //var sum = 0;
+                //$(".quantity").each(function () {
+                //    sum += +$(this).val();
+                //});
+                //sum += +$quantity;
+                //$('#Quantity').val(sum);
+                var sum = 0;
+                $("#dtServices > tbody").find('tr').each(function () {
+                    sum += Number($(this).find('#hfQuantity').val());
+                });
+                $('#Quantity').val(sum)
+
+
+                 @*$.get("@Url.Action("EdiInstallationDate", "Orders")",
+                     { Id: $('#Quantity').val(), previous: $('#hdnquantity').val(), sDate: d }, function (data) {
+                         if (data.order == true) {
+                             $('#btnsubmitorder').show();
+                             $('#spnclor').html('');
+                         }
+                         else {
+                             $('#btnsubmitorder').hide();
+                               $('#spnclor').html('Sorry ... you exceeded the limit for installing AC for the chosen day. Please try again and choose another day to make the installation.');
+
+                         }
+                    });*@
+                ShowOrderQuantity();
+            });
+        });
+
+    </script>
+    <script>
+        $(document).ready(function () {
+
+            $('#frmAdd').submit(function (e) {
+                onBegin();
+
+                e.preventDefault();
+                var $form = $(this);
+                if ($form.valid()) {
+                    var serviceCount = 0;
+                    var o = [];
+                    $("#dtServices > tbody").find('tr').each(function () {
+                        var $role = $(this).attr('role');
+                        if (typeof $role !== typeof undefined && $role !== false) {
+                            var $this = $(this);
+                            var $active = $(this).find("#IsActive");
+                            if ($active === undefined || $active.length == 0) {
+                                $active = true;
+                            } else {
+                                $active = $(this).find("#IsActive").prop("checked");
+                            }
+
+                            var serialized = "ServiceId=" + parseInt($(this).find("#hfService").val());
+                            serialized += "&Unit=0";
+                            serialized += "&Quantity=" + parseInt($(this).find("#hfQuantity").val());
+                            serialized += "&IsActive=" + $active;
+                            serialized += "&OrderServiceId=" + parseInt($(this).attr("Id").split('_')[1]);
+
+                            var item = $.toDictionary(serialized);
+                            o.push(item);
+
+                            if ($active == true) { serviceCount++; }
+                        }
+                    });
+
+                    if (serviceCount == 0) {
+                        warningPopup("@Translation.error_Atleast1Service");
+
+                        onComplete();
+                        return;
+                    }
+
+                    var $formData = new FormData($($form)[0]);
+                    $formData.append('Services', JSON.stringify(o));
+
+                    var isArabic = $('#frmAdd').find('#IsArabic').prop("checked");
+                    $formData.append('SmsInArabic', isArabic);
+
+                    $.ajax({
+                        url: "@Url.Action("AddEditOrder")",
+                        type: 'POST',
+                        data: $formData,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            onComplete();
+                            if (response.StatusId > 0) {
+                                //Success Message
+                                successPopup("@Translation.success_Update");
+
+                                setTimeout(function () { window.location = '@Url.Action("Index")'; }, 3000);
+                            }
+                            else {
+                                warningPopup(response.Message);
+                            }
+                        },
+                        error: function () {
+                            onComplete();
+                        }
+                    });
+                }
+                else {
+                    var validator = $('#frmAdd').validate();
+
+                    onComplete();
+                }
+            });
+        });
+    </script>
+    <script>
+        function Delete() {
+            var result = confirm("@Translation.ConfirmDelete");
+            if (result) {
+                //Logic to delete the item
+                $.post("@Url.Action("DeleteOrder")", {
+                    'Id' : @Model.OrderId
+                }, function (response) {
+                    if (response.StatusId > 0) {
+                        //Success Message
+                        warningPopup("@Translation.success_OrderDelete");
+
+                        setTimeout(function () { window.location = '@Url.Action("Index")'; }, 3000);
+                    }
+                });
+            }
+        }
+    </script>
+    <script>
+        var $Quantity = $('#Quantity').val();
+        $('#dtServices tbody').on('click', '.delete', function () {
+            var rowCount = $('#dtServices tbody tr').length;
+            var $tr = $(this).parents('tr');
+            dtServices.row($tr).remove().draw();
+            if (rowCount == 1) {
+                $('#ServiceTotal').val('0');
+                $('#ServiceVat').val('0');
+                $('#TotalAmount').val('0');
+                $('#Quantity').val('0')
+                $subTotal = 0;
+                $vat = 0;
+                $total = 0;
+                $('#btnsubmitorder').hide();
+            }
+            else {
+                $('#btnsubmitorder').show();
+                CalculateVat();
+                var sum = 0;
+                $("#dtServices > tbody").find('tr').each(function () {
+                    sum += Number($(this).find('#hfQuantity').val());
+                });
+                $('#Quantity').val(sum)
+                ShowOrderQuantity();
+            }
+
+        });
+
+        $('#dtServices tbody').on('click', '.deleteService', function () {
+            // onBegin();
+            var $tr = $(this).parents('tr');
+            var rowCount = $('#dtServices tbody tr').length;
+            dtServices.row($tr).remove().draw();
+
+            if (rowCount == 1) {
+                $('#ServiceTotal').val('0');
+                $('#ServiceVat').val('0');
+                $('#TotalAmount').val('0');
+                $('#Quantity').val('0')
+                $subTotal = 0;
+                $vat = 0;
+                $total = 0;
+            }
+            else {
+
+                CalculateVat();
+                var sum = 0;
+
+                $("#dtServices > tbody").find('tr').each(function () {
+                    sum += Number($(this).find('#hfQuantity').val());
+                });
+                $('#Quantity').val(sum)
+            }
+
+        });
+    </script>
+    <script>
+        $(window).bind("beforeunload", function () {
+             //Logic to delete the item
+                $.post("@Url.Action("RemoveIsEdit")", {
+                    'Id' : @Model.OrderId
+                }, function (response) {
+                    if (response.StatusId > 0) {
+                        //Success Message
+                        warningPopup("@Translation.success_OrderDelete");
+
+                        setTimeout(function () { window.location = '@Url.Action("Index")'; }, 3000);
+                    }
+                });
+        });
+    </script>
+}
+
+
+
+
+

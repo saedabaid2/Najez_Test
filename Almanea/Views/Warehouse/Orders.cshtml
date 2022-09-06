@@ -1,0 +1,186 @@
+﻿
+@{
+    ViewBag.Title = Translation.OrdersList;
+}
+
+@using Almanea.BusinessLogic;
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row" id="divSearch">
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <label>@Translation.InvoiceNo / @Translation.OrderNo</label>
+                                <input type="text" id="sInvoice" class="form-control" placeholder="@Translation.InvoiceNo / @Translation.OrderNo" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <label>@Translation.InstallOn</label>
+                                <select class="form-control" id="sType">
+                                    <option value="0" selected>@Translation.All </option>
+                                    <option value="1">@Translation.Today </option>
+                                    <option value="2">@Translation.NextDay </option>
+                                    <option value="3">@Translation.ThisWeek </option>
+                                    <option value="4">@Translation.NextWeek </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p>
+                    <input type="button" value="@Translation.Search" class="btn btn-primary" onclick="BindDataTable()" />
+                    <span class="ta-right f-right">
+                        <a onclick="Print();" title="Print" data-toggle="tooltip"><i class="fa fa-print"></i></a>
+                    </span>
+                </p>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dataTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="12%">@Translation.InvoiceNo</th>
+                            <th width="12%">@Translation.OrderNo</th>
+                            <th width="12%">@Translation.OrderDate</th>
+                            <th width="20%">@Translation.Customer</th>
+                            <th width="12%">@Translation.InstallOn</th>
+                            @*<th width="12%">@Translation.OrderCost</th>*@
+                            <th width="12%">@Translation.Status</th>
+                            <th width="8%">@Translation.Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+    <script>
+        window.setInterval(function () {
+            /// call your function here
+            if (@Session[cls_Defaults.Session_UserId] != null) {
+                BindDataTable();
+            }
+            else {
+                clearInterval();
+                window.location = '@Url.Action("Index", "Home")';
+            }
+        }, 30000);
+
+           $(window).bind("beforeunload", function () {
+             //Logic to delete the item
+               clearInterval();
+        });
+    </script>
+
+    <script>
+        var newStatus = @((int)OrderStatus.NewOrder);
+        $(document).ready(function () {
+            async: true;
+            //List
+            BindDataTable();
+        });
+        $(document).keypress(function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if (keycode == '13') {
+                BindDataTable();
+            }
+        });
+        var oTable;
+        function BindDataTable(response) {
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+                    "bAutoWidth": false,
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("GetOrders")",
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+                        aoData.push(
+                            { "name": "TypeId", "value": $("#sType").val() },
+                            { "name": "InvoiceNo", "value": $("#sInvoice").val() },
+                        );
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+                    },
+                    // data: response,
+                    "aoColumns": [
+                        { "mData": "Invoice", },
+                        { "mData": "OrderNo", },
+                        { "mData": "AddedDate", },
+                        { "mData": "Customer", },
+                        { "mData": "InstallDate", "orderable": false },
+                        //{ "mData": "TotalAmount"},
+                        { "mData": "StatusText" },
+                        {
+                            "mData": "OrderId",
+                            "render": function (Id, type, full, meta) {
+                                return '<a href="@Url.Action("Details")/' + Id + '" title="@Translation.View" data-toggle="tooltip"><i class="fa fa-eye"></i></a>';
+                            },
+                            "orderable": false
+                        },
+                    ],
+                    "order": [[1, "desc"]],
+                    "fnInitComplete": function (oSettings, json) {
+                    },
+                    "fnDrawCallback": function (oSettings) {
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                         "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                        "emptyTable": false,
+                        "sEmptyTable": "@Translation.NoMatchingRecords",
+                    },
+                });
+            }
+
+        }
+
+        var Reset = function () {
+            $('#divSearch').find('input[type=text]').val('');
+            $('#divSearch').find('select').val('0');
+            BindDataTable();
+        }
+
+    </script>
+    <script>
+        function Print() {
+             var url = "@Url.Action("warehouseExcel", "Warehouse")?InvoiceNo=" + $("#sInvoice").val() + "&TypeId=" + $("#sType").val() ;
+
+
+            @*var url = "@Url.Action("Order", "Print")?InvoiceNo=" + $("#sInvoice").val() + "&TypeId=" + $("#sType").val() +
+                "&OrderId=" + $("#sOrderId").val();*@
+
+            var win = window.open(url, '_blank');
+            win.focus();
+        }
+    </script>
+}
+
+
+

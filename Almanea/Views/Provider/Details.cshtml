@@ -1,0 +1,1672 @@
+
+@{
+    decimal equ = 0;
+    decimal vatper = 0;
+    decimal equation = 0;
+    decimal vat = 0;
+    decimal subtotal = 0;
+    ViewBag.Title = Translation.OrderDetails + " - " + Model.SupplierName; ;
+    var sumOf = ((List<vm_AdditionalService>)ViewBag.Additional).Select(k => new { Sum = k.Quantity * k.Price }).ToList().Sum(o => o.Sum);
+    if (sumOf != 0)
+    {
+        equ = 1.15M;
+        vatper = (@ViewBag.Vat / 100);
+        equation = sumOf / equ * vatper;
+        vat = equation; //(sumOf * (@ViewBag.Vat / 100));
+        subtotal = sumOf - equation;
+    }
+    var labours = (IEnumerable<SelectListItem>)ViewBag.Labours;
+    var drivers = (IEnumerable<SelectListItem>)ViewBag.Drivers;
+
+    var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+    var ActtypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+}
+
+@model vm_Order
+
+@using Almanea.Models;
+@using Almanea.BusinessLogic;
+<style>
+    #ui-datepicker-div {
+        top: 30% !important;
+        left: 25% !important;
+    }
+</style>
+<style>
+    .valid {
+        border-color: #66bb6a;
+       /* padding-right: calc(1.5em + 0.75rem);*/
+        background-repeat: no-repeat;
+        background-position: center right calc(0.375em + 0.1875rem);
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+</style>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="card-header ta-right">
+                <a href="@Url.Action("OrderDetails","Print")/@ViewBag.Id" target="_blank" title="Print" data-toggle="tooltip"><i class="fa fa-print"></i></a>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.SellerName, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.SellerName, new { @class = "form-control", @placeholder = Translation.ReqSellerName, @readonly = "readonly" })
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.SellerContact, new { @class = "bmd-label-floating required" })
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">+966</span>
+                                </div>
+                                @Html.TextBoxFor(m => m.SellerContact, new { @class = "form-control numOnly", @readonly = "readonly" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.OrderNo, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.OrderNo, new { @class = "form-control", @placeholder = Translation.ReqInvoiceNo, @readonly = "readonly" })
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.InvoiceNo, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.InvoiceNo, new { @class = "form-control", @placeholder = Translation.ReqInvoiceNo, @readonly = "readonly" })
+                        </div>
+                    </div>
+                </div>
+                <hr class="thick" />
+
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.CustomerName, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.CustomerName, new { @class = "form-control", @placeholder = Translation.ReqCustomerName, @readonly = "readonly" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.LocationId, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.Location, new { @class = "form-control", @placeholder = Translation.ReqCustomerName, @readonly = "readonly" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.CustomerContact, new { @class = "bmd-label-floating required" })
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">+966</span>
+                                </div>
+                                @Html.TextBoxFor(m => m.CustomerContact, new { @class = "form-control numOnly", @readonly = "readonly" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.InstallDate, new { @class = "bmd-label-floating required" })
+                            @{
+                                string txtInstallDate = "";
+                                if (Model.PreferDate == 1)
+                                {
+                                    txtInstallDate = Translation.PreferAsap;
+                                }
+                                else if (Model.PreferDate == 2)
+                                {
+                                    txtInstallDate = @Model.InstallDate;
+                                }
+                                <input type="text" class="form-control" value="@txtInstallDate" readonly />
+                            }
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.PrefferTime, new { @class = "bmd-label-floating required" })
+                            @{
+                                string txtInstallTime = "";
+                                if (Model.PrefferTime == 1)
+                                {
+                                    txtInstallTime = Translation.MorningTime;
+                                }
+                                else if (Model.PrefferTime == 2)
+                                {
+                                    txtInstallTime = @Translation.EveningTime;
+                                }
+                                else
+                                {
+                                    txtInstallTime = ViewBag.ordertimeslot;
+                                }
+                                <input type="text" class="form-control" value="@txtInstallTime" readonly />
+                            }
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        @Html.LabelFor(m => m.AlternateMobile, new { @class = "bmd-label-floating" })
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1">+966</span>
+                            </div>
+                            @Html.TextBoxFor(m => m.AlternateMobile, new { @class = "form-control numOnly", @readonly = "readonly" })
+                        </div>
+                    </div>
+                    @if (Convert.ToInt32(Session[cls_Defaults.Session_UserGroupTypeId]) == (int)enumGroupType.Admin)
+                    {
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">@Translation.CustomerCode</label>
+                                <input type="text" class="form-control" value="@Model.CustomerCode" readonly />
+                            </div>
+                        </div>
+                    }
+
+                </div>
+                <div class="row">
+                    @if (UserGroupId == (int)enumGroupType.SuperAdmin || (UserGroupId == (int)enumGroupType.Supplier && ActtypeId == (int)enumSupplierAcct.Admin))
+                    {
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.CustomerCode, new { @class = "bmd-label-floating" })
+                                @Html.TextBoxFor(m => m.CustomerCode, new { @class = "form-control", @placeholder = Translation.CustomerCode, @readonly = "readonly" })
+                            </div>
+                        </div>
+                    }
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Comments, new { @class = "bmd-label-floating" })
+                            @Html.TextBoxFor(m => m.Comments, new { @class = "form-control", @placeholder = Translation.Comments, @readonly = "readonly" })
+                        </div>
+                    </div>
+
+
+                </div>
+                <hr class="thick" />
+
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="table-responsive">
+                            <table class="table align-items-center table-flush table-bordered" id="dataTable">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th width="25%">@Translation.Services</th>
+                                        @*<th width="25%">@Translation.Unit</th>*@
+                                        <th width="25%">@Translation.ItemCount</th>
+                                        <th width="25%">@Translation.UnitPrice</th>
+                                        <th width="15%">@Translation.Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.Services != null)
+                                    {
+                                        foreach (var item in (List<vm_OrderServices>)ViewBag.Services)
+                                        {
+                                            if (item.IsActive)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @item.ServiceName
+                                                        <input type="hidden" id="hfService" value="@item.ServiceId" />
+                                                    </td>
+                                                    @*<td>
+                                                            @item.Unit
+                                                            <input type="hidden" id="hfUnit" value="@item.Unit" />
+                                                        </td>*@
+                                                    <td>
+                                                        @item.Quantity
+                                                        <input type="hidden" id="hfQuantity" value="@item.Quantity" />
+                                                    </td>
+                                                    <td>
+                                                        @(item.Price)
+                                                    </td>
+                                                    <td>
+                                                        @(item.Price * item.Quantity)
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-5">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        &nbsp;
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                        <div class="form-group f-right">
+                            @Translation.SubTotal
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ServiceTotal, new { @class = "form-control", @readonly = "true" })
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        &nbsp;
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                        <div class="form-group f-right">
+                            @Translation.Vat&nbsp;(@ViewBag.Vat%)
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ServiceVat, new { @class = "form-control", @readonly = "true" })
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        &nbsp;
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                        <div class="form-group f-right">
+                            @Translation.GrandTotal
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+                        <div class="form-group">
+                            @{
+                                var totalAmount = (Model.ServiceTotal + Model.ServiceVat).ToString("#.##");
+                            }
+                            <input type="text" class="form-control" value="@totalAmount" readonly />
+                        </div>
+                    </div>
+                </div>
+
+
+                @if (ViewBag.Additional != null && ((List<vm_AdditionalService>)ViewBag.Additional).Count > 0)
+                {
+                    <hr class="thick" />
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="form-label-group">
+                                <label>@Translation.AdditionalServices</label>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table align-items-center table-flush table-bordered" id="dtvAdditional">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th width="25%">@Translation.Services</th>
+                                            <th width="20%">@Translation.Quantity</th>
+                                            <th width="20%">@Translation.UnitPrice</th>
+                                            <th width="25%">@Translation.SpareParts</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (!Culture.Contains("ar"))
+                                        {
+                                            foreach (var item in (List<vm_AdditionalService>)ViewBag.Additional)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @item.ServiceName
+                                                    </td>
+                                                    <td>
+                                                        @item.Quantity
+                                                    </td>
+                                                    <td>
+                                                        @item.Price
+                                                    </td>
+                                                    <td>
+                                                        @item.SpareParts
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+
+                                        @if (Culture.Contains("ar"))
+                                        {
+                                            foreach (var item in (List<vm_AdditionalService>)ViewBag.AdditionalAR)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @item.ServiceName
+                                                    </td>
+                                                    <td>
+                                                        @item.Quantity
+                                                    </td>
+                                                    <td>
+                                                        @item.Price
+                                                    </td>
+                                                    <td>
+                                                        @item.SpareParts
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            &nbsp;
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group f-right">
+                                @Translation.SubTotal
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group">
+                                @*@Html.TextBoxFor(m => m.AdditionalTotal, new { @class = "form-control", @readonly = "true" })*@
+                                <input type="text" class="form-control" value="@subtotal.ToString("0.00")" readonly />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            &nbsp;
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group f-right">
+                                @Translation.Vat&nbsp;(@ViewBag.Vat%)
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group">
+                                @*@Html.TextBoxFor(m => m.AdditionalVat, new { @class = "form-control", @readonly = "true" })*@
+
+                                <input type="text" class="form-control" value="@vat.ToString("0.00")" readonly />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            &nbsp;
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group f-right">
+                                @Translation.GrandTotal
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+                            <div class="form-group">
+                                @{
+                                    //var additionalAmt = (Model.AdditionalTotal + Model.AdditionalVat).ToString("#.##");
+                                    var additionalAmt = sumOf.ToString("0.00");
+                                }
+                                <input type="text" class="form-control" value="@additionalAmt" readonly />
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (UserGroupId == (int)enumGroupType.Supplier && ActtypeId == (int)enumSupplierAcct.Admin) // if user is Supplier and Admin two step
+                {
+                }
+                else if (Model.Status != (int)OrderStatus.Cancel && Model.Status != (int)OrderStatus.Rejected && Model.Status != (int)OrderStatus.Complete)
+                {
+                    if ((bool)ViewBag.CanEdit == false)
+                    {
+                        if (Convert.ToInt32(Session[cls_Defaults.Session_UserGroupTypeId]) != 7)
+                        {
+                            //if (ActtypeId != (int)enumGroupType.Executive)
+                            //{
+                            @Html.Partial("_ChangeStatus", new vm_OrderStatus { LabourId = Model.LabourId.ToString(), DriverId = Model.DriverId }, new ViewDataDictionary { { "OrderId", Model.OrderId }, { "StatusId", Model.Status }, { "Labours", labours }, { "Drivers", drivers } })
+                            //}
+                        }
+                    }
+                    if (Model.Status == (int)OrderStatus.Finish)
+                    {
+                        if (Convert.ToInt32(Session[cls_Defaults.Session_UserGroupTypeId]) != 7)
+                        {
+                            //if (ActtypeId != (int)enumGroupType.Executive)
+                            //{
+                            @Html.Partial("_ChangeStatus", new vm_OrderStatus { LabourId = Model.LabourId.ToString(), DriverId = Model.DriverId }, new ViewDataDictionary { { "OrderId", Model.OrderId }, { "StatusId", Model.Status }, { "Labours", labours }, { "Drivers", drivers } })
+                            //}
+                        }
+                    }
+                }
+                else if (Model.Status == (int)OrderStatus.Finish && (ActtypeId == (int)enumSupplierAcct.Admin || UserGroupId == (int)enumGroupType.SuperAdmin || UserGroupId == (int)enumGroupType.SuperAdmin))
+                {
+                    @Html.Partial("_ChangeStatus", new vm_OrderStatus { LabourId = Model.LabourId.ToString(), DriverId = Model.DriverId }, new ViewDataDictionary { { "OrderId", Model.OrderId }, { "StatusId", Model.Status }, { "Labours", labours }, { "Drivers", drivers } })
+                }
+
+
+                @if (ViewBag.History != null && ((List<vm_OrderHistoryList>)ViewBag.History).Count > 0)
+                {
+                    <hr class="thick" />
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="form-label-group">
+                                <label>@Translation.History</label>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table align-items-center table-flush table-bordered" id="dtHistory">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th width="15%">@Translation.ActivityDate</th>
+                                            <th width="20%">@Translation.NewStatus</th>
+                                            <th width="30%">@Translation.DoneBy</th>
+                                            <th width="30%">@Translation.Comments</th>
+                                            @*@if (ViewBag.IsAdmin == true)
+                                                {
+                                                    <th width="30%">@Translation.Remarks</th>
+                                                }*@
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @if (ViewBag.History != null)
+                                        {
+                                            foreach (var item in (List<vm_OrderHistoryList>)ViewBag.History)
+                                            {
+                                                if (item.Status != 4)
+                                                {
+                                                    <tr>
+                                                        <td data-sort='@item.ActivityDt'>@item.ActivityDate</td>
+                                                        @*<td>
+                                                                @item.ActivityDate
+                                                            </td>*@
+
+                                                        <td>
+                                                            @item.NewStatus
+                                                        </td>
+
+                                                        <td>
+                                                            @item.DoneBy
+                                                        </td>
+
+
+                                                        <td>
+
+                                                            @(item.Comments+" "+item.CommentsReschedule)
+                                                        </td>
+
+                                                    </tr>
+                                                }
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    if (Model.Status == (int)OrderStatus.Finish || Model.Status == (int)OrderStatus.Complete)
+                    {
+
+
+                        if (string.IsNullOrEmpty(Model.InvoiceImages))
+                        {
+                            <button type="button" id="btnUploadInvoice" onclick="UploadInvoice()" class="btn btn-primary">
+                                @Translation.UploadAttachment <i class="fa fa-upload"></i>
+                            </button>
+                        }
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="col-xs-2" style=" float: left; ">
+                                    <div id="CustomerSignOff" style="display:none;float:left">
+                                        @if (!string.IsNullOrEmpty(Model.CustomerSignOff))
+                                        {
+                                            <a href="@Url.Action("Download","Home", new { FileName = Model.CustomerSignOff,orderId=Model.OrderId })" target="_blank" class="btn btn-primary">@Translation.CustomerSignOff <i class="fa fa-download"></i></a>
+                                        }
+                                    </div>
+
+
+                                    <div id="CustomerSignOffNotFound" style="display:none">
+                                        @if (!string.IsNullOrEmpty(Model.CustomerSignOff))
+                                        {
+                                            <button class="btn btn-primary" onclick="CustomerSignOffNotFound()">@Translation.CustomerSignOff <i class="fa fa-download"></i></button>
+                                        }
+                                    </div>
+
+                                </div>
+                                <div class="col-xs-2" style=" float: left; ">
+
+                                    @if (!string.IsNullOrEmpty(Model.InvoiceImages))
+                                    {
+                                        {
+                                            var linkimg = "";
+                                            var array = Model.InvoiceImages.Split(',').ToList();
+
+                                            var ind = 1;
+
+                                            <div id="InvoiceImage" style="display:block">
+                                                @foreach (var item in array)
+                                                {
+                                                    linkimg = "https://najez.app/invoices/" + Model.OrderId + "/" + item;
+                                                    //linkimg = cls_Defaults.InvoiceUploadPath + Model.OrderId + "/" + item;
+                                                    <a href=@linkimg target="_blank" class="btn btn-primary">@Translation.InvoiceImage @ind <i class="fa fa-download"></i></a>
+
+                                                    ind = ind + 1;
+                                                }
+
+                                            </div>
+
+
+
+
+                                        }
+                                    }
+
+
+                                    @if (string.IsNullOrEmpty(Model.InvoiceImages))
+                                    {
+                                        <div id="InvoiceImageNotFound" style="display:block">
+                                            <button class="btn btn-primary" onclick="InvoiceNotFound()">@Translation.InvoiceImage <i class="fa fa-download"></i></button>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" data-backdrop="static" id="secondModal">
+    <div class="modal-dialog  modal-xl" id="seconddialog">
+        <div class="modal-content" style="width:1200px">
+            <div class="modal-header">
+                <h5 class="modal-title" id="secondModalLabel"></h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">x</span>
+                </button>
+
+            </div>
+            <div class="modal-body" id="secondModalBody">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #seconddialog.modal-dialog {
+        overflow-y: initial !important
+    }
+
+    #secondModalBody.modal-body {
+        max-height: 600px;
+        /*overflow-y: auto;*/
+    }
+</style>
+
+@section scripts{
+
+
+    <script>
+                                function CheckInvoice(FileName)
+
+        {
+             $.ajax({
+                type: "POST",
+                 url: '@Url.Action("CheckFile", "Home")',
+                 data: '{FileName: ' + JSON.stringify('@Model.InvoiceImages') + ',OrderId:' + JSON.stringify(@Model.OrderId) + '}',
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                 success: function (response) {
+                     debugger;
+                     if (response == 1) {
+                         document.getElementById("InvoiceImage").style.display = "block";
+                     }
+                },
+                 error: function () {
+                   document.getElementById("InvoiceImageNotFound").style.display = "block";
+                }
+            });
+        }
+
+        function CheckCustomerSignOff(FileName)
+        {
+             $.ajax({
+                type: "POST",
+                 url: '@Url.Action("CheckFile", "Home")',
+                 data: '{FileName: ' + JSON.stringify('@Model.InvoiceImages') +',OrderId:' + JSON.stringify(@Model.OrderId) +'}',
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                 success: function (response) {
+                     if (response == 1) {
+                         document.getElementById("CustomerSignOff").style.display = "block";
+                     }
+                },
+                 error: function () {
+                     document.getElementById("CustomerSignOffNotFound").style.display = "block";
+                }
+            });
+        }
+
+        function InvoiceNotFound()
+        {
+            warningPopup("Invoice image not found!");
+        }
+
+        function CustomerSignOffNotFound()
+        {
+            warningPopup("CustomerSignOff image not found!");
+        }
+
+        $(document).ready(function () {
+
+               CheckInvoice("@Model.InvoiceImages");
+               CheckCustomerSignOff('@Model.CustomerSignOff');
+        });
+        var enumOrder = @(Html.EnumToString<OrderStatus>())
+
+        Dropzone.autoDiscover = false;
+        var fileType = '.png,.jpg,.gif,.bmp,.jpeg';
+        var maxsize =   @cls_Defaults.Filesize.ToString();
+
+        var redirectUrl = window.location.href; //'@Url.Action("NewOrders")';
+        @*var userGroupId = @Session[cls_Defaults.Session_UserGroupTypeId];
+        if (userGroupId == 3) {
+            redirectUrl = '@Url.Action("Orders","Setting")';
+        }*@
+
+        var currentStatus = @Model.Status;
+
+    </script>
+    @if (Convert.ToInt32(Session[cls_Defaults.Session_UserGroupTypeId]) == (int)enumGroupType.Admin)
+    {
+        <script>
+            $(document).ready(function () {
+                $("#DriverId").prop("disabled", true);
+                $("#LabourId").prop("disabled", true);
+                $("#select2-DriverId-results li").eq(0).hide();
+
+                $("#Status option[value=17]").css("display", "none");
+                $('#Status').selectpicker('refresh');
+            });
+        </script>
+    }
+
+    @if (Convert.ToInt32(Session[cls_Defaults.Session_UserGroupTypeId]) == (int)enumGroupType.Provider)
+    {
+<script>
+            $(document).ready(function () {
+                $("#select2-DriverId-results li").eq(0).hide();
+        function HideLabourandDriver()
+        {
+            $("#DriverDiv").css('display', 'none');;
+            $("#LabourDiv").css('display', 'none');;
+        }
+                function ShowLabourandDriver() {
+                    $("#select2-DriverId-results li").eq(0).hide();
+            $("#DriverDiv").css('display', 'block');;
+            $("#LabourDiv").css('display', 'block');;
+        }
+
+        HideLabourandDriver();
+
+        $("#DriverId").prop("disabled", true);
+        $("#LabourId").prop("disabled", true);
+
+
+        if (currentStatus >= 2 && currentStatus != 3 && $("#Status").val() >0)
+        {
+            $("#LabourDiv").show();
+            $("#DriverDiv").show();
+        }
+
+                $('#DriverId').change(function () {
+                    debugger;
+
+
+            $("#DriverID").val($("#DriverId").val());
+
+         });
+    $('#LabourId').change(function () {
+
+        $("#LabourID").val($("#LabourId").val());
+
+                });
+
+
+                $('#Status').change(function () {
+                    debugger;
+
+            var dropObj = document.getElementById("Status");
+
+                    var DriverId = $("#DriverID").val();
+                    var LabourId = $("#LabourID").val();
+
+            if ($(this).val() == enumOrder.AssignLabour && DriverId<=0) {
+                 dropObj.value = null;
+                 warningPopup("Please assign driver first");
+            }
+            else if ($(this).val() == enumOrder.AssignDriver && currentStatus != enumOrder.ReceivedFromWarehouse && currentStatus != enumOrder.Job_in_Progress && currentStatus != enumOrder.Finish) {
+                        $("#DriverDiv").css('display', 'block');
+
+                        $("#DriverId").prop("disabled", false);
+                        $("#LabourId").prop("disabled", true);
+                    }
+            else if ($(this).val() == enumOrder.AssignLabour && currentStatus != enumOrder.Job_in_Progress) {
+                $("#LabourDiv").css('display', 'block');
+                $("#DriverDiv").css('display', 'none');
+
+                        $("#LabourId").prop("disabled", false);
+                        $("#DriverId").prop("disabled", true);
+                    }
+
+                    else {
+                        $("#DriverId").prop("disabled", true);
+                        $("#LabourId").prop("disabled", true);
+
+                        if (currentStatus >= enumOrder.Reserved && currentStatus != enumOrder.Rejected && statusId != enumOrder.ReSchedule && $(this).val() > 0)
+                        {
+                            ShowLabourandDriver();
+                        }
+
+                        var statusId = 0;
+                        if ($(this).val() != '') { statusId = parseInt($(this).val()); }
+
+                        if (statusId <= 0) {
+                            HideLabourandDriver();
+                        }
+                        //else if ((DriverId <= 0 || LabourId <= 0) && statusId == enumOrder.AppointmentConfirmed) {
+                        //    dropObj.value = null;
+                        //    warningPopup("Please assign labour and driver first");
+                        //}
+                        //else if ((DriverId <= 0 || LabourId <= 0) && statusId == enumOrder.ReceivedFromWarehouse) {
+                        //    warningPopup("Please assign labour and driver first");
+                        //    dropObj.value = null;
+                        //}
+                        else if ((LabourId <= 0) && statusId == enumOrder.Job_in_Progress) {
+                            debugger;
+                            warningPopup("Please assign labour and driver first");
+                            dropObj.value = null;
+                        }
+                        else if (statusId == enumOrder.Finish && LabourId <= 0) {
+                            //DriverId <= 0 || LabourId <= 0) && temp
+                            warningPopup("Please assign labour and driver first");
+                            dropObj.value = null;
+                        }
+                        //else if ((DriverId <= 0 || LabourId <= 0) && statusId == enumOrder.ReSchedule) {
+                        //    warningPopup("Please assign labour and driver first");
+                        //    dropObj.value = null;
+                        //}
+                        //else if ((DriverId <= 0 || LabourId <= 0) && statusId == enumOrder.AppointmentReschedule) {
+                        //    warningPopup("Please assign labour and driver first");
+                        //    dropObj.value = null;
+                        //}
+                        else if ((DriverId <= 0 || LabourId <= 0) && statusId == enumOrder.HoldOn) {
+                            warningPopup("Please assign labour and driver first");
+                            dropObj.value = null;
+                        }
+                        //else if ((DriverId <= 0 || LabourId <= 0) && statusId == enumOrder.ChangeService) {
+                        //    warningPopup("Please assign labour and driver first");
+                        //    dropObj.value = null;
+                        //}
+                        else if (currentStatus == enumOrder.ReceivedFromWarehouse && statusId == enumOrder.AssignDriver) {
+                            HideLabourandDriver();
+                            warningPopup("Order received from warehouse can not assign the driver");
+                            dropObj.value = null;
+                        }
+                        else if (currentStatus == enumOrder.Job_in_Progress && statusId == enumOrder.AssignDriver) {
+                            HideLabourandDriver();
+                            warningPopup("Work start on order can not assign the driver");
+                            dropObj.value = null;
+                        } else if (currentStatus == enumOrder.Finish && statusId == enumOrder.AssignDriver) {
+                            HideLabourandDriver();
+                            warningPopup("Order finish can not assign the driver");
+                            dropObj.value = null;
+                        }
+                        else if (currentStatus == enumOrder.Job_in_Progress && statusId == enumOrder.AssignLabour) {
+                            HideLabourandDriver();
+                            warningPopup("Work start on order can not assign the labour");
+                            dropObj.value = null;
+                        }
+                        else if (currentStatus == enumOrder.Reserved && statusId != enumOrder.ReSchedule && statusId != enumOrder.Cancel) {
+
+                            warningPopup("@Translation.warning_SetAppointment");
+                            dropObj.value = null;
+                        }
+                        else if (currentStatus == enumOrder.ReSchedule && statusId != enumOrder.AppointmentConfirmed) {
+                            warningPopup("@Translation.warning_ScheduleConfirm");
+                            dropObj.value = null;
+                        }
+                        else if (currentStatus == enumOrder.AppointmentConfirmed && statusId != enumOrder.ReceivedFromWarehouse && statusId != enumOrder.AppointmentReschedule && statusId != enumOrder.Cancel && statusId != enumOrder.Postponed) {
+                            warningPopup("@Translation.warning_ReceivedFromWarehouse");
+                            dropObj.value = null;
+                        }
+                        else if (currentStatus != enumOrder.Job_in_Progress && statusId == enumOrder.HoldOn && statusId == enumOrder.AppointmentReschedule && statusId != enumOrder.AppointmentConfirmed) {
+
+                            warningPopup("@Translation.warning_OnHold");
+                            dropObj.value = null;
+                        }
+                        else if (currentStatus != enumOrder.HoldOn && statusId == enumOrder.ChangeService && statusId == enumOrder.AppointmentReschedule && statusId != enumOrder.AppointmentConfirmed) {
+                            warningPopup("@Translation.warning_ChangeService");
+                            dropObj.value = null;
+                        }
+
+                        else {
+
+                            if (statusId == enumOrder.Finish) {
+                                debugger;
+                                if (@ViewBag.CanFinish ==1) {
+                                    debugger;
+                                    $("#myModalBody").load("@Url.Action("VerifyCode")/@Model.EncryptId", function () {
+                                        $("#myModal").modal('show');
+                                        modalSize('content');
+                                        $.validator.unobtrusive.parse($("#frmVerify"))
+                                        $("#myModalLabel").text("@Translation.Finish");
+                                    });
+                                }
+                                else {
+                                    debugger;
+                                    warningPopup('@Translation.warning_CannotFinish');
+                                }
+                            }
+                            else if (statusId == enumOrder.Job_in_Progress) {
+                                $("#myModalBody").load("@Url.Action("ChangeStatusTeams")/@Model.EncryptId/?status=" + statusId, function () {
+                                    $("#myModal").modal('show');
+                                    modalSize('lg');
+                                    $.validator.unobtrusive.parse($("#frmSchedule"))
+                                    $("#myModalLabel").text("@Translation.Start_Work_Order");
+
+                                    $('#frmSchedule #Comments').val($('#frmAdd #Comments').val());
+                                   // $("#InstallDate").datepicker({ minDate: 0, dateFormat: 'dd/mm/yy' });
+                                    /*  $('#InstallDate').datepicker().datepicker('disable');*/
+                                    //ali need to code here
+                                    $("#Driverid").val($("#DriverID").val());
+                                    $("#Labourid").val($("#LabourID").val());
+
+                                });
+                            }
+
+                            else if (statusId == enumOrder.ReceivedFromWarehouse) {
+                                $("#myModalBody").load("@Url.Action("ChangeStatusTeams")/@Model.EncryptId/?status=" + statusId, function () {
+                                    $("#myModal").modal('show');
+                                    modalSize('lg');
+                                    $.validator.unobtrusive.parse($("#frmSchedule"))
+                                    $("#myModalLabel").text("@Translation.ReceivedFromWarehouse");
+
+                                    $('#frmSchedule #Comments').val($('#frmAdd #Comments').val());
+                                   // $("#InstallDate").datepicker({ minDate: 0, dateFormat: 'dd/mm/yy' });
+                                    /*  $('#InstallDate').datepicker().datepicker('disable');*/
+                                    //ali need to code here
+                                    $("#Driverid").val($("#DriverID").val());
+                                    $("#Labourid").val($("#LabourID").val());
+
+                                });
+                            }
+                            @*else if (statusId == enumOrder.Finish) {
+                                $("#myModalBody").load("@Url.Action("ChangeStatusTeams")/@Model.EncryptId/?status=" + statusId, function () {
+                                    $("#myModal").modal('show');
+                                    modalSize('lg');
+                                    $.validator.unobtrusive.parse($("#frmSchedule"))
+                                    $("#myModalLabel").text("@Translation.Finish");
+
+                                    $('#frmSchedule #Comments').val($('#frmAdd #Comments').val());
+                                   // $("#InstallDate").datepicker({ minDate: 0, dateFormat: 'dd/mm/yy' });
+                                    /*  $('#InstallDate').datepicker().datepicker('disable');*/
+                                    //ali need to code here
+                                    $("#Driverid").val($("#DriverID").val());
+                                    $("#Labourid").val($("#LabourID").val());
+
+                                });
+                            }*@
+                            @*else if (statusId == enumOrder.Postponed) {
+                                $("#myModalBody").load("@Url.Action("ChangeStatusTeams")/@Model.EncryptId/?status=" + statusId, function () {
+                                    $("#myModal").modal('show');
+                                    modalSize('lg');
+                                    $.validator.unobtrusive.parse($("#frmSchedule"))
+                                    $("#myModalLabel").text("@Translation.Postpone");
+
+                                    $('#frmSchedule #Comments').val($('#frmAdd #Comments').val());
+                                   // $("#InstallDate").datepicker({ minDate: 0, dateFormat: 'dd/mm/yy' });
+                                    /*  $('#InstallDate').datepicker().datepicker('disable');*/
+                                    //ali need to code here
+                                    $("#Driverid").val($("#DriverID").val());
+                                    $("#Labourid").val($("#LabourID").val());
+
+                                });
+                            }*@
+                          
+                            else if (statusId == enumOrder.ReSchedule) {
+                                //Reschedule
+                                $("#myModalBody").load("@Url.Action("ReSchedule")/@Model.EncryptId", function () {
+                                    $("#myModal").modal('show');
+                                    modalSize('lg');
+                                    $.validator.unobtrusive.parse($("#frmSchedule"))
+                                    $("#myModalLabel").text("@Translation.ReSchedule");
+
+                                    $('#frmSchedule #Comments').val($('#frmAdd #Comments').val());
+                                   // $("#InstallDate").datepicker({ minDate: 0, dateFormat: 'dd/mm/yy' });
+                                    /*  $('#InstallDate').datepicker().datepicker('disable');*/
+                                    //ali need to code here
+                                    $("#Driverid").val($("#DriverID").val());
+                                    $("#Labourid").val($("#LabourID").val());
+
+                                });
+
+                            }
+                            else if (statusId == enumOrder.AppointmentReschedule) {
+                                //Reschedule
+                                $("#myModalBody").load("@Url.Action("AppointmentReSchedule")/@Model.EncryptId", function () {
+                                    $("#myModal").modal('show');
+                                    modalSize('lg');
+                                    $.validator.unobtrusive.parse($("#frmSchedule"))
+                                    $("#myModalLabel").text("@Translation.AppointmentReschedule");
+
+                                    $('#frmSchedule #Comments').val($('#frmAdd #Comments').val());
+                                    $("#InstallDate").datepicker({ minDate: 0, dateFormat: 'dd/mm/yy' });
+
+                                    $("#DriversID").val($("#DriverId").children("option:selected").val());
+                                    $("#LaboursID").val($("#LabourId").children("option:selected").val());
+                                    //$('#InstallDate').datepicker().datepicker('disable');
+                                });
+                            }
+                            else if (statusId == enumOrder.ChangeService) {
+                                //Change Service
+                                $("#myModalBody").load("@Url.Action("ChangeService")/@Model.EncryptId", function () {
+                                    $("#myModal").modal('show');
+                                    modalSize('lg');
+                                    $.validator.unobtrusive.parse($("#frmService"))
+                                    $("#myModalLabel").text("@Translation.ChangeService");
+
+                                    dtServices = $('#dtServices').DataTable({
+                                        "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                                        "bSearchable": false,
+                                        "bSortable": false,
+                                        "bInfo": false,
+                                        "bLengthChange": false,
+                                        "AutoWidth": true,
+                                        "bPaginate": false,
+                                        "language": {
+                                            "paginate": {
+                                                "previous": "«",
+                                                "next": "»",
+                                            },
+                                            "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                                            "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                                            "emptyTable": false,
+                                            "sEmptyTable": "@Translation.NoMatchingRecords",
+                                        },
+                                    });
+
+                                });
+                            }
+
+                            $('#btnchangestatus').show();
+                    }
+                    }
+
+                });
+            });
+</script>
+    }
+    else
+    {
+        <script>
+            $(document).ready(function () {
+                $('#Status').change(function () {
+                    debugger;
+                    $("#select2-DriverId-results li").eq(0).hide();
+
+                    var statusId = $(this).val();
+                    debugger;
+                    if (statusId == enumOrder.Finish) {
+                            $("#myModalBody").load("@Url.Action("VerifyCode")/@Model.EncryptId", function () {
+                                $("#myModal").modal('show');
+                                modalSize('content');
+                                $.validator.unobtrusive.parse($("#frmVerify"))
+                                $("#myModalLabel").text("@Translation.Finish");
+                            });
+                        }
+                        else if (statusId == enumOrder.ReSchedule) {
+                            //Reschedule
+                            $("#myModalBody").load("@Url.Action("ReSchedule")/@Model.EncryptId", function () {
+                                $("#myModal").modal('show');
+                                modalSize('lg');
+                                $.validator.unobtrusive.parse($("#frmSchedule"))
+                                $("#myModalLabel").text("@Translation.ReSchedule");
+
+                                $('#frmSchedule #Comments').val($('#frmAdd #Comments').val());
+                                $("#InstallDate").datepicker({ minDate: 0, dateFormat: 'dd/mm/yy' });
+                            });
+                        }
+                        else if (statusId == enumOrder.ChangeService) {
+                            //Change Service
+                            $("#myModalBody").load("@Url.Action("ChangeService")/@Model.EncryptId", function () {
+                                $("#myModal").modal('show');
+                                modalSize('lg');
+                                $.validator.unobtrusive.parse($("#frmService"))
+                                $("#myModalLabel").text("@Translation.ChangeService");
+
+                                dtServices = $('#dtServices').DataTable({
+                                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                                    "bSearchable": false,
+                                    "bSortable": false,
+                                    "bInfo": false,
+                                    "bLengthChange": false,
+                                    "AutoWidth": true,
+                                    "bPaginate": false,
+                                    "language": {
+                                        "paginate": {
+                                            "previous": "«",
+                                            "next": "»",
+                                        },
+                                        "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                                        "emptyTable": false,
+                                        "sEmptyTable": "@Translation.NoMatchingRecords",
+                                    },
+                                });
+
+                            });
+                        }
+                });
+            });
+        </script>
+    }
+
+    <script>
+        var dtAdditional;
+        var $totalAdd = 0;
+        var $totalSub = 0;
+        var $totalVat = 0;
+        var dtServices;
+
+        function onStatus(response) {
+
+        if (response.StatusId > 0 && response.StatusId == enumOrder.Rejected) {
+            var status = $('#Status').val();
+            successPopup("Order Rejected")
+               redirectUrl ='@Url.Action("Cancelled")';
+               setTimeout(function () { window.location = redirectUrl; }, 3000);
+        }
+        else if (response.StatusId > 0 && response.StatusId == enumOrder.Cancel) {
+            var status = $('#Status').val();
+            successPopup("Order Cancel")
+               redirectUrl ='@Url.Action("Cancelled")';
+               setTimeout(function () { window.location = redirectUrl; }, 3000);
+            }
+        else if (response.StatusId > 0 && response.StatusId == enumOrder.Finish) {
+            var status = $('#Status').val();
+            successPopup("Order Finished")
+               redirectUrl ='@Url.Action("Finished")';
+               setTimeout(function () { window.location = redirectUrl; }, 3000);
+            }
+        else if (response.StatusId > 0 && response.StatusId != enumOrder.Rejected && response.StatusId != enumOrder.Cancel) {
+                var status = $('#Status').val();
+                successPopup("@Translation.success_Update");
+                $('#divStatus').hide();
+
+                setTimeout(function () { window.location = redirectUrl; }, 3000);
+            }
+            else {
+                 warningPopup(response.Message);
+            }
+        }
+
+        function onSuccess(response) {
+            debugger;
+            $("#btn_submit").prop("disabled", false);
+            if (response.StatusId > 0) {
+                successPopup("@Translation.success_DetailSubmit");
+
+                setTimeout(function () { window.location = redirectUrl; }, 3000);
+            }
+            else if (response.Message != '') {
+                warningPopup(response.Message);
+            }
+    }
+    function onFinish(response) {
+            if (response.StatusId > 0) {
+                successPopup("@Translation.success_DetailSubmit");
+                redirectUrl ='@Url.Action("Finished")';
+                setTimeout(function () { window.location = redirectUrl; }, 3000);
+            }
+            else if (response.Message != '') {
+                warningPopup(response.Message);
+            }
+        }
+    </script>
+
+    <script>
+        //Change Services
+
+        var $total = 0; //@Model.TotalAmount;
+        var $vat = 0; //@Model.Vat;
+        var $vatPerc = parseInt(@ViewBag.Vat);
+        var $subTotal = 0;
+        var $quantity = 0;
+        $(document).ready(function () {
+
+            $("body").delegate("#btnAddService", "click", function (e) {
+                var AddRow = true;
+                var $divAdd = $('#frmAddService');
+                var $service = $divAdd.find('#sAddService').val();
+                var $addcount = $divAdd.find('#sAddCount').val();
+                var $unit = $('#sUnit').val();
+
+                if ($service === "" || $addcount === "" || $unit === "") {
+                    warningPopup('@Translation.error_detailMissing');
+
+                    AddRow = false;
+                }
+                else { //Check service already exists
+                    $("#dtServices > tbody").find('tr').each(function () {
+                        var $role = $(this).attr('role');
+                        if (typeof $role !== typeof undefined && $role !== false) {
+                            var $extService = $(this).find("#hfService").val();
+
+                            if ($extService === $service.split('_')[0]) {
+                                 warningPopup('@Translation.ServiceAlreadyAdded');
+
+                                AddRow = false;
+                            }
+                        }
+                    });
+                }
+
+                if (AddRow === true) {
+                    var $serviceId = $service.split('_')[0];
+                    var $servicePrice = $service.split('_')[1];
+                    var $price = $servicePrice * $addcount;
+                    var $itemVat = $price * ($vatPerc / 100);
+
+                    var $oldTotal = $total;
+                    var $oldVat = $vat;
+
+                    dtServices.row.add([
+                        $("#sAddService option:selected").html(),
+                        //$unit,
+                        $addcount,
+                        $servicePrice,
+                        $price,
+                        '<input type="hidden" id="hfService" value="' + $serviceId + '"  />' +
+                        '<input type="hidden" id="hfUnit" value="' + $unit + '"  />' +
+                        '<input type="hidden" id="hfQuantity" value="' + $addcount + '"  />' +
+                        '<input type="hidden" id="hfPrice" value="' + $price + '"  />' +
+                        '<input type="hidden" id="hfVat" value="' + $itemVat + '"  />' +
+                        '<input type="button" class="btn btn-danger delete" value="X" />'
+                    ])
+                    .node().id = 'tr_0';
+
+                    dtServices.draw(false);
+
+                    $quantity += Number($addcount);
+                    $subTotal += $price;
+                    $vat += $itemVat;
+                    $total += $price + $itemVat;
+
+                    $divAdd.find('#lblQuantity').val($quantity);
+                    $divAdd.find('#SubTotal').val($subTotal);
+                    $divAdd.find('#Vat').val($vat);
+                    $divAdd.find('#TotalAmount').val($total);
+
+                    $('#divNewService').find('select').val('');
+                    $('#divNewService').find('input[type=text]').val('');
+                    $("#sAddService").val('').trigger('change')
+                }
+            });
+
+            $('body').delegate('.delete', 'click', function () {
+                var $tr = $(this).parents('tr');
+                var $divAdd = $('#frmAddService');
+
+                var rowCount = $('#dtServices tbody tr').length;
+
+                if (rowCount == 1) {
+                    $divAdd.find('#Vat').val('0');
+                    $divAdd.find('#TotalAmount').val('0');
+                    $divAdd.find('#SubTotal').val('0');
+
+                    $subTotal = 0;
+                    $vat = 0;
+                    $total = 0;
+                }
+                else {
+                    var $currPrice = parseFloat($tr.find('#hfPrice').val());
+                    var $currVat = parseFloat($tr.find('#hfVat').val());
+
+                    var $minTotal = ($currPrice + $currVat);
+                    $vat -= $currVat
+                    $total -= $minTotal;
+                    $subTotal -= $currPrice
+
+                    $divAdd.find('#SubTotal').val($subTotal);
+                    $divAdd.find('#Vat').val($vat);
+                    $divAdd.find('#TotalAmount').val($total);
+                }
+
+                dtServices.row($(this).parents('tr')).remove().draw();
+            });
+
+            $('body').delegate('#btnChangeSubmit', 'click', function (e) {
+                onBegin();
+
+                var o = [];
+                $("#dtServices > tbody").find('tr').each(function () {
+                    var $role = $(this).attr('role');
+                    if (typeof $role !== typeof undefined && $role !== false) {
+                        var $this = $(this);
+                        var $Id = $(this).attr("Id").split('_')[1];
+                        if ($Id == 0) {
+                            var serialized = "ServiceId=" + parseInt($(this).find("#hfService").val());
+                            serialized += "&Quantity=" + parseInt($(this).find("#hfQuantity").val());
+                            serialized += "&IsActive=true";
+                            serialized += "&OrderId=@Model.OrderId";
+
+                            var item = $.toDictionary(serialized);
+                            o.push(item);
+                        }
+                    }
+                });
+
+                if (o.length == 0) {
+                    warningPopup('@Translation.error_Atleast1Service');
+
+                    onComplete();
+                    return;
+                }
+
+                var iData = { "Comments": $('#frmAdd #Comments').val(), "Vat": $('#frmAddService').find('#Vat').val(), "Total": $('#frmAddService').find('#TotalAmount').val(), "model": o };
+
+                $.ajax({
+                    url: "@Url.Action("ChangeService")",
+                    type: 'POST',
+                    data: JSON.stringify(iData),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function (response) {
+                        $('.overlay').hide();
+                        if (response.StatusId > 0) {
+                            //Success Message
+                            successPopup('@Translation.success_DetailSubmit');
+
+                            setTimeout(function () { window.location = redirectUrl; }, 3000);
+                        }
+                        else if(response.Message !='') {
+                            warningPopup(response.Message);
+                        }
+                        onComplete();
+                    },
+                    error: function () {
+                        onComplete();
+                    }
+                });
+
+            });
+
+        });
+
+    </script>
+
+    <script>
+        Dropzone.autoDiscover = false;
+          function UploadInvoice() {
+              $("#myModalBody").load("@Url.Action("FileAttach")/@Model.EncryptId", function () {
+                  debugger;
+                                $("#myModal").modal('show');
+                                modalSize('lg');
+                                $.validator.unobtrusive.parse($("#frmFile"))
+                                $("#myModalLabel").text("@Translation.Finish");
+
+                            dropUploader.autodropzone('fileUpload', fileType, "InvoiceImage", maxsize, "@cls_Defaults.FinalOrder");
+                            });
+        }
+        function onVerify(response) {
+            if (response.StatusId > 0) {
+                //$("#myModal").modal('hideCCustomerSignOffstomerSignOff');
+                bootbox.confirm({
+                    message: "@Translation.ConfirmFinish",
+                    buttons: {
+                        confirm: {
+                            label: '@Translation.Yes',
+                            className: 'btn-success'
+                        },
+                        cancel: {
+                            label: '@Translation.No',
+                            className: 'btn-danger'
+                        }
+                    },
+                    callback: function (result) {
+                        if (result == true) {
+                            $("#secondModalBody").load("@Url.Action("AdditionalService")/@Model.EncryptId", function () {
+                                $('#myModal').modal('hide');
+                                $("#secondModal").modal('show');
+                                $("#secondModalLabel").text("@Translation.Finish");
+
+                                dtAdditional = $('#dtAdditional').DataTable({
+                                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                                    "bSearchable": false,
+                                    "bSortable": false,
+                                    "bInfo": false,
+                                    "bLengthChange": false,
+                                    "AutoWidth": true,
+                                    "bPaginate": false,
+                                    "language": {
+                                        "paginate": {
+                                            "previous": "«",
+                                            "next": "»",
+                                        },
+                                        "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                                        "emptyTable": false,
+                                        "sEmptyTable": "@Translation.NoMatchingRecords",
+                                    },
+                                });
+                            });
+                        }
+                        else {
+                            $("#myModalBody").load("@Url.Action("FileAttach")/@Model.EncryptId", function () {
+                                $("#myModal").modal('show');
+                                modalSize('lg');
+                                $.validator.unobtrusive.parse($("#frmFile"))
+                                $("#myModalLabel").text("@Translation.Finish");
+                                debugger;
+                                dropUploader.autodropzone('fileUpload', fileType, "InvoiceImage", maxsize, "@cls_Defaults.FinalOrder");
+                            });
+                        }
+                    }
+                });
+            }
+            else if (response.Message != '') {
+                warningPopup(response.Message);
+            }
+        }
+
+
+        $(document).ready(function () {
+            $("body").delegate("#btnAdditional", "click", function (e) {
+
+                var AddRow = true;
+                var Quantity = 0;
+                var Price = 0;
+
+                var $divAdd = $('#frmAdditional');
+
+                var $service = $divAdd.find("#sAdditionalWork option:selected").text();
+                var $serviceId = $divAdd.find("#sAdditionalWork option:selected").val();
+                var $parts = $divAdd.find("#nParts").val();
+
+                if ($divAdd.find("#nQuantity").val() != '') { Quantity = $divAdd.find("#nQuantity").val(); }
+                if ($divAdd.find("#nPrice").val() != '') { Price = $divAdd.find("#nPrice").val(); }
+
+                var $quantity = $divAdd.find('#nQuantity').val();
+                var $price = $divAdd.find('#nPrice').val();
+
+                if ($service === "" && $quantity === "" && $price === "" && $parts === "") {
+                    warningPopup("@Translation.error_detailMissing");
+
+                    AddRow = false;
+                }
+
+                if (AddRow === true) {
+                    dtAdditional.row.add([
+                        $service + '<input type="hidden" data-additionalworkid=' + $serviceId + '  id="txtService" value="' + $service + '" readonly />',
+                        $quantity + '<input type="hidden" class="val1"  id="txtQuantity" value="' + Quantity + '"  readonly />',
+                        $price + '<input type="hidden" class="val2"  id="txtPrice" value="' + Price + '" readonly />',
+                        $parts + '<input type="hidden"   id="txtParts" value="' + $parts + '"  readonly />',
+                        '<input type="button" class="btn btn-danger remove" value="X" />'
+                    ]).node().id = 'tr_0';
+
+                    dtAdditional.draw(false);
+
+                    var $itemPrice = 0;
+                    if ($quantity !== "" && $price !== "") {
+                        $itemPrice= parseInt($quantity) * parseFloat($price);
+                    }
+
+                    var $itemVat = $itemPrice * ($vatPerc / 100);
+
+                    //$totalSub += $itemPrice;
+                    $totalSub += ($itemPrice - $itemVat);
+
+                    $totalVat += $itemVat;
+                    // change on 13092020
+                    $totalAdd += ($itemPrice);
+                    //$totalAdd += ($itemPrice + $itemVat);
+
+                    $('#TotalSub').val($totalSub.toFixed(2));
+                    $('#TotalVat').val($totalVat.toFixed(2));
+                    $('#TotalAdd').val($totalAdd.toFixed(2));
+
+                    $divAdd.find('select').val('');
+                    $divAdd.find('input[type=text]').val('');
+
+                    $("#nQuantity").val(0);
+                    $("#nPrice").val(0);
+                    $("#nParts").val(0);
+                }
+
+                sumInputs();
+            });
+
+            $('body').delegate('.remove', 'click', function () {
+                var $tr = $(this).parents('tr');
+                var rowCount = $('#dtAdditional tbody tr').length;
+                if (rowCount == 1) {
+                    $('#TotalVat').val('0');
+                    $('#TotalAdd').val('0');
+                    $('#TotalSub').val('0');
+
+                    $totalSub = 0;
+                    $totalVat = 0;
+                    $totalAdd = 0;
+                }
+                else {
+
+                    var $tempPrice = parseFloat($tr.find('#txtPrice').val());
+                    var $tempVat = $tempPrice * ($vatPerc / 100);
+
+                    $totalSub -= $tempPrice
+                    $totalVat -= $tempVat
+
+                    var $minTotal = ($tempPrice + $tempVat);
+
+                    $totalAdd -= $minTotal;
+
+                    $('#TotalSub').val($totalSub);
+                    $('#TotalVat').val($totalVat);
+                    $('#TotalAdd').val($totalAdd);
+                }
+                dtAdditional.row($(this).parents('tr')).remove().draw();
+
+                sumInputs();
+
+            });
+
+            function sumInputs() {
+
+                var mult = 0;
+                // for each row:
+                $('#dtAdditional tbody tr').each(function () {
+                    // get the values from this row:
+                    var $val1 = $('.val1', this).val();
+                    var $val2 = $('.val2', this).val();
+                    var $total = ($val1 * 1) * ($val2 * 1)
+                    $('.multTotal', this).text($total);
+                    mult += $total;
+                });
+                if (!isNaN(mult)) {
+                    var vatPerc = parseInt(@ViewBag.Vat);
+                    var tempVat = (mult / (1.15) * (vatPerc / 100));
+                    var totalSub = (mult - tempVat);
+                    $('#TotalSub').val(totalSub.toFixed(2));
+                    $('#TotalVat').val(tempVat.toFixed(2));
+                    $('#TotalAdd').val(mult.toFixed(2));
+                }
+            };
+
+
+            $('body').delegate('#btnAdditionalSubmit', 'click', function (e) {
+
+                $("#btnAdditionalSubmit").prop('disabled', true);
+                onBegin();
+                var $divFile = $('#frmAdditional');
+                var o = [];
+                $("#dtAdditional > tbody").find('tr').each(function () {
+                    var $role = $(this).attr('role');
+                    if (typeof $role !== typeof undefined && $role !== false) {
+                        var $this = $(this);
+
+                        var Id = $(this).find("#txtService").attr('data-additionalworkid');
+                        var Name = $(this).find("#txtService").val();
+                        var parts = $(this).find("#txtParts").val();
+                        var Quantity = 0;
+                        var Price = 0;
+                        if ($(this).find("#txtQuantity").val() != '') { Quantity = $(this).find("#txtQuantity").val(); }
+                        if ($(this).find("#txtPrice").val() != '') { Price = $(this).find("#txtPrice").val(); }
+
+                        var $$services = 'ServiceName=' + Name;
+                        $$services += '&ServiceId=' + Id;
+                        $$services += '&Quantity=' + Quantity;
+                        $$services += '&Price=' + Price;
+                        $$services += '&SpareParts=' + parts;
+                        $$services += "&OrderId=@Model.OrderId";
+
+                        var item = $.toDictionary($$services);
+                        o.push(item);
+                    }
+                });
+
+                if (o.length == 0) {
+                    onComplete();
+
+                    warningPopup("@Translation.error_Atleast1Service");
+                    return;
+                }
+
+                var fileData = new FormData();
+                var signOff = $("#CustomerSignOff").get(0);
+                var signfiles = signOff.files;
+                for (var i = 0; i < signfiles.length; i++) {
+                    fileData.append('CustomerSignOff', signfiles[i]);
+                }
+
+
+                var invoice = $("#InvoiceImage").get(0);
+                var invoicefiles = invoice.files;
+
+                // Looping over all files and add it to FormData object
+                for (var i = 0; i < invoicefiles.length; i++) {
+                    fileData.append('InvoiceImage', invoicefiles[i]);
+                }
+
+                // Adding one more key to FormData object
+                fileData.append('Comments', $('#CommentsText').val());
+                fileData.append('Total', $('#TotalAdd').val());
+                fileData.append('model', JSON.stringify(o));
+
+                $.ajax({
+                    url: "@Url.Action("AdditionalService")",
+                    type: 'POST',
+                    contentType: false, // Not to set any content header
+                    processData: false, // Not to process data
+                    data: fileData,
+                    success: function (response) {
+                        $('.overlay').hide();
+                        if (response.StatusId > 0) {
+                            //Success Message
+                            successPopup("@Translation.success_DetailSubmit");
+
+                            setTimeout(function () { window.location = redirectUrl; }, 3000);
+                        }
+                        else {
+                            $("#btnAdditionalSubmit").prop('disabled', false);
+                            warningPopup(response.Message);
+                        }
+                        onComplete();
+                    },
+                    error: function () {
+                        onComplete();
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        $("#myModal").on('hidden.bs.modal', function () {
+            $('#frmAdd').find('#Status').val('');
+        });
+
+        $("#secondModal").on('hidden.bs.modal', function () {
+            $('#frmAdd').find('#Status').val('');
+
+            onComplete();
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            function formatState(state) {
+                if (state.id == 0) {
+                    return state.text;
+                }
+                else {
+                    var data = state.text.split("###");
+                    var $state = $(
+                        '<span>' + data[0] + '<span class="float-right">' + data[1] + '</span></span>'
+                    );
+                    return $state;
+                }
+            };
+            $("#DriverId").select2({
+                templateResult: formatState
+            });
+        })
+    </script>
+    @if (ViewBag.History != null)
+    {
+        <script>
+            $('#dtHistory').DataTable({
+                "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                "bSearchable": false,
+                "bSortable": false,
+                "bInfo": false,
+                "bLengthChange": false,
+                "AutoWidth": true,
+                "bPaginate": false,
+                "pageLength": 15,
+                 @*"language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                        "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                        "emptyTable": false,
+                        "sEmptyTable": "@Translation.NoMatchingRecords",
+                    },*@
+            });
+        </script>
+    }
+
+    @if (ViewBag.Additional != null)
+    {
+        <script>
+            $('#dtvAdditional').DataTable({
+                "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                "bSearchable": false,
+                "bSortable": false,
+                "bInfo": false,
+                "bLengthChange": false,
+                "AutoWidth": true,
+                "bPaginate": true,
+                "pageLength": 5,
+                "language": {
+                    "paginate": {
+                        "previous": "<small> << </small>",
+                        "next": "<small> >> </small>",
+                    },
+                    "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                    "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                    "emptyTable": false,
+                    "sEmptyTable": "@Translation.NoMatchingRecords",
+                },
+            });
+        </script>
+    }
+
+}

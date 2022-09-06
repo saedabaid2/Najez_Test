@@ -1,0 +1,132 @@
+﻿@model IEnumerable<Almanea.tblProviderWorkinHour>
+
+@{
+    ViewBag.Title = Translation.Workinghours;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var countno = ViewBag.adddata;
+}
+
+
+   @if(countno==0)
+     {
+
+<p>
+    @Html.ActionLink(Translation.AddWorkingHours, "Create", null, new { @class = "btn btn-primary" })
+</p>
+
+    }
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dataTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>
+                                @Translation.CompanyName
+                            </th>
+                            <th>
+                                @Translation.AddWorkingHours
+                            </th>
+
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+        $(document).ready(function () {
+            async: true;
+            //List
+            BindDataTable();
+        });
+
+        var oTable;
+        function BindDataTable(response) {
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+                    "bAutoWidth": false,
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("GetWorkingHours")",
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+
+                    },
+                    "aoColumns": [
+
+                        {
+                            "mData": "CompanyNameEN",
+
+                        },
+                         {
+                             "mData": "WorkingHours",
+
+                        },
+                          {
+                            "mData": "Id",
+                            "render": function (Id, type, full, meta) {
+                                var str = '';
+
+                                    str += '<a href="@Url.Action("Edit")/' + Id + '" /*title="@Translation.Edit" data-toggle="tooltip"*/><i class="fa fa-edit"></i></a>';
+
+                                return str;
+                            },
+                            "orderable": false
+                        },
+
+                    ],
+
+                    "fnCreatedRow": function (nRow, aData, iDataIndex) {
+
+                        //$(nRow).attr('id', 'tr' + aData.ServiceId); // or whatever you choose to set as the id
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                         "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                        "emptyTable": false,
+                        "sEmptyTable": "@Translation.NoMatchingRecords",
+                    },
+                });
+            }
+
+        }
+
+        function string_to_array (str) {
+            return str.trim().split(",");
+        };
+
+        var Reset = function () {
+            $('#divSearch').find('input[type=text]').val('');
+            $('#divSearch').find('select').val('0');
+
+            BindDataTable();
+        }
+
+
+</script>

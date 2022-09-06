@@ -1,0 +1,85 @@
+﻿@model Almanea.Models.vm_OrderSchedule
+
+@using Almanea.BusinessLogic;
+
+@using (Ajax.BeginForm("Reschedule", "Provider", null,
+                             new AjaxOptions
+                             {
+                                 HttpMethod = "POST",
+                                 OnSuccess = "onSuccess",
+                             }, new { id = "frmSchedule", @autoComplete = "off" }))
+{
+
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-6 col-xs-12">
+            <label>@Translation.PreferInstallDateTime</label>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="custom-radio">
+                        <label class="bmd-label-floating required">
+                            <input type="radio" name="PreferDate" value="2" checked>&nbsp;@Translation.PreferSpecific
+                        </label>
+                    </div>
+                    <div id="divInstallDate">
+                        <div class="input-group">
+                            @*<input type="text" id="txtdate" class = "form-control" />*@
+                            @Html.TextBoxFor(m => m.InstallDate, new { @class = "form-control", @readonly = "readonly", @id = "txtdate" })
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                        @Html.ValidationMessageFor(m => m.InstallDate, "", new { @class = "valid-text" })
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <p class="mg-t-15">
+        <input type="submit" class="btn btn-primary" value="@Translation.Submit" />
+    </p>
+    @Html.HiddenFor(m => m.OrderId)
+}
+
+<script>
+    $(document).ready(function () {
+        $('input[name="PreferDate"]').on('click', function () {
+            var status = $(this).val();
+            if (status == '2') {
+                $('#divInstallDate').show();
+            }
+            else {
+                $('#divInstallDate').hide();
+               // $('#frmSchedule #InstallDate').val('');
+
+
+            }
+        });
+
+        alert($('#Quantity').val());
+        var requiredquantity = $('#Quantity').val();
+        var remainingcount=@ViewBag.remainingcount;
+        if (Number(requiredquantity) <= Number(remainingcount)) {
+             $("#txtdate").datepicker({
+       //     minDate: 0,
+                    maxDate: @ViewBag.maxdate,
+            minDate: @ViewBag.mindate,
+                    dateFormat: 'mm/dd/yy'
+                });
+        }
+        else {
+             $("#txtdate").datepicker({
+    
+                    maxDate:1,
+            minDate: 1,
+                    dateFormat: 'mm/dd/yy'
+                });
+        }
+       
+    });
+</script>
+

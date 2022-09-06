@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="bc788cd02fc041a2ad41ee1a4eecdcb7" Name="Diagram1">
+        <EntityTypeShape EntityType="AlmaneaDb.C__MigrationHistory" Width="1.5" PointX="5.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.Category" Width="1.5" PointX="8.25" PointY="14" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.OrderDisplay" Width="1.5" PointX="9.75" PointY="24.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblAdditionalWork" Width="1.5" PointX="10.5" PointY="14.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblComplainHistory" Width="1.5" PointX="5.25" PointY="18.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblComplainType" Width="1.5" PointX="9.75" PointY="43.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblDelivery" Width="1.5" PointX="9.75" PointY="28" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblDeliveryService" Width="1.5" PointX="15" PointY="25.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblDirection" Width="1.5" PointX="0.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblEmail" Width="1.5" PointX="2.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblLaborInactive" Width="1.5" PointX="5.25" PointY="24.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblMultipleComplain" Width="1.5" PointX="12" PointY="39.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblOrderAdditionalService" Width="1.5" PointX="12.75" PointY="28" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblOrderAdditionalWork" Width="1.5" PointX="12.75" PointY="23.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblOrderComplain" Width="1.5" PointX="9.75" PointY="38.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblOrderHistory" Width="1.5" PointX="9.75" PointY="31.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblOrderReleas" Width="1.5" PointX="9.75" PointY="47.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblOrder" Width="1.5" PointX="7.5" PointY="24.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblOrderService" Width="1.5" PointX="12.75" PointY="32.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblOrderUserLink" Width="1.5" PointX="4.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblProviderSettingMapper" Width="1.5" PointX="6.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblProviderTimeSlot" Width="1.5" PointX="8.25" PointY="19.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblProviderWorkinHour" Width="1.5" PointX="3" PointY="32.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblPushNotification" Width="1.5" PointX="7.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblResetOrder" Width="1.5" PointX="8.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblServiceMapper" Width="1.5" PointX="15" PointY="18.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblSetting" Width="1.5" PointX="8.75" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblSM" Width="1.5" PointX="9.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblTeamCapacity" Width="1.5" PointX="3" PointY="34.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblTeamCapacityCalculation" Width="1.5" PointX="15.75" PointY="28" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblUnit" Width="1.5" PointX="0.75" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblUserGroupCompany" Width="1.5" PointX="0.75" PointY="25.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.AggregatedCounter" Width="1.5" PointX="2.75" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.Hash" Width="1.5" PointX="4.75" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.Job" Width="1.5" PointX="0.75" PointY="2.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.JobParameter" Width="1.5" PointX="3" PointY="1.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.JobQueue" Width="1.5" PointX="10.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.List" Width="1.5" PointX="10.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.Schema" Width="1.5" PointX="6.75" PointY="10.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.Server" Width="1.5" PointX="8.75" PointY="10.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.Set" Width="1.5" PointX="10.75" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.State" Width="1.5" PointX="3" PointY="3.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="AlmaneaDb.Counter" Width="1.5" PointX="11.75" PointY="0.75" IsExpanded="true" />
+        <AssociationConnector Association="AlmaneaDb.FK_Category_Category" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblAdditionalWork_Category" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_OrderDisplay_tblOrders" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_dbo_tblOrderAddtionalWork_dbo_tblAdditionalWork_AdditionalWorkId" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblOrderAdditionalServices_tblAdditionalWork" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblMultipleComplains_tblComplainType" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_Delivery_tblOrders" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblDeliveryServices_tblDeliveries" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblLaborInactive_tblLaborInactive" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblMultipleComplains_tblMultipleComplains" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblMultipleComplains_tblOrderComplains" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_dbo_tblAdditionalServices_dbo_tblOrders_OrderId" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_dbo_tblOrderAddtionalWork_dbo_tblOrders_OrderId" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblOrderComplains_tblOrders" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_dbo_tblOrderHistories_dbo_tblOrders_OrderId" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblOrderReleases_tblOrders" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_dbo_tblOrderServices_dbo_tblOrders_OrderId" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblTeamCapacityCalculation_tblOrders" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblProviderTimeSlot_tblUserGroupCompanies" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblProviderWorkinHour_tblUserGroupCompanies" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblTeamCapacity" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblTeamCapacityCalculation_tblUserGroupCompanies" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_HangFire_JobParameter_Job" ManuallyRouted="false" />
+        <AssociationConnector Association="AlmaneaDb.FK_HangFire_State_Job" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblAccountType" Width="1.5" PointX="5.375" PointY="3.75" />
+        <EntityTypeShape EntityType="AlmaneaDb.Admin_Pages" Width="1.5" PointX="0.75" PointY="13.5" />
+        <EntityTypeShape EntityType="AlmaneaDb.Admin_Page_Details" Width="1.5" PointX="3" PointY="12.875" />
+        <AssociationConnector Association="AlmaneaDb.FK_Admin_Page_Details_Admin_Pages" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblService" Width="1.5" PointX="10.5" PointY="19.125" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblServices_tblCategory" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblDeliveryServices_tblServices" />
+        <AssociationConnector Association="AlmaneaDb.FK_dbo_tblOrderServices_dbo_tblServices_ServiceId" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblServiceMapper_tblServices" />
+        <EntityTypeShape EntityType="AlmaneaDb.LabourCapacity" Width="1.5" PointX="5.25" PointY="40.25" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblAdminUser" Width="1.5" PointX="3" PointY="38.625" />
+        <AssociationConnector Association="AlmaneaDb.FK_LabourCapacity_tblAdminUsers" />
+        <AssociationConnector Association="AlmaneaDb.FK_dbo_tblAdminUsers_dbo_tblUserGroupCompanies_UserGroupId" />
+        <AssociationConnector Association="AlmaneaDb.FK_dbo_tblOrderAddtionalWork_dbo_tblAdminUsers_UserId" />
+        <AssociationConnector Association="AlmaneaDb.FK_dbo_tblOrderHistories_dbo_tblAdminUsers_UserId" />
+        <AssociationConnector Association="AlmaneaDb.FK_Delivery_tblAdminUsers" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblComplainHistory_tblAdminUsers" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblLaborInactive_tblAdminUsers" />
+        <AssociationConnector Association="AlmaneaDb.FK_tblProviderTimeSlot_tblAdminUsers" />
+        <EntityTypeShape EntityType="AlmaneaDb.tblLocation" Width="1.5" PointX="5.25" PointY="44.375" />
+        <AssociationConnector Association="AlmaneaDb.FK_dbo_tblLocations_dbo_tblAdminUsers_UserId" />
+        <AssociationConnector Association="AlmaneaDb.FK_dbo_tblOrders_dbo_tblLocations_LocationId" />
+        <EntityTypeShape EntityType="AlmaneaDb.OrdersAssigned" Width="1.5" PointX="17.75" PointY="23.25" />
+        <AssociationConnector Association="AlmaneaDb.FK_OrdersAssigned_tblOrders" />
+        <AssociationConnector Association="AlmaneaDb.FK_OrdersAssigned_tblServices" />
+        <EntityTypeShape EntityType="AlmaneaDb.Item" Width="1.5" PointX="5.375" PointY="12.75" />
+        <EntityTypeShape EntityType="AlmaneaDb.Service_Items" Width="1.5" PointX="12.75" PointY="17.125" />
+        <AssociationConnector Association="AlmaneaDb.FK_Service_Items_Items" />
+        <AssociationConnector Association="AlmaneaDb.FK_Service_Items_Service_Items" />
+        <EntityTypeShape EntityType="AlmaneaDb.Inventoy_Details" Width="1.5" PointX="15.625" PointY="4" />
+        <EntityTypeShape EntityType="AlmaneaDb.Inventory_Master" Width="1.5" PointX="13.375" PointY="3.75" />
+        <AssociationConnector Association="AlmaneaDb.FK_Inventoy_Details_Inventory_Master" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

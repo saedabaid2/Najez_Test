@@ -1,0 +1,474 @@
+﻿
+@{
+    ViewBag.Title = Translation.Calendar;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var UserId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserId]);
+    var UserGroupTypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+    var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupId]);
+    var ActtypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+}
+@using Almanea.BusinessLogic;
+@model Almanea.Models.FilterDropDown
+
+
+<style>
+
+</style>
+@*<div>
+        <i type="button" class="fas fa-filter " style="margin-bottom:10px" data-toggle="collapse" data-target="#divSearch"></i>
+    </div>*@
+<div class="card">
+    <div class="card-body">
+        <div class="row " id="" style="background-color: white">
+            <div class="col-xl-4 col-sm-6 col-md-4">
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <select class="form-control select2" id="sLocation" onchange="getvalueLocation(this)">
+                            <option value="0">@Translation.Select  @Translation.Location</option>
+                            @foreach (var item in cls_DropDowns.GetLocations(UserGroupId, UserGroupTypeId, ActtypeId))
+                            {
+                                if (ViewBag.LocationId != null && item.Value == Convert.ToString(ViewBag.LocationId))
+                                {
+                                    <option value="@item.Value" selected>@item.Text</option>
+                                }
+                                else if (Model.LocationId == Convert.ToInt32(item.Value))
+                                {
+                                    <option value="@item.Value" selected>@item.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Value"> @item.Text </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-sm-6 col-md-4">
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <select class="form-control select2" id="sStatus" onchange="getvalueStatus(this)">
+                            <option value="0">@Translation.SelectStatus</option>
+                            @foreach (var item in cls_DropDowns.AllOrderStatus())
+                            {
+                                if (ViewBag.StatusId != null && item.Value == Convert.ToString(ViewBag.StatusId))
+                                {
+                                    <option value="@item.Value" selected>@item.Text</option>
+                                }
+                                else if (Model.StatusId == Convert.ToInt32(item.Value))
+                                {
+                                    <option value="@item.Value" selected>@item.Text</option>
+                                }
+                                else if (item.Value != "1")
+                                {
+                                    <option value="@item.Value"> @item.Text </option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Value">@Translation.New_Order</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-sm-6 col-md-4" hidden>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        @if (UserGroupTypeId == (int)enumGroupType.Supplier && ActtypeId == (int)enumSupplierAcct.Executive)
+                        {
+                            <select class="form-control select2" id="supplier" onchange="getvalueSupplier(this)" disabled>
+                                @foreach (var item in cls_DropDowns.GetSupplier(UserId))
+                                {
+                                    <option value="@item.Value" selected>@item.Text</option>
+                                }
+                            </select>
+                        }
+                        else if (UserGroupTypeId == (int)enumGroupType.Provider && ActtypeId == (int)enumProviderAcct.Admin) // if user is provider and its role is admin
+                        {
+                            <select class="form-control select2" id="supplier" onchange="getvalueSupplier(this)" disabled>
+                                @foreach (var item in cls_DropDowns.GetSupplier(UserId))
+                                {
+                                    if (ViewBag.SupplierId != null && item.Value == Convert.ToString(ViewBag.SupplierId))
+                                    {
+                                        <option value="@item.Value" selected>@item.Text</option>
+                                    }
+                                    else if (Model.SupplierId == Convert.ToInt32(item.Value))
+                                    {
+                                        <option value="@item.Value" selected>@item.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.Value"> @item.Text </option>
+                                    }
+                                }
+                            </select>
+                        }
+                        else
+                        {
+                            <select class="form-control select2" id="supplier" onchange="getvalueSupplier(this)">
+                                <option value="0">@Translation.All @Translation.Supplier</option>
+
+                                @foreach (var item in cls_DropDowns.GetSupplierList())
+                                {
+                                    if (ViewBag.SupplierId != null && item.Value == Convert.ToString(ViewBag.SupplierId))
+                                    {
+                                        <option value="@item.Value" selected>@item.Text</option>
+                                    }
+                                    else if (Model.SupplierId == Convert.ToInt32(item.Value))
+                                    {
+                                        <option value="@item.Value" selected>@item.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.Value"> @item.Text </option>
+                                    }
+                                }
+                            </select>
+                        }
+
+
+
+                    </div>
+                </div>
+            </div>
+            <form method="post" action="Calendar">
+
+                @*<input type="hidden" id="locationId" value="@Model.LocationId">
+                    <input type="hidden" id="statusId" value="@Model.LocationId">
+                    <input type="hidden" id="supplierId" value="@Model.LocationId">*@
+                @Html.HiddenFor(x => x.LocationId)
+                @Html.HiddenFor(x => x.StatusId)
+                @Html.HiddenFor(x => x.SupplierId)
+                @*<div class="row collapse" id="divSearch">*@
+
+                <button type="submit" class="btn btn-primary pull-right " id="searchbtn" style="margin-bottom: 10px; margin-left: 11px; margin-right: 11px">@Translation.Search</button>
+
+            </form>
+
+
+
+            <div class="events-header">
+
+                @*<h1 style="color: #458f8e"> .</h1>*@
+            </div>
+
+            <div class="row">
+                @*<div class="col-xl-9 col-sm-11 col-md-9">*@
+                <div class="col-xl-12 col-sm-12 col-md-12">
+                    <div id='calendar' style="padding-top: 2%; padding-right: 2%; padding-left: 2%; "></div>
+                </div>
+                @*<div class="col-xl-3 col-sm-5 col-md-3" style="padding-top: 2%;">
+            <table>
+                <tr style=" visibility: hidden;">
+                    <td class="setcolumn"><div class='setalignment m color1'></div><div class="m">@Translation.New_Order</div></td>
+                </tr>
+                <tr style=" visibility: hidden;">
+                    <td class="setcolumn"><div class='setalignment m color1'></div><div class="m">new order</div></td>
+                </tr>
+
+                <tr>
+                    <td class="setcolumn"><div class='setalignment m color1'></div><div class="m">@Translation.New_Order</div></td>
+                </tr>
+                <tr>
+                    <td class="setcolumn"><div class='setalignment m color2'></div><div class="m">@Translation.Cancelled_Order</div></td>
+                </tr>
+                <tr>
+                    <td class="setcolumn"> <div class='setalignment m color3'></div><div class="m">@Translation.Completed_Orders</div></td>
+                </tr>
+                <tr>
+                    <td class="setcolumn"><div class='setalignment m color4'></div><div class="m">@Translation.Reserved_Order</div></td>
+                </tr>
+                <tr>
+                    <td class="setcolumn"><div class='setalignment m color5'></div><div class="m">@Translation.Rejected_Order</div></td>
+                </tr>
+                <tr>
+                    <td class="setcolumn"><div class='setalignment m color6'></div><div class="m">@Translation.Order_Assigned_to_Driver</div></td>
+                </tr>
+                <tr>
+                    <td class="setcolumn"><div class='setalignment m color7'></div><div class="m">@Translation.Order_Assigned_to_Labour</div></td>
+                </tr>
+                <tr>
+                    <td class="setcolumn"><div class='setalignment m color8'></div><div class="m">@Translation.Order_Partial_Delivery</div></td>
+                </tr>
+                <tr>
+                    <td class="setcolumn">  <div class='setalignment m color9'></div> <div class="m">@Translation.Order_Reveived_from_Warehouse</div></td>
+                </tr>
+                <tr>
+                    <td class="setcolumn"> <div class='setalignment m color10'></div><div class="m">@Translation.Start_Work_Order</div>                 </td>
+                </tr>
+                <tr>
+                    <td class="setcolumn"> <div class='setalignment m color11'></div><div class="m">@Translation.Order_Change_Service</div>            </td>
+                </tr>
+                <tr>
+                    <td class="setcolumn"> <div class='setalignment m color12'></div><div class="m">@Translation.Appointment_Confirmed</div>             </td>
+                </tr>
+
+                <tr>
+                    <td class="setcolumn"> <div class='setalignment m color13'></div><div class="m">@Translation.Finish_Work</div>                      </td>
+                </tr>
+                <tr>
+                    <td class="setcolumn"> <div class='setalignment m color14'></div><div class="m">@Translation.Order_on_Hold</div>                    </td>
+                </tr>
+
+                <tr>
+                    <td class="setcolumn"> <div class='setalignment m color15'></div><div class="m">@Translation.Order_Appointment_Reschedule</div>    </td>
+                </tr>
+            </table>
+        </div>*@
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@*<div class="col-sm-2">
+        <div class="events-label-container">
+            <div class="upcoming-events-label"><span></span><span>UpcomingEvents</span></div>
+            <div class="my-events-label"><span></span><span>MyEvents</span></div>
+        </div>
+    </div>*@
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    @*<link href="~/Content/Site-ar.css" rel="stylesheet" />*@
+
+    <script>
+
+        $(document).ready(function () {
+            $("#LocationId").val($("#sLocation").val())
+            $("#StatusId").val($("#sStatus").val())
+            $("#SupplierId").val($("#supplier").val())
+            //$("#searchbtn").click(function () {
+            //    var FilterDropDown = {
+            //        SupplierId: parseInt($("#supplier").val()),
+            //        LocationId: $("#sLocation").val(),
+            //        StatusId: $("#sStatus").val()
+            //    };
+            //    $.ajax({
+            //        type: "POST",
+            //        url: "/Home/Calendar",
+            //        data: JSON.stringify(FilterDropDown),
+            //        dataType: "json",
+            //        contentType: 'application/json; charset=utf-8',
+            //        success: function (data) {
+            //            alert(data.msg);
+            //        },
+            //        error: function () {
+            //            alert("Error occured!!")
+            //        }
+            //    });
+            //})
+            
+        })
+
+    </script>
+    <script>
+
+        $(document).ready(function () {
+
+
+        })
+        function getvalueLocation(sel) {
+            $("#LocationId").val(sel.value);
+        }
+        function getvalueStatus(sel) {
+
+            $("#StatusId").val(sel.value);
+        }
+        function getvalueSupplier(sel) {
+            $("#SupplierId").val(sel.value);
+        }
+
+    </script>
+    <script>
+
+        $(document).ready(function () {
+            $('#calendar').fullCalendar({
+                header: {
+                    left: 'title',
+                    right: 'prev,next'
+                },
+                showNonCurrentDates: false,
+                timeZone: 'local',
+                defaultView: 'month',
+                defaultDate: Date.now(),
+                height: 1000,
+                innerWidth:130 ,
+                navLinks: true, // can click day/week names to navigate views
+                editable: true,
+                eventLimit: 5, // allow "more" link when too many events
+               // eventColor: '#FFFFFF',
+               // eventTextColor : '#ffffff',
+                editable:false,
+                timeFormat: 'H(:mm)',
+                displayEventTime: false,
+                fixedWeekCount: false,
+                events:@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Events)),
+                
+                //events:[
+                //    {
+                //        title: 'Order_NO -1',
+                //        start: '2021-09-02',
+                //        end: '2021-09-02',
+                //        extraParams: {
+                //            custom_param1: 'something',
+                //            custom_param2: 'somethingelse'
+                //        },
+
+                //        color: "red"
+                //    },
+                //     {
+                //        title: 'Order_NO -2664',
+                //        start: '2021-07-07',
+                //        end: '2021-07-07'
+                //    },
+                //      {
+                //        title: 'Order_NO -2664',
+                //        start: '2021-07-09'
+
+                //    },
+                //     {
+                //        title: 'Order_NO -2664',
+                //        start: '2021-07-11'
+
+                //    },
+                //      {
+                //        title: 'Order_NO -2664',
+                //        start: '2021-07-12'
+
+                //    },
+                //      {
+                //        title: 'Order_NO -2664',
+                //        start: '2021-07-12'
+
+                //    },
+
+                //       {
+                //        title: 'Order_NO -2664',
+                //        start: '2021-07-12'
+
+                //    },
+                //       {
+                //        title: 'Order_NO -2664',
+                //        start: '2021-07-12'
+
+                //    },
+                //       {
+                //        title: 'Order_NO -2664',
+                //        start: '2021-07-12'
+
+                //    },
+                //    {
+                //        id: 999,
+                //        title: 'Repeating Event',
+                //        start: '2018-05-09T16:00:00'
+                //    },
+                //    {
+                //        id: 999,
+                //        title: 'Repeating Event',
+                //        start: '2018-05-16T16:00:00'
+                //    },
+                //    {
+                //        title: 'Conference',
+                //        backgroundColor: '#d4af3e',
+                //        borderColor: '#d4af3e',
+                //        textColor: '#fff',
+                //        start: '2018-05-11',
+                //        end: '2018-05-13'
+                //    },
+                //    {
+                //        title: 'Meeting',
+                //        start: '2018-05-12T10:30:00',
+                //        end: '2018-05-12T12:30:00'
+                //    },
+                //    {
+                //        title: 'Lunch',
+                //        start: '2018-05-12T12:00:00'
+                //    },
+                //    {
+                //        title: 'Meeting',
+                //        start: '2018-05-12T14:30:00'
+                //    },
+                //    {
+                //        title: 'Happy Hour',
+                //        start: '2018-05-12T17:30:00'
+                //    },
+                //    {
+                //        title: 'Dinner',
+                //        start: '2018-05-12T20:00:00'
+                //    },
+                //    {
+                //        title: 'Birthday Party',
+                //        start: '2018-05-13T07:00:00',
+                //        backgroundColor: '#d4af3e',
+                //        borderColor: '#d4af3e'
+                //    },
+                //    {
+                //        title: 'Click for Google',
+                //        url: 'http://google.com/',
+                //        start: '2018-05-28'
+                //    }
+                //]
+                });
+
+        });
+
+
+        $(document).ready(function () {
+            /*bindCircle()*/
+
+        })
+        function viewmore(date)
+        {
+            alert(date);
+            $('fc-basicDay-button').trigger('click');
+            $('#calendar').fullCalendar('dayClick', date)
+        }
+        //$(document).on("click", ".fc-next-button", function () {
+        //    $(".color1 div").append("<div class='setali circle1_0'></div>")
+        //    $(".color2 div").append("<div class='setali circle2_0'></div>")
+        //    $(".color3 div").append("<div class='setali circle3_0'></div>")
+        //    $(".color4 div").append("<div class='setali circle4_0'></div>")
+        //    $(".color5 div").append("<div class='setali circle5_0'></div>")
+        //    $(".color6 div").append("<div class='setali circle6_0'></div>")
+        //    $(".color7 div").append("<div class='setali circle7_0'></div>")
+        //    $(".color8 div").append("<div class='setali circle8_0'></div>")
+        //    $(".color9 div").append("<div class='setali circle9_0'></div>")
+        //    $(".color10 div").append("<div class='setali circle10_0'></div>")
+        //    $(".color11 div").append("<div class='setali circle11_0'></div>")
+        //    $(".color12 div").append("<div class='setali circle12_0'></div>")
+        //    $(".color13 div").append("<div class='setali circle13_0'></div>")
+        //    $(".color14 div").append("<div class='setali circle14_0'></div>")
+        //    $(".color15 div").append("<div class='setali circle15_0'></div>")
+        //})
+        //$(document).on("click", ".fc-prev-button", function () {
+        //    $(".color1 div").append("<div class='setali circle1_0'></div>")
+        //    $(".color2 div").append("<div class='setali circle2_0'></div>")
+        //    $(".color3 div").append("<div class='setali circle3_0'></div>")
+        //    $(".color4 div").append("<div class='setali circle4_0'></div>")
+        //    $(".color5 div").append("<div class='setali circle5_0'></div>")
+        //    $(".color6 div").append("<div class='setali circle6_0'></div>")
+        //    $(".color7 div").append("<div class='setali circle7_0'></div>")
+        //    $(".color8 div").append("<div class='setali circle8_0'></div>")
+        //    $(".color9 div").append("<div class='setali circle9_0'></div>")
+        //    $(".color10 div").append("<div class='setali circle10_0'></div>")
+        //    $(".color11 div").append("<div class='setali circle11_0'></div>")
+        //    $(".color12 div").append("<div class='setali circle12_0'></div>")
+        //    $(".color13 div").append("<div class='setali circle13_0'></div>")
+        //    $(".color14 div").append("<div class='setali circle14_0'></div>")
+        //    $(".color15 div").append("<div class='setali circle15_0'></div>")
+
+        //})
+
+
+    </script>
+
+    <link href="~/assets/customcss.css" rel="stylesheet" />
+}

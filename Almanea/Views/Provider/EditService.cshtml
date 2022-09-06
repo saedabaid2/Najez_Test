@@ -1,0 +1,300 @@
+﻿@model  vm_ServicesMapper
+
+@{
+    ViewBag.Title = Translation.Services + " " + Translation.Edit;
+}
+
+
+@using Almanea.Models;
+@using Almanea.BusinessLogic;
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header" style=" border-bottom: 1px solid #ccc; ">
+<label>@Model.ServiceNameEN</label>
+            </div>
+            <div class="card-body">
+                @using (Html.BeginForm("UpdateService", "Provider", FormMethod.Post, new { id = "frmAdd" }))
+                {
+
+                    @Html.AntiForgeryToken()
+
+                <div class="row">
+                    @Html.HiddenFor(m => m.ServiceId)
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.Label(Translation.EstimatedTime, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.Estimated, new { @class = "form-control", type = "number" })
+
+                        </div>
+                        @Html.ValidationMessageFor(m => m.Estimated, "", new { @class = "valid-text" })
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <label>@Translation.IsWorking</label>
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" id="isworkingcheckbox" class="custom-control-input" @(Model.isworking == true ? "checked" : "Unchecked") />
+                            <label for="isworkingcheckbox" class="custom-control-label"></label>
+                            @Html.HiddenFor(m => m.isworking)
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <label>@Translation.Inventory</label>
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" name="InventoryRequired" id="InventoryRequired" class="custom-control-input" @(Model.InventoryRequired == true ? "checked" : "Unchecked") />
+                            <label for="InventoryRequired" class="custom-control-label"></label>
+                        </div>
+                    </div>
+                    @*<div class="col-lg-4 col-md-2 col-sm-6 col-xs-12">
+            <div class="form-group">
+                @Html.Label("Estimated Minuts", new { @class = "bmd-label-floating required" })
+                @Html.TextBoxFor(m => m.UnitPrice, new { @class = "form-control currencyOnly", @placeholder = Translation.ReqUnitPrice })
+            </div>
+            @Html.ValidationMessageFor(m => m.UnitPrice, "", new { @class = "valid-text" })
+        </div>*@
+
+                    @*<div class="col-lg-4 col-md-2 col-sm-6 col-xs-12">
+            <div class="form-group">
+                @Html.LabelFor(m => m.SupplierId, new { @class = "bmd-label-floating required" })
+                <input type="hidden" name="SupplierId" id="SupplierId" />
+                <select class="form-control select2" multiple id="supplier">
+                    <optgroup label="Select All">
+                        @foreach (var item in cls_DropDowns.GetSupplierList(Model.ServiceId))
+                        {
+                            if (@item.Selected)
+                            {
+                                <option value="@item.Value" selected="selected">@item.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        }
+                    </optgroup>
+                </select>
+            </div>
+            @Html.ValidationMessageFor(m => m.ServiceNameEN, "", new { @class = "valid-text" })
+        </div>*@
+
+
+                </div>
+                    <div class="row inventory">
+                        <label>@Translation.Items</label>
+                        <div class="col-md-12 laboursContainer">
+
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12">
+                            <div class="custom-control custom-switch" style="padding-left:0px !important;margin-top:20px;">
+                                <input type="button" class="add btn btn-primary" name="add" value="add" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12" style="margin-top: 50px;">
+                        <input type="submit" class="btn btn-primary pull-right" onclick="getSelectValue();" value="@Translation.Update" />
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts{
+
+    <script>
+        var index = [];
+        var i = 0;
+        $(document).on('click', '#removeRow', function () {
+            debugger;
+            var ii = $(this).parent().parent().index();
+            index.pop(ii);
+            //var val = $(this).attr("val");
+            //$("#LabourId2 option[value=" + val + "]").removeAttr('disabled').select2();
+
+            $(this).closest('#inputFormRow').remove();
+            //i--;
+        });
+        $(document).ready(function () {
+          //  $(".inventory").hide();
+            $('.js-example-basic-multiple').select2();
+
+              $.ajax({
+                type: "GET",
+                  url: '/provider/GetServiceItems/' + $("#ServiceId").val(),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                  success: function (response) {
+                      var html = "";
+                      $.each(response.data, function (k, v) {
+                debugger;
+                var ii = $(this).parent().index();
+                index.push(ii);
+                i = index.length - 1;
+            html += "<div class='row col-md-12' id='inputFormRow'>";
+            var statesAvailable = '@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Items))';
+            html += "<div class='col-md-3'><select id='items[" + i + "]' onchange='myFunction(this)'  name='items[" + i + "]' style='font-size: 12px;width:100%' class='form-control'>";
+            html += "<option title='select service ' value='-1'>@Translation.SelectService ";
+            $.each(JSON.parse(statesAvailable), function (Text, Value) {
+                if(Value.id==v.ItemId)
+                    html += "<option selected title=" + Value.name + " value='" + Value.id + "'>" + Value.name + "";
+                else
+                    html += "<option  title=" + Value.name + " value='" + Value.id + "'>" + Value.name + "";
+
+            });
+                html += "</select></div>";
+                debugger;
+                          html += "<div class=\"col-md-2\"><input type='number' id='quantity[" + i + "]' value='" + v.quantity+"' name='quantity[" + i + "]'></div>";
+                html += "<div class='col-md-1'><a class='btn btn-danger rmv' id='removeRow'><i class='fa fa-times' style='color:white'></i></a></div>";
+                html += "</div>";
+                debugger;
+                      });
+                      $(".laboursContainer").append(html);
+
+                     if (response.StatusId > 0) {
+                         successPopup("Send login details To the User");
+
+                     }
+                },
+                 error: function () {
+                }
+            });
+
+            $(".add").click(function () {
+                var html = '';
+                debugger;
+                var ii = $(this).parent().index();
+                index.push(ii);
+                i = index.length - 1;
+            html += "<div class='row col-md-12' id='inputFormRow'>";
+            var statesAvailable = '@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Items))';
+            html += "<div class='col-md-3'><select id='items[" + i + "]' onchange='myFunction(this)'  name='items[" + i + "]' style='font-size: 12px;width:100%' class='form-control'>";
+            html += "<option title='select service ' value='-1'>@Translation.SelectService ";
+            $.each(JSON.parse(statesAvailable), function (Text, Value) {
+                debugger;
+                html += "<option title=" + Value.name+" value='" + Value.id + "'>" + Value.name  + "";
+            });
+                html += "</select></div>";
+                debugger;
+                html += "<div class=\"col-md-2\"><input type='number' id='quantity[" + i + "]' value='1' name='quantity[" + i + "]'></div>";
+                html += "<div class='col-md-1'><a class='btn btn-danger rmv' id='removeRow'><i class='fa fa-trash'></i></a></div>";
+                html += "</div>";
+                debugger;
+            $(".laboursContainer").append(html);
+            //console.log(myarray);
+            return false;
+        });
+        });
+        $("#isworkingcheckbox").on('change', function () {
+            if ($(this).is(':checked')) {
+                $(this).attr('value', 'true');
+            } else {
+                $(this).attr('value', 'false');
+            }
+            $('#isworking').val($('#isworkingcheckbox').val());
+        });
+
+        function OnlyNumeric(e) {
+            if ((e.which < 48 || e.which > 57)) {
+                if (e.which == 8 || e.which == 46 || e.which == 0) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+        function getSelectValue() {
+            $("#SupplierId").val($("#supplier").val());
+            // $("#ServiceProviderId").val($("#serviceprovider").val());
+
+        };
+
+        RunSelect2();
+        $("#InventoryRequired").change(function () {
+            if (this.checked) {
+                $(".inventory").show();
+            }
+            else
+                $(".inventory").hide();
+
+        });
+        function RunSelect2() {
+            $('#supplier').select2({
+                allowClear: true,
+                closeOnSelect: false,
+            }).on('select2:open', function () {
+
+                setTimeout(function () {
+                    $(".select2-results__option .select2-results__group").bind("click", selectAllclickHandler_supplier);
+                }, 0);
+            });
+
+            $('#serviceprovider').select2({
+                allowClear: true,
+                closeOnSelect: false,
+            }).on('select2:open', function () {
+
+                setTimeout(function () {
+                    $(".select2-results__option .select2-results__group").bind("click", selectAllclickHandler_serviceprovider);
+                }, 0);
+            });
+
+            $('#supplier_update').select2({
+                allowClear: true,
+                closeOnSelect: false,
+            }).on('select2:open', function () {
+
+                setTimeout(function () {
+                    $(".select2-results__option .select2-results__group").bind("click", selectAllclickHandler_supplier_update);
+                }, 0);
+            });
+
+            $('#serviceprovider_update').select2({
+                allowClear: true,
+                closeOnSelect: false,
+            }).on('select2:open', function () {
+
+                setTimeout(function () {
+                    $(".select2-results__option .select2-results__group").bind("click", selectAllclickHandler_serviceprovider_update);
+                }, 0);
+            });
+        };
+
+        var selectAllclickHandler_supplier = function () {
+            $(".select2-results__option .select2-results__group").unbind("click", selectAllclickHandler_supplier);
+            $('#supplier').select2('destroy').find('option').prop('selected', 'selected').end();
+            RunSelect2();
+        };
+
+        var selectAllclickHandler_serviceprovider = function () {
+            $(".select2-results__option .select2-results__group").unbind("click", selectAllclickHandler_serviceprovider);
+            $('#serviceprovider').select2('destroy').find('option').prop('selected', 'selected').end();
+            RunSelect2();
+        };
+
+        var selectAllclickHandler_supplier_update = function () {
+            $(".select2-results__option .select2-results__group").unbind("click", selectAllclickHandler_supplier_update);
+            $('#supplier_update').select2('destroy').find('option').prop('selected', 'selected').end();
+            RunSelect2();
+        };
+
+        var selectAllclickHandler_serviceprovider_update = function () {
+            $(".select2-results__option .select2-results__group").unbind("click", selectAllclickHandler_serviceprovider_update);
+            $('#serviceprovider_update').select2('destroy').find('option').prop('selected', 'selected').end();
+            RunSelect2();
+        };
+
+
+        $('#supplier').change(function () {
+            var arr = $(this).val();
+            console.log(arr)
+        })
+
+
+    </script>
+
+}

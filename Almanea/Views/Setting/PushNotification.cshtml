@@ -1,0 +1,162 @@
+﻿
+@{
+    /**/
+
+    ViewBag.Title = "Push Notification";
+}
+
+@using Almanea.Models
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dataTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="20%">Unique Key</th>
+                            <th width="35%">Push Notification in English</th>
+                            <th width="35%">Push Notification in Arabic</th>
+                            <th width="10%"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @*<tr>
+                            <td>
+                                <textarea class="form-control" id="txtkeyName" placeholder="Key Name"></textarea>
+                                <label id="msgforkeyName" style="color:red"></label>
+                            </td>
+                            <td>
+                                <textarea class="form-control" id="txtEN" placeholder="Push Notification Text in English"></textarea>
+                                <label id="msgforEN" style="color:red"></label>
+                            </td>
+                            <td>
+                                <textarea class="form-control" id="txtAR" placeholder="Push Notification Text in Arabic"></textarea>
+                                <label id="msgforAR" style="color:red"></label>
+                            </td>
+                            <td>
+                                <a href="javascript:void(0)" onclick="Add()" class="btn btn-sm btn-primary">@Translation.AddNew</a>
+                            </td>
+                        </tr>*@
+                        @if (ViewBag.Data != null)
+                        {
+                            foreach (var item in (List<vm_PushNotification>)ViewBag.Data)
+                            {
+                                <tr id="tr@(item.Id)">
+                                    @*<td>
+                                        <textarea class="form-control" id="txtkeyName_@item.Id" placeholder="Key Name">@item.KeyName</textarea>
+                                        <label id="msgforkeyName_@item.Id" style="color:red"></label>
+                                    </td>*@
+                                    <td>
+                                        @item.KeyName
+                                    </td>
+                                    <td>
+                                        <textarea class="form-control" id="txtEN_@item.Id" placeholder="Push Notification Text in English">@item.PushNotificationTextEN</textarea>
+                                        <label id="msgforEN_@item.Id" style="color:red"></label>
+                                    </td>
+                                    <td>
+                                        <textarea class="form-control" id="txtAR_@item.Id" placeholder="Push Notification Text in Arabic">@item.PushNotificationTextAR</textarea>
+                                        <label id="msgforAR_@item.Id" style="color:red"></label>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0)" onclick="Update(this)" class="btn btn-sm btn-primary">@Translation.Update</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        var redirectUrl = window.location.href;
+             function Add(button) {
+                 $('.loader-wrapper').show();
+
+                 if ($("#txtPushNotificationkeyName").val() != "") {
+                     $("#msgforkeyName").text("");
+                 }
+                  if ($("#txtEN").val() != "") {
+                     $("#msgforEN").text("");
+                 }
+                  if ($("#txtAR").val() != "") {
+                     $("#msgforAR").text("");
+                 }
+
+                 if ($("#txtkeyName").val() == "") {
+                     $("#msgforkeyName").text("Key Name is Required.");
+                 }
+                 if ($("#txtEN").val() == "") {
+                     $("#msgforEN").text("Push Notification in English is Required.");
+                 }
+                 if ($("#txtAR").val() == "") {
+                     $("#msgforAR").text("Push Notification in Arabic is Required.");
+                 }
+                 else {
+                    $.post('@Url.Action("AddPushNotification")', {
+                        KeyName: $('#txtkeyName').val(),
+                        PushNotificationTextEN: $('#txtEN').val(),
+                        PushNotificationTextAR: $('#txtAR').val(),
+                    }, function (response) {
+                            if (response && response.StatusId > 0) {
+                                successPopup("@Translation.success_DetailSubmit");
+                                setTimeout(function () { window.location = redirectUrl; }, 3000);
+                        }
+                        else {
+                                warningPopup("@Translation.EnterAllDetails");
+                        }
+                        $('.loader-wrapper').hide();
+                    });
+                 }
+        };
+
+        function Update(button) {
+            $('.loader-wrapper').show();
+            //Determine the reference of the Row using the Button.
+            var row = $(button).closest("TR");
+            var id = parseInt(row.attr("id").substring(2));
+
+            //if ($("#txtkeyName"+id).val() != "") {
+            //    $("#msgforkeyName"+id).text("");
+            //}
+            if ($("#txtEN_"+id).val() != "") {
+                $("#msgforEN_" + id).text("");
+            }
+            if ($("#txtAR_"+id).val() != "") {
+                $("#msgforAR_" + id).text("");
+            }
+
+            //if ($("#txtkeyName"+id).val() == "") {
+            //    $("#msgforkeyName"+id).text("Key Name is Required.");
+            //}
+            if ($("#txtEN_"+id).val() == "") {
+                $("#msgforEN_" + id).text("Push Notification in English is Required.");
+            }
+            if ($("#txtAR_" + id).val() == "") {
+                $("#msgforAR_" + id).text("Push Notification in Arabic is Required.");
+            }
+            else {
+            $.post('@Url.Action("EditPushNotification")', {
+                Id: parseInt(row.attr("id").substring(2)),
+                PushNotificationTextEN: row.find('#txtEN_'+id).val(),
+                PushNotificationTextAR: row.find('#txtAR_'+id).val(),
+            }, function (response) {
+                if (response && response.StatusId > 0) {
+                    successPopup("@Translation.success_Update");
+                    setTimeout(function () { window.location = redirectUrl; }, 3000);
+                }
+                else {
+                    warningPopup("@Translation.EnterAllDetails");
+                }
+                $('.loader-wrapper').hide();
+            });
+            }
+        };
+    </script>
+}

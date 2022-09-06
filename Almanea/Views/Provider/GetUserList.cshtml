@@ -1,0 +1,231 @@
+﻿@using Almanea.BusinessLogic;
+@{
+    ViewBag.Title = Translation.Users;
+    var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+    var ActtypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+
+            <div class="card-body">
+                <div class="row" id="divSearch">
+                    <div class="col-xl-4 col-sm-6 col-md-3">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="text" id="sName" class="form-control" placeholder="@Translation.Name" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-3">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="text" id="sEmail" class="form-control" placeholder="@Translation.Email" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-3">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="text" id="sPhone" class="form-control" placeholder="@Translation.Telephone" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-3">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <select class="form-control" id="sStatus">
+                                    <option value="0">@Translation.AllStatus</option>
+                                    <option value="1">@Translation.Active</option>
+                                    <option value="2">@Translation.InActive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-3">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <select class="form-control" id="sTypeId">
+                                    <option value="0">@Translation.AllUserType</option>
+                                    <option value="1">@Translation.ServiceProvider</option>
+                                    <option value="2">@Translation.Supplier</option>
+                                    <option value="3">@Translation.Admin</option>
+                                    <option value="4">@Translation.Labour</option>
+                                    <option value="5">@Translation.Driver</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p>
+                    <input type="button" value="@Translation.Search" class="btn btn-primary" onclick="BindDataTable()" />
+                    @if (UserGroupId ==(int)enumGroupType.Provider && ActtypeId==(int)enumProviderAcct.Admin)
+                    {
+                        <a href="@Url.Action("AddUser")" class="btn btn-secondary float-right">@Translation.AddUser</a>
+                    }
+                </p>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dataTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="12%">@Translation.FullName</th>
+                            <th width="15%">@Translation.Email</th>
+                            <th width="11%">@Translation.Telephone</th>
+                            <th width="10%">@Translation.Status</th>
+                            <th width="10%">@Translation.Type</th>
+                            <th width="18%">@Translation.AccountType</th>
+                            <th width="28%">@Translation.CompanyName</th>
+                            <th width="25%">@Translation.LastLoggedIn</th>
+                            @if (UserGroupId == (int)enumGroupType.Provider && ActtypeId == (int)enumProviderAcct.Admin)
+                            {
+                                <th width="8%">@Translation.Action</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+            async: true;
+            //List
+            BindDataTable();
+        });
+        $(document).keypress(function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if (keycode == '13') {
+                BindDataTable();
+            }
+        });
+        var oTable;
+        function BindDataTable(response) {
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+                    "bAutoWidth": false,
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("GetUsers","Provider")",
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+                        aoData.push(
+                            { "name": "Name", "value": $("#sName").val() },
+                            { "name": "Email", "value": $("#sEmail").val() },
+                            { "name": "Telephone", "value": $("#sPhone").val() },
+                            { "name": "StatusId", "value": $("#sStatus").val() },
+                            { "name": "TypeId", "value": $("#sTypeId").val() },
+
+                        );
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+                    },
+                    // data: response,
+                    "aoColumns": [
+                        { "mData": "FullName", "orderable": false },
+                        { "mData": "Email" },
+                        { "mData": "MobileNo" },
+                        { "mData": "StatusText" },
+                        { "mData": "UserGroup" },
+                        { "mData": "AccountName" },
+                        { "mData": "CompanyName" },
+                        { "mData": "LastLoggedIn" },
+                        {
+                            "mData": "EncryptId",
+                            "render": function (Id, type, full, meta) {
+                                if (@UserGroupId == @Convert.ToInt32(enumGroupType.Provider) && @ActtypeId == @Convert.ToInt32(enumProviderAcct.Admin))
+                                 {
+                                     return '<a href="@Url.Action("EditUser")/' + Id + '" title="@Translation.Edit" data-toggle="tooltip"><i class="fa fa-edit"></i></a>&nbsp;'
+                                        + '<a href="javascript:void(0)" onclick="Password(\'' + Id + '\')" title="@Translation.ChangePassword" data-toggle="tooltip"><i class="fa fa-lock"></i></a>'
+                                        + '<a href="javascript:void(0)" onclick="SendNewPasswordSMS(\'' + Id + '\')" title="Send New Password" data-toggle="tooltip"><i class="fas fa-paper-plane"></i></a>';
+
+                                 }
+                                 else
+                                 {
+
+                                 }
+                                 },
+                            "orderable": false
+                        },
+                    ],
+                    "order": [[5, "desc"]],
+                    "fnInitComplete": function (oSettings, json) {
+                    },
+                    "fnDrawCallback": function (oSettings) {
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                      "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                        "emptyTable": false,
+                        "sEmptyTable": "@Translation.NoMatchingRecords",
+                    },
+                });
+            }
+        }
+
+        var Reset = function () {
+            $('#divSearch').find('input[type=text]').val('');
+            $('#divSearch').find('select').val('0');
+            BindDataTable();
+        }
+    </script>
+    <script>
+        function Password(Id) {
+            $("#myModalBody").load("@Url.Action("UpdatePassword","User")/" + Id, function () {
+                $("#myModal").modal('show');
+                $.validator.unobtrusive.parse($("#frmAdd"))
+                $("#myModalLabel").text("@Translation.ChangePassword");
+            });
+        }
+
+        function onSuccess(response) {
+            if (response.StatusId > 0) {
+
+                $("#myModal").modal('hide');
+                $.notify("@Translation.success_UpdatePwd", { position: "right middle", style: "bootstrap", className: "success", showAnimation: 'slideDown', showDuration: 400, });
+            }
+        }
+         function SendNewPasswordSMS(Id)
+        {
+             $.ajax({
+                type: "POST",
+                 url: '@Url.Action("SendNewPasswordSMS", "Provider")',
+                 data: '{Id: ' + JSON.stringify(Id) + '}',
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                 success: function (response) {
+                     if (response.StatusId > 0) {
+                         successPopup("Send login details To the User");
+
+                     }
+                },
+                 error: function () {
+                }
+            });
+        }
+    </script>
+}

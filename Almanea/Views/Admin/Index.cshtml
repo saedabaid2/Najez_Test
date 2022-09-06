@@ -1,0 +1,58 @@
+﻿@{
+    ViewBag.Title = Translation.OrdersList;
+    var UserGroupTypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+    var UserId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserId]);
+    var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupId]);
+    var ActtypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+}
+@using Almanea.BusinessLogic;
+@model IEnumerable<Almanea.Models.vm_page_details>
+
+<!DOCTYPE html>
+@*0 => SP
+    1 =>Agent
+    2 => Supplier*@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+    <div>
+        <h4>Fields</h4>
+        <div class="table-responsive">
+            <table class="table align-items-center table-flush" id="dataTable">
+                <thead class="thead-light">
+                    <tr>
+                        <th width="12%">Page Name</th>
+                        <th width="12%">Service Provider</th>
+                        <th width="20%">Agent</th>
+                        <th width="12%">Supplier</th>
+                        <th width="12%">Display</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td width="12%">@item.FieldName</td>
+                            <td width="12%">
+                                <input type="checkbox" checked="@item.SP" />
+                            </td>
+                            <td width="12%">
+                                <input type="checkbox" checked="@item.Agent" />
+                            </td>
+                            <td width="12%">
+                                <input type="checkbox" checked="@item.Supplier" />
+                            </td>
+                            <td width="12%">
+                                <input type="checkbox"  checked="@item.Display"/>
+                           </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

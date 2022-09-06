@@ -1,0 +1,690 @@
+﻿
+@{
+    ViewBag.Title = Translation.OrderDetails;
+}
+
+
+@model vm_Order
+
+@using Almanea.Models;
+@using Almanea.BusinessLogic;
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.SellerName, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.SellerName, new { @class = "form-control", @placeholder = Translation.ReqSellerName, @readonly = "readonly" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.SellerName, "", new { @class = "valid-text" })
+                    </div>
+
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.SellerContact, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.SellerContact, new { @class = "form-control numOnly", @placeholder = Translation.ReqSellerContact, @readonly = "readonly" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.SellerContact, "", new { @class = "valid-text" })
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.InvoiceNo, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.InvoiceNo, new { @class = "form-control", @placeholder = Translation.ReqInvoiceNo, @readonly = "readonly" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.InvoiceNo, "", new { @class = "valid-text" })
+                    </div>
+                </div>
+                <hr class="thick" />
+
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.CustomerName, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.CustomerName, new { @class = "form-control", @placeholder = Translation.ReqCustomerName, @readonly = "readonly" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.CustomerName, "", new { @class = "valid-text" })
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.LocationId, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.Location, new { @class = "form-control", @placeholder = Translation.ReqCustomerName, @readonly = "readonly" })
+                            @*@Html.DropDownListFor(model => model.LocationId, cls_DropDowns.GetLocations(), Translation.Select, new { @class = "form-control select2", @readonly = "readonly" })*@
+                        </div>
+                        @Html.ValidationMessageFor(m => m.LocationId, "", new { @class = "valid-text" })
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.CustomerContact, new { @class = "bmd-label-floating required" })
+                            @Html.TextBoxFor(m => m.CustomerContact, new { @class = "form-control numOnly", @placeholder = Translation.ReqCustomerContact, @readonly = "readonly" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.CustomerContact, "", new { @class = "valid-text" })
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        @Html.LabelFor(m => m.InstallDate, new { @class = "bmd-label-floating required" })
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="custom-radio">
+                                    @if (Model.PreferDate == 1)
+                                    {
+                                        <label>
+                                            @Translation.PreferAsap
+                                        </label>
+                                    }
+                                    else if (Model.PreferDate == 2)
+                                    {
+                                        <label>@Model.InstallDate</label>
+                                    }
+
+                                </div>
+                            </div>
+                            @*@if (Model.PreferDate == 2)
+                            {
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(m => m.InstallDate, new { @class = "form-control", @readonly = "readonly" })
+                                        <div class="input-group-append">
+                                            <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                        @Html.HiddenFor(m => m.PreferDate)
+                                    </div>
+                                </div>
+                            }*@
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        @Html.LabelFor(m => m.PrefferTime, new { @class = "bmd-label-floating required" })
+                        <div class="form-group">
+
+                            @if (Model.PrefferTime == 1)
+                            {
+                                <label>@Translation.MorningTime</label>
+                            }
+                            else if (Model.PrefferTime == 2)
+                            {
+                                <label>@Translation.EveningTime</label>
+                            }
+                            else
+                            {
+                                <label>@Model.PreferTiming</label>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <hr class="thick" />
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="table-responsive">
+                            <table class="table align-items-center table-flush table-bordered" id="dataTable">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th width="25%">@Translation.Services</th>
+                                        <th width="25%">@Translation.ItemCount</th>
+                                        <th width="25%">@Translation.UnitPrice</th>
+                                        <th width="15%">@Translation.Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.Services != null)
+                                    {
+                                        foreach (var item in (List<vm_OrderServices>)ViewBag.Services)
+                                        {
+                                            if (item.IsActive)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @item.ServiceName
+                                                        <input type="hidden" id="hfService" value="@item.ServiceId" />
+                                                    </td>
+                                                    <td>
+                                                        @item.Quantity
+                                                        <input type="hidden" id="hfQuantity" value="@item.Quantity" />
+                                                    </td>
+                                                    <td>
+                                                        @(item.Price)
+                                                    </td>
+                                                    <td>
+                                                        @(item.Price * item.Quantity)
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        &nbsp;
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                        <div class="form-group">
+                            @Translation.Vat&nbsp;@ViewBag.Vat %
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Vat, new { @class = "form-control", @readonly = "true" })
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        &nbsp;
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                        <div class="form-group">
+                            @Translation.Total
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-3 col-sm-3 col-xs-2">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.TotalAmount, new { @class = "form-control", @readonly = "true" })
+                        </div>
+                    </div>
+                </div>
+
+                @if (ViewBag.History != null)
+                {
+                    <hr class="thick" />
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="form-label-group">
+                                <label>@Translation.History</label>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table align-items-center table-flush table-bordered" id="dtHistory">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th width="15%">@Translation.ActivityDate</th>
+                                            <th width="20%">@Translation.NewStatus</th>
+                                            <th width="30%">@Translation.DoneBy</th>
+                                            <th width="30%">@Translation.Comments</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (ViewBag.History != null)
+                                        {
+                                            foreach (var item in (List<vm_OrderHistoryList>)ViewBag.History)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @item.ActivityDate
+                                                    </td>
+                                                    <td>
+                                                        @item.NewStatus
+                                                    </td>
+                                                    <td>
+                                                        @item.DoneBy
+                                                    </td>
+                                                    <td>
+                                                        @item.Comments
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <hr class="thick" />
+        @Html.Partial("_ChangeStatus", new ViewDataDictionary { { "OrderId", Model.OrderId }, { "StatusId", Model.Status } })
+    </div>
+</div>
+
+<div class="modal fade" data-backdrop="static" id="secondModal">
+    <div class="modal-dialog  modal-xl" id="seconddialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="secondModalLabel"></h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body" id="secondModalBody">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #seconddialog.modal-dialog {
+        overflow-y: initial !important
+    }
+
+    #secondModalBody.modal-body {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+</style>
+@section scripts{
+    <script>
+        var enumOrder = @(Html.EnumToString<OrderStatus>())
+
+            function onStatus(response) {
+                if (response.StatusId > 0) {
+                    var status = $('#Status').val();
+                    
+                    ShowNotification("@Translation.success_Update", "success");
+                    $('#divStatus').hide();
+
+                    setTimeout(function () { window.location = '@Url.Action("NewOrders")'; }, 3000);
+
+                }
+                else {
+                    ShowNotification(response.Message, "error");
+                }
+            }
+
+        function onSuccess(response) {
+            if (response.StatusId > 0) {
+                ShowNotification('@Translation.success_DetailSubmit', "success");
+
+                setTimeout(function () { window.location = '@Url.Action("NewOrders")'; }, 3000);
+            }
+            else if (response.Message != '') {
+                ShowNotification(response.Message, "error");
+            }
+        }
+    </script>
+
+    <script>
+        //Change Services
+        var dtServices;
+        var $total = @Model.TotalAmount;
+        var $vat = @Model.Vat;
+        var $vatPerc = parseInt(@ViewBag.Vat);
+
+        $(document).ready(function () {
+
+            $("body").delegate("#btnAddService", "click", function (e) {
+                var AddRow = true;
+
+                var $divAdd = $('#frmAddService');
+
+                var $service = $divAdd.find('#sAddService').val();
+                var $unit = $divAdd.find('#sAddCount').val();
+
+                if ($service === "" || $unit === "") {
+                    ShowNotification("@Translation.error_detailMissing", "error");
+
+                    AddRow = false;
+                }
+                else { //Check service already exists
+                    $("#dtServices > tbody").find('tr').each(function () {
+                        var $role = $(this).attr('role');
+                        if (typeof $role !== typeof undefined && $role !== false) {
+                            var $extService = $(this).find("#hfService").val();
+
+                            if ($extService === $service.split('_')[0]) {
+                                ShowNotification("@Translation.ServiceAlreadyAdded", "error");
+
+                                AddRow = false;
+                            }
+                        }
+                    });
+                }
+
+                if (AddRow === true) {
+                    var $serviceId = $service.split('_')[0];
+                    var $servicePrice = $service.split('_')[1];
+                    var $price = $servicePrice * $unit;
+                    var $itemVat = $price * ($vatPerc / 100);
+
+                    var $oldTotal = $total;
+                    var $oldVat = $vat;
+                    
+                    dtServices.row.add([
+                        $("#sAddService option:selected").html(),
+                        $unit,
+                        $servicePrice,
+                        $price,
+                        '<input type="hidden" id="hfService" value="' + $serviceId + '"  />' +
+                        '<input type="hidden" id="hfQuantity" value="' + $unit + '"  />' +
+                        '<input type="hidden" id="hfPrice" value="' + $price + '"  />' +
+                        '<input type="hidden" id="hfVat" value="' + $itemVat + '"  />' +
+                        '<input type="button" class="btn btn-danger delete" value="X" />'
+                    ]).node().id = 'tr_0';
+
+                    dtServices.draw(false);
+
+                    $vat += $itemVat;
+                    $total += $price + $itemVat;
+
+                    $divAdd.find('#Vat').val($vat);
+                    $divAdd.find('#TotalAmount').val($total);
+
+                    $('#divNewService').find('select').val('');
+                    $('#divNewService').find('input[type=text]').val('');
+                    $("#sAddService").val('').trigger('change')
+                }
+            });
+
+            $('body').delegate('.delete', 'click', function () {
+                var $tr = $(this).parents('tr');
+                var $divAdd = $('#frmAddService');
+
+                var rowCount = $('#dtServices tbody tr').length;
+
+                if (rowCount == 1) {
+                    $divAdd.find('#Vat').val('0');
+                    $divAdd.find('#TotalAmount').val('0');
+
+                    $vat = 0;
+                    $total = 0;
+                }
+                else {
+
+                    var $currPrice = parseFloat($tr.find('#hfPrice').val());
+                    var $currVat = parseFloat($tr.find('#hfVat').val());
+
+                    var $minTotal = ($currPrice + $currVat);
+                    $vat -= $currVat
+                    $total -= $minTotal;
+
+                    $divAdd.find('#Vat').val($vat);
+                    $divAdd.find('#TotalAmount').val($total);
+                }
+
+                dtServices.row($(this).parents('tr')).remove().draw();
+
+
+            });
+
+            $('body').delegate('#btnChangeSubmit', 'click', function (e) {
+                onBegin();
+
+                var o = [];
+                $("#dtServices > tbody").find('tr').each(function () {
+                    var $role = $(this).attr('role');
+                    if (typeof $role !== typeof undefined && $role !== false) {
+                        var $this = $(this);
+                        var $Id = $(this).attr("Id").split('_')[1];
+                        if ($Id == 0) {
+                            var serialized = "ServiceId=" + parseInt($(this).find("#hfService").val());
+                            serialized += "&Quantity=" + parseInt($(this).find("#hfQuantity").val());
+                            serialized += "&IsActive=true";
+                            serialized += "&OrderId=@Model.OrderId";
+
+                            var item = $.toDictionary(serialized);
+                            o.push(item);
+                        }
+                    }
+                });
+
+                if (o.length == 0) {
+                    ShowNotification("@Translation.error_Atleast1Service", "error");
+
+                    onComplete();
+                    return;
+                }
+
+                var iData = { "Comments": $('#frmAdd #Comments').val(), "Vat": $('#frmAddService').find('#Vat').val(), "Total": $('#frmAddService').find('#TotalAmount').val(), "model": o };
+
+                $.ajax({
+                    url: "@Url.Action("ChangeService")",
+                    type: 'POST',
+                    data: JSON.stringify(iData),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function (response) {
+                        $('.overlay').hide();
+                        if (response.StatusId > 0) {
+                            //Success Message
+                            ShowNotification("@Translation.success_NewOrder", "success");
+
+                            setTimeout(function () { window.location = '@Url.Action("NewOrders")'; }, 3000);
+                        }
+                        else if(response.Message !='') {
+                            
+                            ShowNotification(response.Message, "error");
+                        }
+                        onComplete();
+                    },
+                    error: function () {
+                        onComplete();
+                    }
+                });
+
+            });
+        });
+
+    </script>
+
+    <script>
+        //finish
+        var dtAdditional;
+        var $totalAdd = 0;
+        Dropzone.autoDiscover = false;
+        var fileType = '.png,.jpg,.gif,.bmp,.jpeg';
+        var maxsize =   @cls_Defaults.Filesize.ToString();
+
+        $(document).ready(function () {
+            $('#Status').change(function () {
+
+                var statusId = $(this).val();
+
+                if (statusId == enumOrder.Finish) {
+                    bootbox.confirm({
+                        message: "@Translation.ConfirmFinish",
+                        buttons: {
+                            confirm: {
+                                label: '@Translation.Yes',
+                                className: 'btn-success'
+                            },
+                            cancel: {
+                                label: '@Translation.No',
+                                className: 'btn-danger'
+                            }
+                        },
+                        callback: function (result) {
+                            if (result == true) {
+                                $("#secondModalBody").load("@Url.Action("AdditionalService")/@Model.EncryptId", function () {
+                                    $("#secondModal").modal('show');
+                                    $("#secondModalLabel").text("@Translation.Finish");
+
+                                    dropUploader.autodropzone('fileUpload', fileType, "FileAttachment", maxsize, "@cls_Defaults.ProfilePic");
+
+                                    dtAdditional = $('#dtAdditional').DataTable({
+                                        "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                                        "bSearchable": false,
+                                        "bSortable": false,
+                                        "bInfo": false,
+                                        "bLengthChange": false,
+                                        "AutoWidth": true,
+                                        "bPaginate": false,
+                                    });
+                                });
+                            }
+                            else {
+                                $("#myModalBody").load("@Url.Action("FileAttach")/@Model.EncryptId", function () {
+                                    $("#myModal").modal('show');
+                                    $.validator.unobtrusive.parse($("#frmFile"))
+                                    $("#myModalLabel").text("@Translation.Finish");
+
+                                    dropUploader.autodropzone('fileUpload', fileType, "FileAttachment", maxsize, "@cls_Defaults.ProfilePic");
+                                });
+                            }
+                        }
+                    });
+                }
+                else if (statusId == enumOrder.ReSchedule) {
+                    //Reschedule
+                    $("#myModalBody").load("@Url.Action("ReSchedule")/@Model.EncryptId", function () {
+                        $("#myModal").modal('show');
+                        $.validator.unobtrusive.parse($("#frmSchedule"))
+                        $("#myModalLabel").text("@Translation.ReSchedule");
+
+                        $('#frmSchedule #Comments').val($('#frmAdd #Comments').val());
+                        $("#InstallDate").datepicker({ dateFormat: 'dd/mm/yy' });
+                    });
+                }
+                else if (statusId == enumOrder.ChangeService) {
+                    //Change Service
+                    $("#myModalBody").load("@Url.Action("ChangeService")/@Model.EncryptId", function () {
+                        $("#myModal").modal('show');
+                        $.validator.unobtrusive.parse($("#frmService"))
+                        $("#myModalLabel").text("@Translation.ChangeService");
+
+                        dtServices = $('#dtServices').DataTable({
+                            "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                            "bSearchable": false,
+                            "bSortable": false,
+                            "bInfo": false,
+                            "bLengthChange": false,
+                            "AutoWidth": true,
+                            "bPaginate": false,
+                        });
+                    });
+
+                }
+                else if (statusId == enumOrder.Finish) {
+                    //Change Service
+                    $("#myModalBody").load("@Url.Action("Finish")/@Model.EncryptId", function () {
+                        $("#myModal").modal('show');
+                        $.validator.unobtrusive.parse($("#frmService"))
+                        $("#myModalLabel").text("@Translation.Finish");
+                    });
+
+                }
+            });
+
+            $("body").delegate("#btnAdditional", "click", function (e) {
+
+                var AddRow = true;
+                var $divAdd = $('#frmAdditional');
+
+                var $service = $divAdd.find('#nServiceName').val();
+                var $quantity = $divAdd.find('#nQuantity').val();
+                var $price = $divAdd.find('#nPrice').val();
+                var $parts = $divAdd.find('#nParts').val();
+
+                if ($service === "" || $quantity === "" || $price === "" || $parts === "") {
+                    ShowNotification("@Translation.error_detailMissing", "error");
+
+                    AddRow = false;
+                }
+
+                if (AddRow === true) {
+                    dtAdditional.row.add([
+                        $service + '<input type="hidden" id="txtService" value="' + $service + '" readonly />',
+                        $quantity + '<input type="hidden" id="txtQuality" value="' + $quantity + '"  readonly />',
+                        $price + '<input type="hidden" id="txtPrice" value="' + $price + '" readonly />',
+                        $parts + '<input type="hidden" id="txtParts" value="' + $parts + '"  readonly />',
+                        '<input type="button" class="btn btn-danger remove" value="X" />'
+                    ]).node().id = 'tr_0';
+
+                    dtAdditional.draw(false);
+
+                    $totalAdd += parseInt($quantity) * parseFloat($price);
+
+                    $('#TotalAdd').val($totalAdd);
+
+                    $divAdd.find('select').val('');
+                    $divAdd.find('input[type=text]').val('');
+
+                    $("#nQuantity").val(0);
+                    $("#nPrice").val(0);
+                    $("#nParts").val(0);
+                }
+            });
+
+             $('body').delegate('.remove','click',  function () {
+                dtAdditional.row($(this).parents('tr')).remove().draw();
+            });
+
+            $('body').delegate('#btnAdditionalSubmit', 'click', function (e) {
+
+                onBegin();
+                var $divFile = $('#frmAdditional');
+                var o = [];
+                $("#dtAddtional > tbody").find('tr').each(function () {
+                    var $role = $(this).attr('role');
+                    if (typeof $role !== typeof undefined && $role !== false) {
+                        var $this = $(this);
+
+                        var $$services = 'ServiceId=' + parseInt($(this).find("#txtService").val());
+                        $$services += '&Quantity=' + parseInt($(this).find("#txtQuantity").val());
+                        $$services += '&Price=' + parseInt($(this).find("#txtPrice").val());
+                        $$services += '&SpareParts=' + parseInt($(this).find("#txtParts").val());
+                        $$services += "&OrderId=@Model.OrderId";
+
+                        var item = $.toDictionary($$services);
+                        o.push(item);
+                    }
+                });
+
+                if (o.length == 0) {
+                    onComplete();
+                    ShowNotification("@Translation.error_Atleast1Service", "error");
+                    return;
+                }
+                var iData = { "Comments": $divFile.find('#Comments').val(), "FileAttachment": $divFile.find('#FileAttachment').val(), "Total": $('#TotalAdd').val(), "model": o };
+
+                $.ajax({
+                    url: "@Url.Action("AdditionalService")",
+                    type: 'POST',
+                    data: JSON.stringify(iData),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function (response) {
+                        $('.overlay').hide();
+                        if (response.StatusId > 0) {
+                            //Success Message
+                            ShowNotification("@Translation.success_NewOrder", "success");
+
+                            setTimeout(function () { window.location = '@Url.Action("NewOrders")'; }, 3000);
+                        }
+                        else {
+
+                            ShowNotification(response.Message, "error");
+                        }
+                        onComplete();
+                    },
+                    error: function () {
+                        onComplete();
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        $("#myModal").on('hidden.bs.modal', function () {
+            $('#frmAdd').find('#Status').val('');
+        });
+
+        $("#secondModal").on('hidden.bs.modal', function () {
+            $('#frmAdd').find('#Status').val('');
+        });
+    </script>
+
+    @if (ViewBag.History != null)
+    {
+        <script>
+            $('#dtHistory').DataTable({
+                "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                "bSearchable": false,
+                "bSortable": false,
+                "bInfo": false,
+                "bLengthChange": false,
+                "AutoWidth": true,
+                "bPaginate": false,
+            });
+        </script>
+    }
+}
+
+

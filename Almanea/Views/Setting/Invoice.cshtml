@@ -1,0 +1,180 @@
+﻿
+@{
+    ViewBag.Title = "Invoice";
+}
+
+
+@using Almanea.BusinessLogic;
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+
+            <div class="card-body">
+                <div class="row" id="divSearch">
+                    <div class="col-xl-3 col-sm-6 col-md-3">
+                        <div class="form-group">
+                            <label>@Translation.UserGroupType</label>
+                            <div class="form-label-group">
+                                @Html.DropDownList("UserGroupTypeId", cls_DropDowns.DDL_UserGroupTypes(), Translation.Select, new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <label>@Translation.UserGroup</label>
+                            <div class="form-label-group">
+                                @Html.DropDownList("UserGroupId", new SelectList(" "), Translation.Select, new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6 col-md-3">
+                        <div class="form-group">
+                            <label>@Translation.OrderStartDate</label>
+                            <div class="form-label-group">
+                                <input type="text" id="start" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6 col-md-3">
+                        <div class="form-group">
+                            <label>@Translation.OrderEndDate</label>
+                            <div class="form-label-group">
+                                <input type="text" id="finish" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p>
+                    <input type="button" value="@Translation.Search" class="btn btn-primary pull-right" onclick="BindDataTable()" />
+                </p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dataTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="12%">@Translation.InvoiceNo</th>
+                            <th width="14%">@Translation.OrderDate</th>
+                            <th width="20%">@Translation.Customer</th>
+                            <th width="17%">@Translation.InstallOn</th>
+                            <th width="16%">@Translation.OrderCost</th>
+                            <th width="14%">@Translation.Status</th>
+                            <th width="9%">@Translation.Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    <script>
+        window.setInterval(function () {
+            /// call your function here
+            if (@Session[cls_Defaults.Session_UserId] != null) {
+                BindDataTable();
+            }
+            else {
+                clearInterval();
+                window.location = '@Url.Action("Index", "Home")';
+            }
+        }, 30000);
+
+           $(window).bind("beforeunload", function () {
+             //Logic to delete the item
+               clearInterval();
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            async: true;
+            //List
+            BindDataTable();
+        });
+        $(document).keypress(function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if (keycode == '13') {
+                BindDataTable();
+            }
+        });
+        var oTable;
+        function BindDataTable(response) {
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+                    "bAutoWidth": false,
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("GetInvoices")",
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+                        aoData.push(
+                            { "name": "UserGroupId", "value": $("#UserGroupId").val() },
+                            { "name": "fromDate", "value": $("#start").val() },
+                            { "name": "toDate", "value": $("#finish").val() },
+                        );
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+                    },
+                    "aoColumns": [
+                        { "mData": "OrderNo", },
+                        //{ "mData": "Invoice", },
+                        { "mData": "AddedDate", },
+                        { "mData": "Customer", },
+                        { "mData": "InstallDate", "orderable": false },
+                        { "mData": "TotalAmount" },
+                        { "mData": "StatusText" },
+                        {
+                            "mData": "OrderId",
+                            "render": function (Id, type, full, meta) {
+                                    return '<a href="@Url.Action("Details")/' + Id + '" title="Edit" data-toggle="tooltip"><i class="fa fa-eye"></i></a>';
+                            },
+                            "orderable": false
+                        },
+                    ],
+                    "order": [[1, "desc"]],
+                    "fnInitComplete": function (oSettings, json) {
+                    },
+                    "fnDrawCallback": function (oSettings) {
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                        "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "emptyTable": false,
+                        "infoEmpty": "@Translation.NoMatchingRecords",
+                    },
+                });
+            }
+        }
+
+        var Reset = function () {
+            $('#divSearch').find('input[type=text]').val('');
+            $('#divSearch').find('select').val('0');
+
+            BindDataTable();
+        }
+    </script>
+}
+
+
+
+

@@ -1,0 +1,295 @@
+﻿@model vm_AdditionalWork
+
+@{
+    ViewBag.Title =Translation.AdditionalWork;
+    var UserGroupTypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+    var UserId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserId]);
+    var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupId]);
+    var ActtypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+}
+
+
+@using Almanea.Models;
+@using Almanea.BusinessLogic;
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                @using (Ajax.BeginForm("AddEditAdditionalWork", "Setting", null,
+                new AjaxOptions
+                {
+                    HttpMethod = "POST",
+                    OnSuccess = "onSuccess",
+                    OnBegin = "onBegin",
+                    OnComplete = "onComplete",
+                    OnFailure = "onComplete",
+                }, new { id = "frmAdd" }))
+                {
+
+                    @Html.AntiForgeryToken()
+
+                <div class="row">
+
+                    <div class="col-lg-4 col-md-2 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @*<input type="hidden" name="CategoryId" id="CategoryId" />*@
+                            @*@Html.LabelFor(m => m.CategoryId, new { @class = "bmd-label-floating required" })*@
+                            @Html.Label(Translation.Category, new { @class = "bmd-label-floating required" })
+
+                            @Html.DropDownListFor(m => m.CategoryId, cls_DropDowns.GetCategoryList(UserGroupId, UserGroupTypeId, ActtypeId), Translation.Select, new { @class = "form-control select2" })
+
+                            @Html.ValidationMessageFor(m => m.CategoryId, "", new { @class = "valid-text" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.Label(Translation.AdditionalWorkNameEnglish, new { @class = "bmd-label-floating required" })
+                            @Html.EditorFor(m => m.AdditionalWorkNameEN, new { htmlAttributes = new { @class = "form-control", placeholder = Translation.Enterthenameofadditionalwork, required = "required", title = Translation.Enterthenameofadditionalwork } })
+                            @Html.ValidationMessageFor(m => m.AdditionalWorkNameEN, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.Label(Translation.AdditionalWorkNameArabic, new { @class = "bmd-label-floating required" })
+                            @Html.EditorFor(m => m.AdditionalWorkNameAR, new { htmlAttributes = new { @class = "form-control", placeholder = Translation.Enterthenameofadditionalwork, required = "required", title = Translation.Enterthenameofadditionalwork } })
+                            @Html.ValidationMessageFor(m => m.AdditionalWorkNameAR, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-2 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            @Html.Label(Translation.Price, new { @class = "bmd-label-floating required" })
+
+                            @Html.EditorFor(m => m.Price, new { htmlAttributes = new { @class = "form-control", placeholder = Translation.Enterthepriceofadditionalwork, required = "required", title = Translation.Enterthepriceofadditionalwork } })
+                            @Html.ValidationMessageFor(m => m.Price, "", new { @class = "text-danger" })
+
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12" style="padding-top:30px;">
+                        <input type="submit" class="btn btn-primary pull-right" value="@Translation.AddNew" />
+                    </div>
+                </div>
+                }
+            </div>
+
+
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dataTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="25%">@Translation.Category</th>
+                            <th width="25%">@Translation.AdditionalWorkNameEnglish</th>
+                            <th width="25%">@Translation.AdditionalWorkNameArabic</th>
+                            <th width="10%">@Translation.Price</th>
+                            <th width="10%">@Translation.Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+
+            var table = $('#example').DataTable({
+                scrollY: 200,
+                initComplete: function () {
+                    count = 0;
+                    this.api().columns().every(function () {
+                        var title = this.header();
+                        //replace spaces with dashes
+                        title = $(title).html().replace(/[\W]/g, '-');
+                        var column = this;
+                        var select = $('<select id="' + title + '" class="select2" ></select>')
+                            .appendTo($(column.footer()).empty())
+                            .on('change', function () {
+                                //Get the "text" property from each selected data
+                                //regex escape the value and store in array
+                                var data = $.map($(this).select2('data'), function (value, key) {
+                                    return value.text ? '^' + $.fn.dataTable.util.escapeRegex(value.text) + '$' : null;
+                                });
+
+                                //if no data selected use ""
+                                if (data.length === 0) {
+                                    data = [""];
+                                }
+
+                                //join array into string with regex or (|)
+                                var val = data.join('|');
+
+                                //search for the option(s) selected
+                                column
+                                    .search(val ? val : '', true, false)
+                                    .draw();
+                            });
+
+                        column.data().unique().sort().each(function (d, j) {
+                            select.append('<option value="' + d + '">' + d + '</option>');
+                        });
+
+                        //use column title as selector and placeholder
+                        $('#' + title).select2({
+                            multiple: true,
+                            closeOnSelect: false,
+                            placeholder: "Select a " + title
+                        });
+
+                        //initially clear select otherwise first option is selected
+                        $('.select2').val(null).trigger('change');
+                    });
+                }
+            });
+        });
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
+            async: true;
+            //List
+            BindDataTable();
+        });
+
+        var oTable;
+        function BindDataTable(response) {
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+                    "bAutoWidth": false,
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("GetAdditionalWork")",
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+                    },
+                    "aoColumns": [
+                        {
+                            "mData": "CategoryName",
+                           
+                        },
+                         {
+                            "mData": "AdditionalWorkNameEN",
+                        },
+                        {
+                            "mData": "AdditionalWorkNameAR",
+                        },
+                        {
+                            "mData": "Price",
+                        },
+
+                        {
+                            "mData": "AdditionalWorkId",
+                            "render": function (vals, type, full, meta) {
+                                return '<a href="@Url.Action("EditAdditionalWork")/' + full.AdditionalWorkId + '" class="btn btn-sm btn-primary">@Translation.Edit</a>';
+                            },
+                            "orderable": false
+                        },
+                    ],
+                    "order": [[0, "desc"]],
+                    "fnInitComplete": function (oSettings, json) {
+                
+
+                    },
+                    "fnDrawCallback": function (oSettings) {
+
+                    },
+                    "fnCreatedRow": function (nRow, aData, iDataIndex) {
+                     
+                        $(nRow).attr('id', 'tr' + aData.AdditionalWorkId); // or whatever you choose to set as the id
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                         "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                        "emptyTable": false,
+                        "sEmptyTable": "@Translation.NoMatchingRecords",
+                    },
+                });
+            }
+
+        }
+
+        function string_to_array (str) {
+            return str.trim().split(",");
+        };
+
+        var Reset = function () {
+            $('#divSearch').find('input[type=text]').val('');
+            $('#divSearch').find('select').val('0');
+
+            BindDataTable();
+        }
+
+
+    </script>
+
+
+    <script>
+        //call add sucess view
+        function onSuccess(response) {
+            if (response.StatusId > 0) {
+                successPopup("Sucessfully add detail of additional Work");
+
+                setTimeout(function () { window.location = window.location.href; }, 3000);
+            }
+        }
+
+        function Update(button) {
+            onBegin();
+            //Determine the reference of the Row using the Button.
+            var row = $(button).closest("TR");
+
+            if (row.find('#UnitPrice').val() === '') {
+                warningPopup('@Translation.ReqAll');
+                return;
+            }
+
+            $.post('@Url.Action("AddEditAdditionalWork")', {
+                AdditionalWorkId: parseInt(row.attr("id").substring(2)),
+                AdditionalWorkNameEN: row.find('#AdditionalWorkNameEN').val(),
+                AdditionalWorkNameAR: row.find('#AdditionalWorkNameAR').val(),
+                Price: row.find('#Price').val(),
+            }, function (response) {
+                if (response.StatusId > 0) {
+                    successPopup("@Translation.success_Update");
+                }
+                else {
+                    warningPopup(response.Message);
+                }
+                onComplete();
+            });
+        };
+    </script>
+
+   
+
+
+}
+
+
+
+

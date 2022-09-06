@@ -1,0 +1,849 @@
+﻿@using Almanea.BusinessLogic;
+@using System.Globalization;
+@{
+    var culture = CultureInfo.CurrentCulture.Name;
+    var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+    var ActtypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+
+}
+
+<ul class="navbar-nav sidebar sidebar-light accordion" id="accordionSidebar">
+    @if (Session.Keys.Count > 0)
+    {
+        <li class="sidebar-brand d-flex align-items-center justify-content-center">
+            @{
+                string userImg = "/Content/Light-Icon.png";
+                //var culture = CultureInfo.CurrentCulture.Name;
+
+
+                if (Session[cls_Defaults.Session_CompanyLogo] != null &&
+                !string.IsNullOrEmpty(Session[cls_Defaults.Session_CompanyLogo].ToString()))
+                {
+                    userImg = cls_Defaults.FindImage(Session[cls_Defaults.Session_CompanyLogo].ToString(), cls_Defaults.CompanyLogo, userImg);
+
+                }
+
+                <div class="sidebar-brand-icon">
+                    <img src="@(userImg)" style="max-width: 60px;" class="img-thumbnail img-responsive" />
+                </div>
+            }
+
+            @if (Session[cls_Defaults.Session_CompanyNameAR] != null &&
+                                       !string.IsNullOrEmpty(Session[cls_Defaults.Session_CompanyNameAR].ToString()))
+            {
+
+                <div class="sidebar-brand-text mx-3">
+                    @if (culture.Contains("ar"))
+                    {
+                        @Session[cls_Defaults.Session_CompanyNameAR].ToString()}
+                    else
+                    {
+                        @Session[cls_Defaults.Session_CompanyNameEN].ToString()
+                    }
+                </div>
+            }
+
+        </li>
+        @*<hr class="sidebar-divider my-0" />
+            <li class="nav-item active">
+                <a class="nav-link" href="index.html">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>@Translation.Dashboard</span>
+                </a>
+            </li>*@
+        <hr class="sidebar-divider">
+
+        if (UserGroupId == (int)enumGroupType.Admin || UserGroupId == (int)enumGroupType.SuperAdmin || ActtypeId == 19)
+        {
+            @*<div class="sidebar-heading">
+                    @Translation.Users
+                </div>*@
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Groups", "User")">
+
+                    <img src="~/Content/icons/UserGroup.png" class="img-responsive icon-img" />
+                    <span>@Translation.UserGroup</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Index", "User")">
+                    <img src="~/Content/icons/User.png" class="img-responsive icon-img" />
+                    <span>@Translation.Users</span>
+                </a>
+            </li>
+            <hr class="sidebar-divider" />
+            @*<li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("SalesDashboard", "Orders")">
+                        <i class="fab fa-fw fa-wpforms"></i>
+                        <span>@Translation.Dashboard</span>
+                    </a>
+                </li>*@
+            if (UserGroupId == (int)enumGroupType.Admin || ActtypeId == 19)
+            {
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Dashboard2", "Home")">
+                        <img src="~/Content/icons/dashboard.png" class="img-responsive icon-img" />
+                        <span>@Translation.Dashboard</span>
+                    </a>
+                </li>
+            }
+
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("SalesReport", "Orders")">
+                    <img src="~/Content/icons/salesreport.png" class="img-responsive icon-img" />
+                    <span>@Translation.SalesReport</span>
+                </a>
+            </li>
+            <hr class="sidebar-divider" />
+            <li class="nav-item">
+
+                <a class="nav-link" href="@Url.Action("Orders", "Setting")">
+                    <img src="~/Content/icons/orderlist.png" class="img-responsive icon-img" />
+                    <span>@Translation.OrdersList</span>
+                    <span class="badge badge-pill badge-danger" style="display:none;" id="bd_All">0</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Completed", "Setting")">
+                    <img src="~/Content/icons/completeorder.png" class="img-responsive icon-img" />
+                    <span>@Translation.CompletedOrders</span>
+                    @*<span class="badge badge-pill badge-danger" style="float:right;" id="bd_Completed">0</span>*@
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Cancelled", "Setting")">
+                    <img src="~/Content/icons/cancelorder.png" class="img-responsive icon-img" />
+                    <span>@Translation.CancelledOrders</span>
+                    @*<span class="badge badge-pill badge-danger" style="float:right;" id="bd_Completed">0</span>*@
+                </a>
+            </li>
+            <hr class="sidebar-divider" />
+            <li class="nav-item">
+
+                <a class="nav-link" href="@Url.Action("Admin", "Complain")">
+                    <img src="~/Content/icons/complainlist.png" class="img-responsive icon-img" />
+                    <span>@Translation.ComplainList</span>
+                    <span class="badge badge-pill badge-danger" style="display:none;" id="bd_Complain">0</span>
+                </a>
+            </li>
+            <li class="nav-item">
+
+                <a class="nav-link" href="@Url.Action("Resolved", "Complain")">
+                    <img src="~/Content/icons/archivecomplain.png" class="img-responsive icon-img" />
+                    <span>@Translation.ArchieveComplain</span>
+                    @*<span class="badge badge-pill badge-danger" style="float:right;" id="bd_Resolved">0</span>*@
+                </a>
+            </li>
+            <hr class="sidebar-divider" />
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Invoice", "Print")">
+                    <img src="~/Content/icons/salesreport.png" class="img-responsive icon-img" />
+                    <span>@Translation.Report</span>
+                </a>
+            </li>
+            <hr class="sidebar-divider">
+
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Index", "Categories")">
+                    <img src="~/Content/icons/catgegories.png" class="img-responsive icon-img" />
+                    <span>@Translation.Categories</span>
+                </a>
+            </li>
+
+
+
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Services", "Setting")">
+                    <img src="~/Content/icons/services.png" class="img-responsive icon-img" />
+                    <span>@Translation.Services</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("AdditionalWork", "Setting")">
+                    <img src="~/Content/icons/additionwork.png" class="img-responsive icon-img" />
+                    <span>@Translation.AdditionalWork </span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Location", "Setting")">
+                    <img src="~/Content/icons/location.png" class="img-responsive icon-img" />
+                    <span>@Translation.Location</span>
+                </a>
+            </li>
+
+
+            <hr class="sidebar-divider" />
+
+
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Index", "Setting")">
+                    <img src="~/Content/icons/settings.png" class="img-responsive icon-img" />
+                    <span>@Translation.Settings</span>
+                </a>
+            </li>
+
+
+            if (UserGroupId == (int)enumGroupType.SuperAdmin)
+            {
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Email", "Setting")">
+                        <img src="~/Content/icons/email.png" class="img-responsive icon-img" />
+                        <span>@Translation.Email</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("SMS", "Setting")">
+                        <img src="~/Content/icons/sms.png" class="img-responsive icon-img" />
+                        <span>@Translation.SMS</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("PushNotification", "Setting")">
+                        <img src="~/Content/icons/pushnotification.png" class="img-responsive icon-img" />
+                        <span>Push Notification</span>
+                    </a>
+                </li>
+            }
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("ComplainCategory", "Setting")">
+                    <img src="~/Content/icons/complainlist.png" class="img-responsive icon-img" />
+                    <span>@Translation.ComplainCategory</span>
+                </a>
+            </li>
+
+
+        }
+
+
+
+        else if (UserGroupId == (int)enumGroupType.Supplier && ActtypeId == (int)enumSupplierAcct.Admin)
+        {
+            @*<div class="sidebar-heading">
+                    @Translation.Users
+                </div>*@
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Groups", "User")">
+
+                    <img src="~/Content/icons/UserGroup.png" class="img-responsive icon-img" />
+                    <span>@Translation.UserGroup</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Index", "User")">
+                    <img src="~/Content/icons/User.png" class="img-responsive icon-img" />
+                    <span>@Translation.Users</span>
+                </a>
+            </li>
+            <hr class="sidebar-divider" />
+            @*<li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("SalesDashboard", "Orders")">
+                        <i class="fab fa-fw fa-wpforms"></i>
+                        <span>@Translation.Dashboard</span>
+                    </a>
+                </li>*@
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Dashboard2", "Home")">
+                    <img src="~/Content/icons/dashboard.png" class="img-responsive icon-img" />
+                    <span>@Translation.Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("SalesReport", "Orders")">
+                    <img src="~/Content/icons/salesreport.png" class="img-responsive icon-img" />
+                    <span>@Translation.SalesReport</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+
+                <a class="nav-link" href="@Url.Action("CalendarSupplier","Home")">
+                    <img src="~/Content/icons/catgegories.png" class="img-responsive icon-img" />
+                    <span>@Translation.Calendar</span>
+
+                </a>
+            </li>
+            <hr class="sidebar-divider" />
+            <li class="nav-item">
+
+                <a class="nav-link" href="@Url.Action("Orders", "Setting")">
+                    <img src="~/Content/icons/orderlist.png" class="img-responsive icon-img" />
+                    <span>@Translation.OrdersList</span>
+                    <span class="badge badge-pill badge-danger" style="display:none;" id="bd_All">0</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Completed", "Setting")">
+                    <img src="~/Content/icons/completeorder.png" class="img-responsive icon-img" />
+                    <span>@Translation.CompletedOrders</span>
+                    @*<span class="badge badge-pill badge-danger" style="float:right;" id="bd_Completed">0</span>*@
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Cancelled", "Setting")">
+                    <img src="~/Content/icons/cancelorder.png" class="img-responsive icon-img" />
+                    <span>@Translation.CancelledOrders</span>
+                    @*<span class="badge badge-pill badge-danger" style="float:right;" id="bd_Completed">0</span>*@
+                </a>
+            </li>
+
+            <li class="nav-item">
+
+                <a class="nav-link" href="@Url.Action("Index", "TeamCapacities")">
+                    <img src="~/Content/icons/complainlist.png" class="img-responsive icon-img" />
+                    <span>@Translation.TeamCapacity</span>
+                </a>
+            </li>
+            <hr class="sidebar-divider" />
+            <li class="nav-item">
+
+                <a class="nav-link" href="@Url.Action("Admin", "Complain")">
+                    <img src="~/Content/icons/complainlist.png" class="img-responsive icon-img" />
+                    <span>@Translation.ComplainList</span>
+                    <span class="badge badge-pill badge-danger" style="display:none;" id="bd_Complain">0</span>
+                </a>
+            </li>
+            <li class="nav-item">
+
+                <a class="nav-link" href="@Url.Action("Resolved", "Complain")">
+                    <img src="~/Content/icons/archivecomplain.png" class="img-responsive icon-img" />
+                    <span>@Translation.ArchieveComplain</span>
+                    @*<span class="badge badge-pill badge-danger" style="float:right;" id="bd_Resolved">0</span>*@
+                </a>
+            </li>
+            <hr class="sidebar-divider" />
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Invoice", "Print")">
+                    <img src="~/Content/icons/salesreport.png" class="img-responsive icon-img" />
+                    <span>@Translation.Report</span>
+                </a>
+            </li>
+            <hr class="sidebar-divider">
+
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Index", "Categories")">
+                    <img src="~/Content/icons/catgegories.png" class="img-responsive icon-img" />
+                    <span>@Translation.Categories</span>
+                </a>
+            </li>
+
+
+
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Services", "Setting")">
+                    <img src="~/Content/icons/services.png" class="img-responsive icon-img" />
+                    <span>@Translation.Services</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("AdditionalWork", "Setting")">
+                    <img src="~/Content/icons/additionwork.png" class="img-responsive icon-img" />
+                    <span>@Translation.AdditionalWork </span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Location", "Setting")">
+                    <img src="~/Content/icons/location.png" class="img-responsive icon-img" />
+                    <span>@Translation.Location</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("ComplainCategory", "Setting")">
+                    <img src="~/Content/icons/complainlist.png" class="img-responsive icon-img" />
+                    <span>@Translation.ComplainCategory</span>
+                </a>
+            </li>
+
+            <hr class="sidebar-divider" />
+
+
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("SupplierSetting", "Setting")">
+                    <img src="~/Content/icons/settings.png" class="img-responsive icon-img" />
+                    <span>@Translation.Settings</span>
+                </a>
+            </li>
+        }
+
+
+        else if (UserGroupId == (int)enumGroupType.Executive)
+        {
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Dashboard2", "Home")">
+                    <img src="~/Content/icons/dashboard.png" class="img-responsive icon-img" />
+                    <span>@Translation.Dashboard</span>
+                </a>
+            </li>
+            <hr class="sidebar-divider" />
+            <li class="nav-item">
+
+                <a class="nav-link" href="@Url.Action("Orders", "Setting")">
+                    <img src="~/Content/icons/orderlist.png" class="img-responsive icon-img" />
+                    <span>@Translation.OrdersList</span>
+                    <span class="badge badge-pill badge-danger" style="display:none;" id="bd_All">0</span>
+                </a>
+            </li>
+            <hr class="sidebar-divider" />
+            <li class="nav-item">
+
+                <a class="nav-link" href="@Url.Action("Calendar","Home")">
+                    <img src="~/Content/icons/catgegories.png" class="img-responsive icon-img" />
+                    <span>@Translation.Calendar</span>
+                    <span class="badge badge-pill badge-danger" style="display:none;" id="bd_All">0</span>
+                </a>
+            </li>
+        }
+
+        else if (UserGroupId == (int)enumGroupType.Supplier)
+        {
+            var accountType = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+
+            if (accountType == (int)enumSupplierAcct.Finance)
+            {
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("SupplierInvoice", "Print")">
+                        <img src="~/Content/icons/salesreport.png" class="img-responsive icon-img" />
+                        <span>@Translation.Report</span>
+                    </a>
+                </li>
+            }
+            else if (accountType == (int)enumSupplierAcct.Executive)
+            {
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Dashboard2", "Home")">
+                        <img src="~/Content/icons/dashboard.png" class="img-responsive icon-img" />
+                        <span>@Translation.Dashboard</span>
+                    </a>
+                </li>
+                <hr class="sidebar-divider" />
+                <li class="nav-item">
+
+                    <a class="nav-link" href="@Url.Action("Orders", "Setting")">
+                        <img src="~/Content/icons/orderlist.png" class="img-responsive icon-img" />
+                        <span>@Translation.OrdersList</span>
+                        <span class="badge badge-pill badge-danger" style="display:none;" id="bd_All">0</span>
+                    </a>
+                </li>
+                <hr class="sidebar-divider" />
+                <li class="nav-item">
+
+                    <a class="nav-link" href="@Url.Action("Calendar","Home")">
+                        <img src="~/Content/icons/catgegories.png" class="img-responsive icon-img" />
+                        <span>@Translation.Calendar</span>
+                        <span class="badge badge-pill badge-danger" style="display:none;" id="bd_All">0</span>
+                    </a>
+                </li>
+            }
+            else if (accountType == (int)enumSupplierAcct.Warehouse)
+            {
+                @*<div class="sidebar-heading">
+                        @Translation.Orders
+                    </div>*@
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Orders", "Warehouse")">
+                        <img src="~/Content/icons/orderlist.png" class="img-responsive icon-img" />
+                        <span>@Translation.OrdersList</span>
+                        <span class="badge badge-pill badge-danger" style="display:none;" id="bd_All">0</span>
+                    </a>
+                </li>
+            }
+            else if (accountType == (int)enumSupplierAcct.CallCenter)
+            {
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Valid", "Orders")">
+                        <img src="~/Content/icons/orderlist.png" class="img-responsive icon-img" />
+                        <span>@Translation.OrdersList</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Index", "Complain")">
+                        <img src="~/Content/icons/complainlist.png" class="img-responsive icon-img" />
+                        <span>@Translation.ComplainList</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Archieve", "Complain")">
+                        <img src="~/Content/icons/archivecomplain.png" class="img-responsive icon-img" />
+                        <span>@Translation.ArchieveComplain</span>
+                    </a>
+                </li>
+            }
+            else if (accountType == (int)enumSupplierAcct.SellerAgent || accountType == (int)enumSupplierAcct.SellerSupervisor)
+            {
+                <div class="sidebar-heading">
+                    @Translation.Orders
+                </div>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Create", "Orders")">
+                        <img src="~/Content/icons/orderlist.png" class="img-responsive icon-img" />
+                        <span>@Translation.NewOrder</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Index", "Orders")">
+                        <img src="~/Content/icons/orderlist.png" class="img-responsive icon-img" />
+                        <span>@Translation.OrdersList</span>
+                        @*<span class="badge badge-pill badge-danger" style="display:none;" id="bd_All">0</span>*@
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Archieve", "Orders")">
+                        <img src="~/Content/icons/archivecomplain.png" class="img-responsive icon-img" />
+                        <span>@Translation.Archieve</span>
+                        @*<span class="badge badge-pill badge-danger" style="float:right;" id="bd_Archieve">0</span>*@
+                    </a>
+                </li>
+                if (accountType == (int)enumSupplierAcct.SellerSupervisor)
+                {
+                    <li class="nav-item">
+
+                        <a class="nav-link" href="@Url.Action("Index", "TeamCapacities")">
+                            <img src="~/Content/icons/complainlist.png" class="img-responsive icon-img" />
+                            <span>@Translation.TeamCapacity</span>
+                        </a>
+                    </li>
+                }
+
+
+                <hr class="sidebar-divider">
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Index", "Complain")">
+                        <img src="~/Content/icons/complainlist.png" class="img-responsive icon-img" />
+                        <span>@Translation.ComplainList</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Archieve", "Complain")">
+                        <img src="~/Content/icons/archivecomplain.png" class="img-responsive icon-img" />
+                        <span>@Translation.ArchieveComplain</span>
+                    </a>
+                </li>
+
+                if (accountType == (int)enumSupplierAcct.SellerSupervisor)
+                {
+                    <hr class="sidebar-divider">
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("SupplierSetting", "Setting")">
+                            <img src="~/Content/icons/settings.png" class="img-responsive icon-img" />
+                            <span>@Translation.Settings</span>
+                        </a>
+                    </li>
+                    <hr class="sidebar-divider">
+                }
+            }
+            else if (accountType == (int)enumSupplierAcct.Installation)
+            {
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Installation", "Orders")">
+                        <img src="~/Content/icons/orderlist.png" class="img-responsive icon-img" />
+                        <span>@Translation.OrdersList</span>
+                        @*<span class="badge badge-pill badge-danger" style="display:none;" id="bd_All">0</span>*@
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Archieve", "Orders")">
+                        <img src="~/Content/icons/archivecomplain.png" class="img-responsive icon-img" />
+                        <span>@Translation.Archieve</span>
+                        @*<span class="badge badge-pill badge-danger" style="float:right;" id="bd_Archieve">0</span>*@
+                    </a>
+                </li>
+                <hr class="sidebar-divider">
+
+            }
+
+            else if (UserGroupId == (int)enumGroupType.Provider)
+            {
+                var accountType1 = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+                // adding new tab users for service provier where Service Provider can add labour and driver users
+
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("GetUserList", "Provider")">
+                        <img src="~/Content/icons/User.png" class="img-responsive icon-img" />
+                        <span>@Translation.Users</span>
+                    </a>
+                </li>
+                <hr class="sidebar-divider" />
+                // end
+
+                <div class="sidebar-heading">
+                    @Translation.Orders
+                </div>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("NewOrders", "Provider")">
+                        <img src="~/Content/icons/orderlist.png" class="img-responsive icon-img" />
+                        <span>@Translation.OrdersList</span>
+                        <span class="badge badge-pill badge-danger" style="display:none;" id="bd_All">0</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Finished", "Provider")">
+                        <img src="~/Content/icons/completeorder.png" class="img-responsive icon-img" />
+                        <span>@Translation.FinishedOrders</span>
+                        @*<span class="badge badge-pill badge-danger" style="float:right;" id="bd_Finish">0</span>*@
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Cancelled", "Provider")">
+                        <img src="~/Content/icons/cancelorder.png" class="img-responsive icon-img" />
+                        <span>@Translation.CancelledOrders</span>
+                        @*<span class="badge badge-pill badge-danger" style="float:right;" id="bd_Cancel">0</span>*@
+                    </a>
+                </li>
+
+                if (Session[cls_Defaults.Session_HasInventory] != null && Session[cls_Defaults.Session_HasInventory].ToString() == "1")
+                {
+                    <div class="sidebar-heading">
+                        @Translation.Inventory
+                    </div>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Inventory", "Index")">
+                            <img src="~/Content/icons/orderlist.png" class="img-responsive icon-img" />
+                            <span>@Translation.Inventory</span>
+                            <span class="badge badge-pill badge-danger" id="bd_All">@Session[cls_Defaults.Session_LaboursNotified]</span>
+
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Items", "add")">
+                            <img src="~/Content/icons/orderlist.png" class="img-responsive icon-img" />
+                            <span>@Translation.Inventory</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Report", "Inventory")">
+                            <img src="~/Content/icons/orderlist.png" class="img-responsive icon-img" />
+                            <span>@Translation.InventoryReport</span>
+                        </a>
+                    </li>
+
+                }
+                <hr class="sidebar-divider" />
+
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Complain", "Provider")">
+                        <img src="~/Content/icons/complainlist.png" class="img-responsive icon-img" />
+                        <span>@Translation.ComplainList</span>
+                        <span class="badge badge-pill badge-danger" style="display:none;" id="bd_Complain">0</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Resolved", "Provider")">
+                        <img src="~/Content/icons/archivecomplain.png" class="img-responsive icon-img" />
+                        <span>@Translation.ArchieveComplain</span>
+                        @*<span class="badge badge-pill badge-danger" style="float:right;" id="bd_Resolved">0</span>*@
+                    </a>
+                </li>
+                <hr class="sidebar-divider" />
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Index", "Setting")">
+                        <img src="~/Content/icons/settings.png" class="img-responsive icon-img" />
+                        <span>@Translation.Settings</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Services", "Provider")">
+                        <img src="~/Content/icons/services.png" class="img-responsive icon-img" />
+                        <span>@Translation.Services</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Index", "ProviderWorkinHours")">
+                        <img src="~/Content/icons/services.png" class="img-responsive icon-img" />
+                        <span>Working Hours</span>
+                    </a>
+                </li>
+                if (accountType1 != (int)enumProviderAcct.Agent)
+                {
+                    <hr class="sidebar-divider" />
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Invoice","Provider")">
+                            <img src="~/Content/icons/salesreport.png" class="img-responsive icon-img" />
+                            <span>@Translation.Report</span>
+                        </a>
+                    </li>
+                }
+            }
+
+
+
+
+        }
+
+        else if (UserGroupId == (int)enumGroupType.Provider)
+        {
+            if (ActtypeId == (int)enumProviderAcct.Labour || ActtypeId == (int)enumProviderAcct.Driver)
+            {
+
+            }
+            else
+            {
+                var accountType = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+                // adding new tab users for service provier where Service Provider can add labour and driver users
+                if (accountType == (int)enumProviderAcct.Admin)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("ServiceProviderDashboard", "Provider")">
+                            <img src="~/Content/icons/dashboard.png" class="img-responsive icon-img" />
+                            <span>@Translation.Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("GetUserList", "Provider")">
+                            <img src="~/Content/icons/User.png" class="img-responsive icon-img" />
+                            <span>@Translation.Users</span>
+                        </a>
+                    </li>
+                    <hr class="sidebar-divider" />
+                }
+
+
+                // end
+
+                <div class="sidebar-heading">
+                    @Translation.Orders
+                </div>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("NewOrders", "Provider")">
+                        <img src="~/Content/icons/orderlist.png" class="img-responsive icon-img" />
+                        <span>@Translation.OrdersList</span>
+                        <span class="badge badge-pill badge-danger" style="display:none;" id="bd_All"></span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Finished", "Provider")">
+                        <img src="~/Content/icons/completeorder.png" class="img-responsive icon-img" />
+                        <span>@Translation.FinishedOrders</span>
+                        @*<span class="badge badge-pill badge-danger" style="float:right;" id="bd_Finish">0</span>*@
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Cancelled", "Provider")">
+                        <img src="~/Content/icons/cancelorder.png" class="img-responsive icon-img" />
+                        <span>@Translation.CancelledOrders</span>
+                        @*<span class="badge badge-pill badge-danger" style="float:right;" id="bd_Cancel">0</span>*@
+                    </a>
+                </li>
+                if (Session[cls_Defaults.Session_HasInventory] != null && Session[cls_Defaults.Session_HasInventory].ToString() == "1")
+                {
+                    <hr class="sidebar-divider">
+                    <div class="sidebar-heading">
+                        @Translation.Inventory
+                    </div>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("", "Inventory")">
+                            <img src="~/Content/icons/orderlist.png" class="img-responsive icon-img" />
+                            <span>@Translation.Inventory</span>
+                            <span class="badge badge-pill badge-danger" id="bd_All">@Session[cls_Defaults.Session_LaboursNotified]</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("AddItem", "Provider")">
+                            <img src="~/Content/icons/orderlist.png" class="img-responsive icon-img" />
+                            <span>@Translation.AddItem</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Report", "Inventory")">
+                            <img src="~/Content/icons/orderlist.png" class="img-responsive icon-img" />
+                            <span>@Translation.InventoryReport</span>
+                        </a>
+                    </li>
+                }
+                <hr class="sidebar-divider">
+                if (accountType == (int)enumProviderAcct.Admin)
+                {
+
+                    <li class="nav-item">
+
+                        <a class="nav-link" href="@Url.Action("Index", "TeamCapacities")">
+                            <img src="~/Content/icons/complainlist.png" class="img-responsive icon-img" />
+                            <span>@Translation.TeamCapacity</span>
+                        </a>
+                    </li>
+                    <hr class="sidebar-divider">
+                    <li class="nav-item">
+
+                        <a class="nav-link" href="@Url.Action("Calendar", "Home")">
+                            <img src="~/Content/icons/catgegories.png" class="img-responsive icon-img" />
+                            <span>@Translation.Calendar</span>
+                            <span class="badge badge-pill badge-danger" style="display:none;" id="bd_All"></span>
+                        </a>
+                    </li>
+                }
+                if (accountType == (int)enumProviderAcct.Supervisor)
+                {
+                    <li class="nav-item">
+
+                        <a class="nav-link" href="@Url.Action("Index", "TeamCapacities")">
+                            <img src="~/Content/icons/complainlist.png" class="img-responsive icon-img" />
+                            <span>@Translation.TeamCapacity</span>
+                        </a>
+                    </li>
+                }
+                @*<hr class="sidebar-divider" />*@
+
+                <li class="nav-item">
+
+                    <a class="nav-link" href="@Url.Action("Complain", "Provider")">
+                        <img src="~/Content/icons/complainlist.png" class="img-responsive icon-img" />
+                        <span>@Translation.ComplainList</span>
+                        <span class="badge badge-pill badge-danger" style="display:none;" id="bd_Complain">0</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+
+                    <a class="nav-link" href="@Url.Action("Resolved", "Provider")">
+                        <img src="~/Content/icons/archivecomplain.png" class="img-responsive icon-img" />
+                        <span>@Translation.ArchieveComplain</span>
+                        @*<span class="badge badge-pill badge-danger" style="float:right;" id="bd_Resolved">0</span>*@
+                    </a>
+                </li>
+                <hr class="sidebar-divider" />
+                if (accountType != (int)enumProviderAcct.Agent)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Index", "Setting")">
+                            <img src="~/Content/icons/settings.png" class="img-responsive icon-img" />
+                            <span>@Translation.Settings</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Services", "Provider")">
+                            <img src="~/Content/icons/services.png" class="img-responsive icon-img" />
+                            <span>@Translation.Services</span>
+                            <span class="badge badge-pill badge-danger" style="display:none;" id="bd_NewService" name="bd_NewService"></span>
+                        </a>
+                    </li>
+                }
+                @*<li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Index", "ProviderWorkinHours")">
+                            <img src="~/Content/icons/services.png" class="img-responsive icon-img" />
+                            <span>Working Hours</span>
+                        </a>
+                    </li>*@
+
+                if (accountType != (int)enumProviderAcct.Agent)
+                {
+                    <hr class="sidebar-divider" />
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Invoice","Provider")">
+                            <img src="~/Content/icons/salesreport.png" class="img-responsive icon-img" />
+                            <span>@Translation.Report</span>
+                        </a>
+                    </li>
+                }
+            }
+
+
+        }
+
+
+
+
+    }
+
+</ul>

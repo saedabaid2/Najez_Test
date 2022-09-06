@@ -1,0 +1,162 @@
+﻿
+@*@{
+    ViewBag.Title = Translation.Complain;
+}*@
+
+@using Almanea.BusinessLogic;
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                @*<div class="row" id="divSearch">
+                        <div class="col-xl-4 col-sm-6 col-md-4">
+                            <div class="form-group">
+                                <div class="form-label-group">
+                                    <input type="text" id="sDate" class="form-control" placeholder="Complain Date" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-4 col-sm-6 col-md-4">
+                            <div class="form-group">
+                                <div class="form-label-group">
+                                    <select class="form-control select2" id="sStatus">
+                                        <option value="0">@Translation.Select</option>
+                                        <option value="1">@Translation.New</option>
+                                        <option value="2">Assigned to Sp</option>
+                                        <option value="3">Resolved</option>
+                                        <option value="4">Reject</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p>
+                        <input type="button" value="@Translation.Search" class="btn btn-primary pull-right" onclick="BindDataTable()" />
+                        <span class="ta-right f-right">
+                            <a onclick="Print();" title="Print" data-toggle="tooltip"><i class="fa fa-print"></i></a>
+                        </span>
+                    </p>*@
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dataTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="15%">@Translation.ComplainId</th>
+                            <th width="15%">@Translation.OrderNo</th>
+                            <th width="30%">@Translation.ServiceProvider</th>
+                            <th width="30%">@Translation.SubmissionDate</th>
+                            <th width="10%">@Translation.Status</th>
+                            <th width="25%">@Translation.CloseDate</th>
+                            <th width="5%">@Translation.Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+            async: true;
+            //List
+            BindDataTable();
+        });
+        $(document).keypress(function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if (keycode == '13') {
+                BindDataTable();
+            }
+        });
+        var oTable;
+        function BindDataTable(response) {
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+                    "bAutoWidth": false,
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("GetComplain")",
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+                        aoData.push(
+                            //{ "name": "Date", "value": $("#sDate").val() },
+                            { "name": "isNew", "value": @ViewBag.IsNew },
+                        );
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+                    },
+                    "aoColumns": [
+                        { "mData": "ComplainId", },
+                        { "mData": "OrderNo", },
+                        { "mData": "Provider", "orderable": false },
+                        { "mData": "AddedOn" },
+                        { "mData": "Status" },
+                        // {
+                        //    "mData": "Status",
+                        //     "render": function (Id, type, full, meta) {
+                        //         var str = Id;
+                        //         if (full.StatusId != 1 && full.StatusId != 2) {
+                        //             str += ' (' + full.UpdatedOn + ')';
+                        //         }
+                        //         return str;
+                        //    },
+                        //},
+                        { "mData": "ResolveOn", "orderable": false },
+                        //{ "mData": "Response", "orderable": false },
+                         {
+                            "mData": "Id",
+                            "render": function (Id, type, full, meta) {
+                               return '<a href="@Url.Action("Preview", "Complain")/' + Id + '" title="@Translation.View" data-toggle="tooltip"><i class="fa fa-eye"></i></a>';
+                            },
+                            "orderable": false
+                        },
+                    ],
+                    "order": [[0, "desc"]],
+                    "fnInitComplete": function (oSettings, json) {
+                    },
+                    "fnDrawCallback": function (oSettings) {
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                        "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                        "emptyTable": false,
+                        "sEmptyTable": "@Translation.NoDataFound",
+                    },
+                });
+            }
+        }
+
+        var Reset = function () {
+            $('#divSearch').find('input[type=text]').val('');
+            $('#divSearch').find('select').val('0');
+            BindDataTable();
+        }
+    </script>
+}
+
+
+
+

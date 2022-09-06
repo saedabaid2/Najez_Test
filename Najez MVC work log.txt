@@ -1,0 +1,13 @@
+abdulhameed@gmail.com----abdul12345---labour
+abdulshakoor@gmail.com---shakoor12345--driver
+mustak@gmail.com-----mustak1234--labour  under Hiba@matksa.com service provider   503454569
+mustafa@gmail.com---mustafa1234-driver under Hiba@matksa.com service provider
+
+
+
+UserGroupTypeId
+-------------------------
+service provider--1
+supplier---2
+admin-----3
+-------------------------------

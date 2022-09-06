@@ -1,0 +1,259 @@
+﻿@*@model IEnumerable<Almanea.Category>*@
+@model Almanea.Category
+
+@{
+    ViewBag.Title = Translation.Categories;
+}
+
+
+@using Almanea.Models;
+@using Almanea.BusinessLogic;
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+
+                @using (Ajax.BeginForm("Create", "Categories", null,
+                 new AjaxOptions
+                 {
+                     HttpMethod = "POST",
+                     OnSuccess = "onSuccess",
+                     OnBegin = "onBegin",
+                     OnComplete = "onComplete",
+                     OnFailure = "onComplete",
+                 }, new { id = "frmAdd" }))
+                {
+
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(Translation.CategoryInEnglish, htmlAttributes: new { @class = "bmd-label-floating required" })
+
+                                @Html.EditorFor(m => m.NameEn, new { htmlAttributes = new { @class = "form-control", placeholder = Translation.EnterCategoryInEnglish, required = "required", title = Translation.EnterCategoryInEnglish } })
+                                @Html.ValidationMessageFor(m => m.NameEn, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(Translation.CategoryInArabic, htmlAttributes: new { @class = "bmd-label-floating required" })
+
+                                @Html.EditorFor(m => m.Name, new { htmlAttributes = new { @class = "form-control", placeholder = Translation.EnterCategoryInArabic, required = "required", title = Translation.EnterCategoryInArabic } })
+                                @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(Translation.DescriptioninEnglish, htmlAttributes: new { @class = "bmd-label-floating required" })
+
+                                @Html.EditorFor(m => m.DescriptionEn, new { htmlAttributes = new { @class = "form-control", placeholder = Translation.EnterDescriptionInEnglish, required = "required", title = Translation.EnterDescriptionInEnglish } })
+                                @Html.ValidationMessageFor(m => m.DescriptionEn, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(Translation.DescriptioninArabic, htmlAttributes: new { @class = "bmd-label-floating required" })
+
+                                @Html.EditorFor(m => m.Description, new { htmlAttributes = new { @class = "form-control", placeholder = Translation.EnterDescriptionInArabic, required = "required", title = Translation.EnterDescriptionInArabic } })
+                                @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(Translation.SortOrder, htmlAttributes: new { @class = "bmd-label-floating required" })
+
+                                <input type="text" name="SortOrder" id="SortOrder" class="form-control" placeholder = "@Translation.EnterSortOrderQuantity" required = "required" title ="@Translation.EnterSortOrderQuantity" >
+                              @*@Html.EditorFor(m => m.SortOrder, new { htmlAttributes = new { @class = "form-control", placeholder = Translation.EnterSortOrderQuantity, required = "required", title = Translation.EnterSortOrderQuantity } })*@
+                                @Html.ValidationMessageFor(m => m.SortOrder, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(Translation.Active, htmlAttributes: new { @class = "control-label col-md-2" })
+
+                                <div class="checkbox">
+                                    @Html.EditorFor(model => model.Active)
+                                    @Html.ValidationMessageFor(model => model.Active, "", new { @class = "text-danger" })
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    @Html.HiddenFor(x => x.UserGroupId)
+                    <p class="mg-t-15">
+                        <input type="submit" class="btn btn-primary pull-right" value="@Translation.Submit" />
+                    </p>
+                }
+
+            </div>
+
+
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dataTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>
+                               @Translation.CategoryInEnglish
+                            </th>
+
+                            <th>
+                                @Translation.CategoryInArabic
+                            </th>
+                            <th>
+                                @Translation.DescriptioninEnglish
+                            </th>
+                            <th>
+                                @Translation.DescriptioninArabic
+                            </th>
+
+                            <th>
+                                @Translation.Active
+                            </th>
+                            <th>
+                                @Translation.SortOrder
+                            </th>
+                            @*<th>
+                                    @Html.DisplayNameFor(model => model.Category2.Name)
+                                </th>*@
+                            <th>@Translation.Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+
+
+    <script>
+        $(document).ready(function () {
+            async: true;
+            //List
+            BindDataTable();
+            if ($("#SortOrder").val()==0)
+            {
+                $("#SortOrder").val('');
+            }
+        });
+
+        var oTable;
+        function BindDataTable(response) {
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+                    "bAutoWidth": false,
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("GetCategoriesList")",
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+                    },
+                    "aoColumns": [
+                        {
+                            "mData": "NameEn",
+                        },
+                         {
+                            "mData": "Name",
+                        },
+                        {
+                            "mData": "DescriptionEn",
+                        },
+                        {
+                            "mData": "Description",
+                        },
+                        {
+                            "mData": "Active",
+
+                        },
+                        {
+                            "mData": "SortOrder",
+                        },
+
+
+                        {
+                            "mData": "Id",
+                            "render": function (vals, type, full, meta) {
+                                @*var html = '<a href="@Url.Action("Delete")/' + full.Id + '" class="btn btn-sm btn-primary">@Translation.Delete</a>';*@
+                                return '<a href="@Url.Action("Edit")/' + full.Id + '" class="btn btn-sm btn-primary">@Translation.Edit</a>' ;
+                            },
+                            "orderable": false
+                        },
+                    ],
+                    "order": [[0, "desc"]],
+                    "fnInitComplete": function (oSettings, json) {
+
+
+                    },
+                    "fnDrawCallback": function (oSettings) {
+
+                    },
+                    "fnCreatedRow": function (nRow, aData, iDataIndex) {
+
+                        $(nRow).attr('id', 'tr' + aData.Id); // or whatever you choose to set as the id
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                         "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                        "emptyTable": false,
+                        "sEmptyTable": "@Translation.NoMatchingRecords",
+                    },
+                });
+            }
+
+        }
+
+        function string_to_array (str) {
+            return str.trim().split(",");
+        };
+
+        var Reset = function () {
+            $('#divSearch').find('input[type=text]').val('');
+            $('#divSearch').find('select').val('0');
+
+            BindDataTable();
+        }
+
+        function onSuccess(response) {
+
+                successPopup("Category added successfully");
+
+                setTimeout(function () { window.location = window.location.href; }, 3000);
+
+        }
+    </script>
+
+}

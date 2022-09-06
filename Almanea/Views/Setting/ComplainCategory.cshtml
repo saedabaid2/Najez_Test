@@ -1,0 +1,180 @@
+﻿@using Almanea.Models;
+@using Almanea.BusinessLogic;
+
+@{
+    ViewBag.Title = Translation.ComplainCategory;
+    var UserGroupTypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+    var UserId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserId]);
+    var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupId]);
+    var ActtypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+}
+
+@model Almanea.Models.vm_ComplainType
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+
+            <div class="card-body">
+                @using (Ajax.BeginForm("AddEditCategory", "Setting", null,
+                                   new AjaxOptions
+                                   {
+                                       HttpMethod = "POST",
+                                       OnSuccess = "onSuccess",
+                                       OnBegin = "onBegin",
+                                       OnComplete = "onComplete",
+                                   }, new { id = "frmAdd", @autocomplete = "off" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="row" id="divSearch">
+                        <div class="col-lg-4 col-md-2 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @*<input type="hidden" name="CategoryId" id="CategoryId" />*@
+                                @Html.LabelFor(m => m.ComplainCategoryId, new { @class = "bmd-label-floating required" })
+
+                                @Html.DropDownListFor(m => m.ComplainCategoryId, cls_DropDowns.GetCategoryList(UserGroupId, UserGroupTypeId, ActtypeId), Translation.Select, new { @class = "form-control select2" })
+
+                                @Html.ValidationMessageFor(m => m.ComplainCategoryId, "", new { @class = "valid-text" })
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-sm-6 col-md-4">
+                            <div class="form-group">
+                                <label class="bmd-label-floating required">@Translation.ComplainCategoryEN</label>
+                                @Html.TextBoxFor(m => m.TitleEN, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(m => m.TitleEN, "", new { @class = "valid-text" })
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-sm-6 col-md-4">
+                            <div class="form-group">
+                                <label class="bmd-label-floating required">@Translation.ComplainCategoryAR</label>
+                                @Html.TextBoxFor(m => m.TitleAR, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.TitleAR, "", new { @class = "valid-text" })
+                            </div>
+                        </div>
+                    </div>
+                    <p>
+                        <input type="submit" value="@Translation.AddNew" class="btn btn-primary pull-right" />
+                    </p>
+                }
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dtData">
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="25%">@Translation.Category</th>
+                            <th width="25%">@Translation.ComplainCategoryEN</th>
+                            <th width="25%">@Translation.ComplainCategoryAR</th>
+                            <th width="15%">@Translation.IsActive</th>
+                            <th width="15%">@Translation.Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.Data != null)
+                                    {
+
+                                        foreach (var item in (List<Almanea.Models.vm_ComplainType>
+                                        )ViewBag.Data)
+                                        {
+
+                                <tr id="tr@(item.ComplainTypeId)">
+                                    <td>
+                                                <select class="form-control" id="ComplainCategory">
+                                                    @foreach (var category in cls_DropDowns.GetCategoryList(UserGroupId, UserGroupTypeId, ActtypeId))
+                                                    {
+                                                        if (category.Value == item.ComplainCategoryId.ToString())
+                                                        {
+                                                            <option value="@category.Value" selected>@category.Text</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@category.Value">@category.Text</option>
+                                                        }
+                                                    }
+                                                </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" id="txtEN" value="@item.TitleEN" />
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" id="txtAR" value="@item.TitleAR" />
+                                    </td>
+                                    <td>
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" id="chkActive_@item.ComplainTypeId" name="chkActive" class="custom-control-input" @(item.IsActive == true ? "checked" : "") />
+                                            <label for="chkActive_@item.ComplainTypeId" class="custom-control-label"></label>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0)" onclick="Update(this)" class="btn btn-sm btn-primary">@Translation.Update</a>
+                                    </td>
+                                </tr>
+
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts
+{
+
+    <script>
+        $(document).ready(function () {
+            var dtServices = $('#dtData').DataTable({
+                "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                "bSearchable": false,
+                "bSortable": false,
+                "bInfo": false,
+                "bLengthChange": false,
+                "AutoWidth": true,
+                "bPaginate": false,
+                "language": {
+                    "paginate": {
+                        "previous": "«",
+                        "next": "»",
+                    },
+                     "sEmptyTable": "@Translation.NoMatchingRecords",
+                    "emptyTable": false
+                },
+            });
+        });
+
+        function Update(button) {
+            $('.loader-wrapper').show();
+            //Determine the reference of the Row using the Button.
+            var row = $(button).closest("TR");
+            var Id = parseInt(row.attr("id").substring(2));
+
+            $.post('@Url.Action("AddEditCategory")', {
+                ComplainCategoryId: row.find('#ComplainCategory').val(),
+                ComplainTypeId: Id,
+                TitleEN: row.find('#txtEN').val(),
+                TitleAR: row.find('#txtAR').val(),
+                IsActive: row.find('#chkActive_' + Id).prop('checked'),
+            }, function (response) {
+                if (response.StatusId > 0) {
+                    successPopup('@Translation.success_Update')
+                }
+                else {
+                    warningPopup('Enter all details.');
+                }
+                $('.loader-wrapper').hide();
+            });
+        };
+
+        function onSuccess(response) {
+            if (response.StatusId > 0) {
+                successPopup('@Translation.success_Update');
+
+                window.location = window.location.href;
+            }
+        }
+    </script>
+}

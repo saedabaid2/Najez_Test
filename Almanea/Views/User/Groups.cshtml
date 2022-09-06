@@ -1,0 +1,205 @@
+﻿
+@{
+    ViewBag.Title = Translation.UserGroup;
+}
+@using Almanea.BusinessLogic
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+
+            <div class="card-body">
+                <div class="row" id="divSearch">
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="text" id="sName" class="form-control" placeholder="@Translation.CompanyName" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="text" id="sEmail" class="form-control" placeholder="@Translation.Email" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <input type="text" id="sPhone" class="form-control" placeholder="@Translation.Telephone" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                <select class="form-control" id="sStatus">
+                                    <option value="0">@Translation.AllStatus</option>
+                                    <option value="1">@Translation.Active</option>
+                                    <option value="2">@Translation.InActive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="form-label-group">
+                                
+
+
+                                    @{
+                                        var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+
+                                        if (UserGroupId == (int)enumGroupType.Admin)
+                                        {
+                                                                    <select class="form-control" id="sGroup">
+                                                                        <option value="0">@Translation.AllGroupType</option>
+                                                                        <option value="1">@Translation.ServiceProvider</option>
+                                                                        <option value="2">@Translation.Supplier</option>
+                                                                        <option value="7">@Translation.Executive</option>
+                                                                    </select>
+                                        }
+
+                                        else
+                                        {
+                              <select class="form-control" id="sGroup">
+                                <option value="0">@Translation.AllUserType</option>
+                                <option value="1">@Translation.ServiceProvider</option>                               
+                                <option value="3">@Translation.Admin</option>
+
+                            </select>
+                                        }
+                                    }
+                                  
+                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p>
+                    <input type="button" value="@Translation.Search" class="btn btn-primary" onclick="BindDataTable()" />
+                    <a href="@Url.Action("AddGroup")" class="btn btn-secondary float-right">@Translation.AddGroup</a>
+                </p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dataTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="12%">@Translation.Logo</th>
+                            <th width="20%">@Translation.CompanyName</th>
+                            <th width="20%">@Translation.Email</th>
+                            <th width="15%">@Translation.MobileNo</th>
+                            <th width="12%">@Translation.Status</th>
+                            <th width="12%">@Translation.InternalTeamOnly</th>
+                            <th width="12%">@Translation.Type</th>
+                            <th width="8%">@Translation.Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+            async: true;
+            //List
+            BindDataTable();
+        });
+        $(document).keypress(function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if (keycode == '13') {
+                BindDataTable();
+            }
+        });
+        var oTable;
+        function BindDataTable(response) {
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+                    "bAutoWidth": false,
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("GetGroups")",
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+                        aoData.push(
+                            { "name": "CompanyName", "value": $("#sName").val() },
+                            { "name": "Email", "value": $("#sEmail").val() },
+                            { "name": "Telephone", "value": $("#sPhone").val() },
+                            { "name": "StatusId", "value": $("#sStatus").val() },
+                            { "name": "GroupTypeId", "value": $("#sGroup").val() },
+                        );
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+                    },
+                    // data: response,
+                    "aoColumns": [
+                        {
+                            "mData": "CompanyLogo",
+                            "render": function (Logo, type, full, meta) {
+                                if (Logo != '') { return '<img src="' + Logo + '?dummy=@cls_Defaults.GenerateCode(4)" class="img-responsive" style="max-height:50px;" />';}
+
+                                return '';
+                            },
+                            "orderable": false
+                        },
+                        { "mData": "CompanyName", },
+                        { "mData": "Email",},
+                        { "mData": "Telephone",},
+                        { "mData": "StatusText", },
+                        { "mData": "IsInternalText",},
+                        { "mData": "UserGroup", },
+                        {
+                            "mData": "EncryptId",
+                            "render": function (Id, type, full, meta) {
+                                return '<a href="@Url.Action("EditGroup")/' + Id + '" title="Details" data-toggle="tooltip"><i class="fa fa-edit"></i></a>';
+                            },
+                            "orderable": false
+                        },
+                    ],
+                    "order": [[0, "desc"]],
+                    "fnInitComplete": function (oSettings, json) {
+                    },
+                    "fnDrawCallback": function (oSettings) {
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                       "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                        "emptyTable": false,
+                        "sEmptyTable": "@Translation.NoMatchingRecords",
+                    },
+                });
+            }
+
+        }
+
+        var Reset = function () {
+            $('#divSearch').find('input[type=text]').val('');
+            $('#divSearch').find('select').val('0');
+            BindDataTable();
+        }
+    </script>
+}

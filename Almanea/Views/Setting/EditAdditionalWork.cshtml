@@ -1,0 +1,103 @@
+﻿@model vm_AdditionalWork
+
+@{
+    ViewBag.Title = Translation.AdditionalWork + " " + Translation.Edit;
+}
+@using Almanea.Models;
+@using Almanea.BusinessLogic;
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                @using (Html.BeginForm("UpdateAdditionalWork", "Setting", FormMethod.Post, new { id = "frmAdd" }))
+                {
+
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        @Html.HiddenFor(m => m.AdditionalWorkId)
+
+
+                        <div class="col-lg-4 col-md-2 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @*<input type="hidden" name="CategoryId" id="CategoryId" />*@
+                                @Html.Label(Translation.CategoryName, new { @class = "bmd-label-floating required" })
+                                @*@Html.DropDownListFor(model => model.CategoryId, new SelectList(ViewBag.CategoryId, "Value", "Text"), Translation.Select, new { @class = "form-control selectpicker" })*@
+
+                                @*  @Html.DropDownListFor(m => m.CategoryId, cls_DropDowns.GetCategoryList(Model.CategoryId), Translation.Select, new { @class = "form-control select2" })*@
+                                <select id="sCategoryId" class="form-control select2">
+                                    <option value="">@Translation.Select</option>
+                                    @foreach (var item in new SelectList(ViewBag.CategoryIds, "Value", "Text"))
+                                    {
+                                        if (Convert.ToInt32(item.Value) == ViewBag.CategoryId)
+                                        {
+                                            <option value="@item.Value" selected>@item.Text</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+
+                                    }
+                                </select>
+                                @Html.HiddenFor(m => m.CategoryId)
+                            </div>
+                            @Html.ValidationMessageFor(m => m.CategoryId, "", new { @class = "valid-text" })
+                        </div>
+
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(Translation.AdditionalWorkNameEnglish, new { @class = "bmd-label-floating required" })
+                                @Html.EditorFor(m => m.AdditionalWorkNameEN, new { htmlAttributes = new { @class = "form-control", placeholder = Translation.Enterthenameofadditionalwork, required = "required", title = Translation.Enterthenameofadditionalwork } })
+                                @Html.ValidationMessageFor(m => m.AdditionalWorkNameEN, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(Translation.AdditionalWorkNameArabic, new { @class = "bmd-label-floating required" })
+                                @Html.EditorFor(m => m.AdditionalWorkNameAR, new { htmlAttributes = new { @class = "form-control", placeholder = Translation.Enterthenameofadditionalwork, required = "required", title = Translation.Enterthenameofadditionalwork } })
+                                @Html.ValidationMessageFor(m => m.AdditionalWorkNameAR, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-2 col-sm-6 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(Translation.Price, new { @class = "bmd-label-floating required" })
+
+                                @Html.EditorFor(m => m.Price, new { htmlAttributes = new { @class = "form-control", placeholder = Translation.Enterthepriceofadditionalwork, required = "required", title = Translation.Enterthepriceofadditionalwork } })
+                                @Html.ValidationMessageFor(m => m.Price, "", new { @class = "text-danger" })
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12" style="margin-top: 50px;">
+                            <input type="submit" class="btn btn-primary pull-right" value="@Translation.Update" />
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+    @section scripts{
+
+        <script>
+        $(document).ready(function () {
+            $("#CategoryId").val($("#sCategoryId").val);
+        });
+
+        $(function () {
+            $("#sCategoryId").change(function () {
+
+                var selectedValue = $(this).val();
+                $("#CategoryId").val(selectedValue);
+            });
+        });
+        </script>
+        }

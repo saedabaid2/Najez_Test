@@ -1,0 +1,179 @@
+@charset "UTF-8"; /*!* CoreUI Plugins - Chart.js for CoreUI 3
+* @version vv2.0.0-beta.0
+* @link https://coreui.io
+* Copyright (c) 2019 creativeLabs Łukasz Holeczek
+* Licensed under MIT (https://coreui.io/license/plugins/chart.js)*/
+
+.c-chartjs-tooltip {
+    position: absolute;
+    z-index: 1021;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    padding: .25rem .5rem;
+    color: #fff;
+    pointer-events: none;
+    background: rgba(0,0,0,.7);
+    opacity: 0;
+    transition: all .25s ease;
+    -webkit-transform: translate(-50%,0);
+    transform: translate(-50%,0);
+    border-radius: .25rem
+}
+
+    .c-chartjs-tooltip .c-tooltip-header {
+        margin-bottom: .5rem
+    }
+
+    .c-chartjs-tooltip .c-tooltip-header-item {
+        font-size: .765625rem;
+        font-weight: 700
+    }
+
+    .c-chartjs-tooltip .c-tooltip-body-item {
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-align: center;
+        align-items: center;
+        font-size: .765625rem;
+        white-space: nowrap
+    }
+
+    .c-chartjs-tooltip .c-tooltip-body-item-color {
+        display: inline-block;
+        width: .875rem;
+        height: .875rem;
+        margin-right: .875rem
+    }
+
+    .c-chartjs-tooltip .c-tooltip-body-item-value {
+        padding-left: 1rem;
+        margin-left: auto;
+        font-weight: 700
+    }
+
+{
+    "mode":"full","isActive":false
+}
+
+
+.setheightwidth {
+  height: 110px;
+  width: 270px;
+}
+
+.setheader {
+  padding-bottom: 0px;
+  padding-top: 5%
+}
+
+.dataTables_length {
+  padding-top: 6px;
+}
+
+.dataTables_filter {
+  padding-top: 6px;
+}
+
+.cardsettingEng {
+  margin-inline-end: 20px;
+  margin-left: 10px;
+  margin-inline-start: 23px;
+}
+
+.cardsettingArb {
+  margin-inline-end: 23px;
+  margin-right: 10px;
+  margin-inline-start: 20px;
+}
+
+.number {
+  padding-left: 0%;
+  margin: 0%;
+}
+
+.cardtext {
+  margin-top: 20px;
+}
+
+.card-body-custom {
+  padding-top: 2% !important;
+  padding-left: 5% !important;
+  padding-right: 5% !important;
+}
+
+.card-body-icon {
+  padding-top: 2% !important;
+}
+
+.card-body-value {
+  margin-left: 0% !important;
+}
+
+.OpenComplaintsIcon {
+  width: 56px;
+  height: 59px;
+  background-image: url('../../images/ServiceProviderDashboard/outline_list_white_24dp 2.png');
+}
+
+.CloseComplaintsIcon {
+  width: 56px;
+  height: 55px;
+  background-image: url('../../images/ServiceProviderDashboard/outline_feedback_white_48dp 1.png');
+}
+
+.MissingOrderIcon {
+  width: 56px;
+  height: 59px;
+  background-image: url('../../images/ServiceProviderDashboard/outline_assignment_late_white_48dp 1.png');
+}
+
+.UnassignedOrderIcon {
+  width: 56px;
+  height: 59px;
+  background-image: url('../../images/ServiceProviderDashboard/outline_assignment_white_48dp 1.png');
+}
+
+.RevenueIcon {
+  width: 56px;
+  height: 59px;
+  background-image: url('../../images/ServiceProviderDashboard/outline_paid_white_48dp 1.png');
+}
+
+.txtUpperCase {
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 16px;
+  /* or 114% */
+  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  letter-spacing: 0.996px;
+  text-transform: uppercase;
+  color: #FFFFFF;
+}
+
+.cardHeader {
+  font-family: 'Roboto';
+  font-weight: 500;
+  font-style: normal;
+  color: #3A3B3F;
+}
+
+.arabicNumber {
+  padding-left: 100%;
+}
+
+.number {
+  padding-left: 0%;
+  margin: 0%;
+}
+
+h5, h4, h3, j2, span {
+  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+.table {
+  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}

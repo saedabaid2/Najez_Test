@@ -1,0 +1,256 @@
+﻿@{
+    ViewBag.Title = Translation.Report;
+}
+
+@using Almanea.BusinessLogic;
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row" id="divSearch">
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" id="start" class="form-control" placeholder="@Translation.FinishStartDate" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-sm-6 col-md-4">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" id="finish" class="form-control" placeholder="@Translation.FinishEndDate" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p>
+                    <input type="button" value="@Translation.Search" class="btn btn-primary pull-right" onclick="BindDataTable()" />
+                    <span class="ta-right f-right">
+                        <a style="margin-right:10px;" onclick="BindDataTableExcel();" title="Excel" data-toggle="tooltip"><i class="fa fa-file-excel"></i></a>
+                        <a onclick="BindDataTablePdf();" title="Print" data-toggle="tooltip"><i class="fa fa-print"></i></a>
+                    </span>
+                </p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dataTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="10%">@Translation.OrderNo</th>
+                            <th width="10%">@Translation.InvoiceNo</th>
+                            <th width="12%">@Translation.InstallOn</th>
+                            <th width="20%">@Translation.Services</th>
+                            <th width="12%">@Translation.Quantity</th>
+                            <th width="12%">@Translation.UnitPrice</th>
+                            <th width="14%">@Translation.Amount</th>
+                            <th width="12%">@Translation.Vat</th>
+                            <th width="8%">@Translation.SubTotal</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            // Date range
+            $('#start').datepicker({
+                dateFormat: 'dd/mm/yy',
+                changeMonth: true,
+                changeYear: true,
+                prevText: '<i class="fa fa-angle-left"></i>',
+                nextText: '<i class="fa fa-angle-right"></i>',
+                onSelect: function (selectedDate) {
+                    $('#finish').datepicker('option', 'minDate', selectedDate);
+                }
+            });
+            $('#finish').datepicker({
+                dateFormat: 'dd/mm/yy',
+                changeMonth: true,
+                changeYear: true,
+                prevText: '<i class="fa fa-angle-left"></i>',
+                nextText: '<i class="fa fa-angle-right"></i>',
+                maxDate: 0,
+                onSelect: function (selectedDate) {
+                    $('#start').datepicker('option', 'maxDate', selectedDate);
+                }
+            });
+
+            $('#start').datepicker('setDate', new Date());
+            $('#finish').datepicker('setDate', new Date());
+
+            async: true;
+            BindDataTable();
+        });
+
+        function BindDataTable() {
+            var uGTypeId = $('#UserGroupTypeId').val();
+            var uGroupId = $("#UserGroupId").val();
+            var fromDate = $('#start').val();
+            var toDate = $('#finish').val();
+            if (uGTypeId == '' || uGroupId == '' ||
+                fromDate == '' || toDate == '') {
+
+                warningPopup('Enter All Details');
+                return;
+            }
+            else {
+                BindData();
+            }
+        }
+
+        $(document).keypress(function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if (keycode == '13') {
+                BindDataTable();
+            }
+        }); 
+
+        var oTable;
+        function BindData(response) {
+           
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                var fromDt = $('#start').val();
+                var toDt = $('#finish').val();
+
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+                    "bAutoWidth": false,
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("SerachSupplierInvoice")",
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+                        aoData.push(
+                            { "name": "fromDate", "value": $('#start').val() },
+                            { "name": "toDate", "value": $('#finish').val() },
+                        );
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+                    },
+                    "aoColumns": [
+                        { "mData": "OrderNo", },
+                        { "mData": "InvoiceNo", },
+                        { "mData": "InstallDate", "orderable": true },
+                        { "mData": "Services[0].Title", "orderable": false },
+                        { "mData": "Quantity", "orderable": false },
+                        { "mData": "UnitPrice", "orderable": false },
+                        { "mData": "Amount", "orderable": false },
+                        { "mData": "Vat", "orderable": false },
+                        { "mData": "SubTotal", "orderable": false },
+                    ],
+                    "order": [[1, "desc"]],
+                    "fnInitComplete": function (oSettings, json) {
+                    },
+                    "fnDrawCallback": function (oSettings) {
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                        "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "emptyTable": false,
+                        "infoEmpty": "@Translation.NoMatchingRecords",
+                    },
+                    //'rowsGroup': [2],
+                    //'createdRow': function (row, data, dataIndex) {
+                    //    // Use empty value in the "Office" column
+                    //    // as an indication that grouping with COLSPAN is needed
+                    //    if (data.Services.length > 1) {
+                    //        // Add COLSPAN attribute
+                    //        $('td:eq(3)', row).attr('colspan', 5);
+                    //        // Hide required number of columns
+                    //        // next to the cell with COLSPAN attribute
+                    //        $('td:eq(4)', row).css('display', 'none');
+                    //        $('td:eq(5)', row).css('display', 'none');
+                    //        $('td:eq(6)', row).css('display', 'none');
+                    //        $('td:eq(7)', row).css('display', 'none');
+                    //    }
+                    //} 
+                });
+            }
+
+        }
+
+        var Reset = function () {
+            $('#divSearch').find('input[type=text]').val('');
+            $('#divSearch').find('select').val('0');
+            BindDataTable();
+        }
+
+        function BindDataTableExcel() {
+            
+            var uGTypeId = $('#UserGroupTypeId').val();
+            var uGroupId = $("#UserGroupId").val();
+            var fromDate = $('#start').val();
+            var toDate = $('#finish').val();
+          
+            if (uGTypeId == '' || uGroupId == '' ||
+                fromDate == '' || toDate == '') {
+
+                warningPopup('Enter All Details');
+                return;
+            }
+            else {
+                var url = "@Url.Action("SupplierInvoiceExcel", "Print")?fromDate=" + fromDate + "&toDate=" + toDate;
+
+            var win = window.open(url, '_blank');
+            win.focus();
+            }
+        }
+
+        function BindDataTablePdf() {
+
+            var uGTypeId = $('#UserGroupTypeId').val();
+            var uGroupId = $("#UserGroupId").val();
+            var fromDate = $('#start').val();
+            var toDate = $('#finish').val();
+        
+            if (uGTypeId == '' || uGroupId == '' ||
+                fromDate == '' || toDate == '') {
+
+                warningPopup('Enter All Details');
+                return;
+            }
+            else {
+                var url = "@ViewBag.TypeId" +
+
+                    "?fromDate=" + fromDate +
+                    "&toDate=" + toDate;
+
+                var win = window.open(url, '_blank');
+                win.focus();
+            }
+        }
+
+    </script>
+}
+
+
+
+
+

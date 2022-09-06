@@ -1,0 +1,424 @@
+﻿@{
+    ViewBag.Title = Translation.SalesReport;
+
+    var userGroupTypeId = ViewBag.userGroupTypeId;
+    var UserGroupTypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+    var UserId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserId]);
+    var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupId]);
+    var ActtypeId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_AccountTypeId]);
+}
+
+@model vm_OrderList
+
+@using Almanea.Models;
+@using Almanea.BusinessLogic;
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+
+            <div class="card-body">
+                <div class="row">
+
+                    @if (userGroupTypeId == (int)enumGroupType.Admin)
+                    {
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                            <div class="form-group">
+                                @Html.Label(@Translation.ServiceProvider, new { @class = "bmd-label-floating required" })
+                                @*<select class="form-control select2" id="sCompany" onchange="getBranchData();">*@
+                                <select class="form-control select2" id="sCompany">
+                                    <option value="0">@Translation.All @Translation.ServiceProvider</option>
+                                    @foreach (var item in cls_DropDowns.GetCompanies())
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    }
+                    <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+    <div class="form-group">
+        <label class="bmd-label-floating required" style="text-transform: capitalize;">@Translation.Supplier</label>-->
+                    @*@Html.Label(Translation.Supplier, new { @class = "bmd-label-floating required" })*@
+                    <!--<select class="form-control select2" id="supplierid" onchange="getBranchbyId();">
+    <option value="0">@Translation.All @Translation.Supplier</option>-->
+                    @*@foreach (var item in cls_DropDowns.GetSupplierList())
+        {
+            <option value="@item.Value">@item.Text</option>
+        }*@
+                    <!--</select>
+        </div>
+    </div>-->
+                    @*<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Branch, new { @class = "bmd-label-floating required" })
+                <select class="form-control select2" id="AjentId" name="AjentId" onchange="getBranchbyId();">
+                    <option value="0">@Translation.All</option>
+                    @foreach (var item in cls_DropDowns.GetAjentUsers())
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+            @Html.ValidationMessageFor(m => m.AjentId, "", new { @class = "valid-text" })
+        </div>*@
+                    @if (UserGroupTypeId == (int)enumGroupType.SuperAdmin)
+                    {
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                            <div class="form-group">
+                                <input type="hidden" id="branchId" value=" " />
+                                @Html.LabelFor(m => m.Branch, new { @class = "bmd-label-floating required" })
+                                <select class="form-control select2" multiple id="AjentId" name="AjentId">
+                                </select>
+                            </div>
+                            @Html.ValidationMessageFor(m => m.AjentId, "", new { @class = "valid-text" })
+                        </div>
+                    }
+                    @if (UserGroupTypeId == (int)enumGroupType.Supplier && ActtypeId == (int)enumSupplierAcct.Admin)
+                    {
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                            <div class="form-group">
+                                <input type="hidden" id="branchId" value=" " />
+                                @Html.Label(Translation.SellerAccount, new { @class = "bmd-label-floating" })
+                             
+                                <select class="form-control select2" id="AjentId" name="AjentId">
+                                    <option value="0">@Translation.Select  @Translation.SellerAccount</option>
+                                    @foreach (var item in cls_DropDowns.GetSupplierAdminAgent(UserGroupId, UserGroupTypeId, ActtypeId))
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                            @Html.ValidationMessageFor(m => m.AjentId, "", new { @class = "valid-text" })
+                        </div>
+                    }
+                    <div class="col-lg-2 col-md-2 col-sm-4 col-xs-8">
+                        <div class="form-group">
+                            @Html.Label(Translation.StartDate, new { @class = "bmd-label-floating" })
+                        
+                                <input type="text" id="StartDate" class="form-control datepickerall" placeholder="@Translation.StartDate" />
+                       
+                            @*@Html.TextBoxFor(m => m.StartDate, new { @class = "form-control numOnly", @placeholder = Translation.StartDate, @readonly = "readonly" })*@
+                        </div>
+                        @Html.ValidationMessageFor(m => m.StartDate, "", new { @class = "valid-text" })
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-4 col-xs-8">
+                        <div class="form-group">
+                            @Html.Label(Translation.EndDate, new { @class = "bmd-label-floating" })
+                            <input type="text" id="EndDate" class="form-control datepickerall" placeholder="@Translation.EndDate" />
+
+
+                            @*@Html.TextBoxFor(m => m.EndDate, new { @class = "form-control numOnly", @placeholder = Translation.EndDate, @readonly = "readonly" })*@
+                        </div>
+                        @Html.ValidationMessageFor(m => m.EndDate, "", new { @class = "valid-text" })
+                    </div>
+
+                    @if (UserGroupTypeId == (int)enumGroupType.SuperAdmin)
+                    {
+                        <div class="col-xl-2 col-sm-2 col-md-2 col-lg-2 col-md-2 col-sm-4 col-xs-8">
+                            <div class="form-group" style="padding-top: 0px; padding-left: 0px;">
+                                <div class="custom-control  custom-checkbox" style="padding-top: 40px;">
+                                    <input type="checkbox" id="delayed" />
+                                    <label for="checkbox_id">@Translation.Delayed</label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-xl-2 col-sm-2 col-md-2 col-lg-2 col-md-2 col-sm-4 col-xs-8">
+                            <div class="form-group" style="padding-top: 0px; padding-left: 0px;">
+                                <div class="custom-control  custom-checkbox" style="padding-top: 40px;">
+                                    <input type="checkbox" id="notupdated" />
+                                    <label for="checkbox_id">@Translation.NotUpdated</label>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    </div>
+                <p>
+                    <input type="button" value="@Translation.Search" class="btn btn-primary" onclick="BindDataTable()" />
+                    <span class="ta-right f-right">
+                        <a onclick="Print();" title="Print" data-toggle="tooltip"><i class="fa fa-print"></i></a>
+                    </span>
+                </p>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush" id="dataTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="12%">@Translation.InvoiceNo</th>
+                            <th width="12%">@Translation.SellerName</th>
+                            <th width="12%">@Translation.ServiceProviderAssigned</th>
+                            <th width="12%">@Translation.OrderDate</th>
+                            <th width="12%">@Translation.InstallOn</th>
+                            <th width="12%">@Translation.Quantity</th>
+                            <th width="12%">@Translation.Location</th>
+                            @*<th width="12%">@Translation.OrderCost</th>*@
+                            <th width="12%">@Translation.Status</th>
+
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+         function getBranchData() {
+            // get references to the source and target drop downs html controls
+            // These are jquery searches to find the drop down controls
+
+            // find a control with id=Manufacturer
+            src = $("#sCompany");
+
+            // find a control with id=Model (you need to add this to your view)
+            tgt = $("#AjentId");
+
+            // clear drop down
+            tgt.empty();
+             tgt.append('<option value="0">@Translation.All</option>');
+
+            // Get new model dataset via ajax
+            // based on manufacturer
+            // The url parameter points at your web method
+            $.ajax({
+                type: 'GET',
+                url: '/Orders/GetBranch',
+                dataType: 'json',
+                data: { userGroupTypeId: src.val() },
+                // success is called when dataset returns
+                success: function (p) {
+                    // Populate with each returned member
+                    $.each(p, function (i, pr) {
+                        tgt.append(
+                            '<option value="' + pr.Value + '">' +
+                            pr.Text + '</option>'
+                        );
+                    })
+                }
+            });
+        };
+
+         function getBranchbyId() {
+            // get references to the source and target drop downs html controls
+            // These are jquery searches to find the drop down controls
+
+            // find a control with id=Manufacturer
+             src = $("#supplierid");
+            // find a control with id=Model (you need to add this to your view)
+            tgt = $("#AjentId");
+            // clear drop down
+            tgt.empty();
+            tgt.append('<option value="0">@Translation.All</option>');
+
+            // Get new model dataset via ajax
+            // based on manufacturer
+            // The url parameter points at your web method
+
+            if (src.val() != "0" || src.val() == '' || src.val() == null || src.val() == undefined) {
+                $.ajax({
+                    type: 'GET',
+                    url: '/Orders/GetBranch',
+                    dataType: 'json',
+                    data: { groupid: src.val() },
+                    // success is called when dataset returns
+                    success: function (p) {
+                        // Populate with each returned member
+                        $.each(p, function (i, pr) {
+                            tgt.append(
+                                '<option value="' + pr.Value + '">' +
+                                pr.Text + '</option>'
+                            );
+                        })
+                    }
+                });
+            }
+        };
+
+        $('#AjentId').on("select2:select", function (e) {
+            var data = e.params.data.text;
+            if (data.toLowerCase() == 'all'.toLowerCase()) {
+                $("#AjentId > option").prop("selected", "selected");
+                $("#AjentId").trigger("change");
+            }
+        });
+
+        $("#StartDate").datepicker({
+            numberOfMonths: 1,
+            maxDate: 0,
+            onSelect: function (selected) {
+                //var dt = new Date(selected);
+                //dt.setDate(dt.getDate() + 1);
+                $("#EndDate").datepicker("option", "minDate", selected);
+            }, dateFormat: 'dd/mm/yy'
+        });
+        $("#EndDate").datepicker({
+            numberOfMonths: 1,
+            maxDate: 0,
+            onSelect: function (selected) {
+                //var dt = new Date(selected);
+                //dt.setDate(dt.getDate() - 1);
+
+                $("#StartDate").datepicker("option", "maxDate", selected);
+            }, dateFormat: 'dd/mm/yy'
+        });
+
+    </script>
+    <script>
+        var newStatus = @((int)OrderStatus.NewOrder);
+        $(document).ready(function () {
+            async: true;
+            //List
+            BindDataTable();
+        });
+
+        $(document).keypress(function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if (keycode == '13') {
+                BindDataTable();
+            }
+        });
+
+        var oTable;
+        function BindDataTable(response) {
+            var branch = $("#branchId").val($("#AjentId").val());
+            if ($.fn.DataTable.isDataTable("#dataTable")) {
+                oTable.draw();
+            }
+            else {
+                oTable = $("#dataTable").DataTable({
+                    "bProcessing": true,
+                    "bServerSide": true,
+                    "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                    "bSearchable": true,
+                    "bSortable": true,
+                    "bLengthChange": false,
+                    "bInfo": true,
+                    "bAutoWidth": false,
+                    "AutoWidth": false,
+                    "sAjaxSource": "@Url.Action("GetSalesReport")",
+                    "fnServerData": function (sSource, aoData, fnCallBack) {
+                        aoData.push(
+                            { "name": "id", "value": 0 }, //($("#AjentId").val() == undefined) ? 0 : branch },
+                            { "name": "branch", "value": branch.val() }, 
+                            { "name": "sDate", "value": $("#StartDate").val() },
+                            { "name": "EDate", "value": $("#EndDate").val() },
+                            { "name": "CompanyId", "value": $("#sCompany").val() },
+                            { "name": "SupplierId", "value": $("#supplierid").val() },
+                            { "name": "delayed", "value": $('#delayed').prop("checked") },
+                            { "name": "notupdated", "value": $('#notupdated').prop("checked") },
+
+                        );
+                        $.ajax({
+                            type: "GET",
+                            url: sSource,
+                            data: aoData,
+                            success: fnCallBack
+                        });
+                    },
+                    // data: response,
+                    "aoColumns": [
+                      @*{
+                            "mData": "OrderNo",
+                            "render": function (Id, type, full, meta) {
+                                return Id + '&nbsp; ' +
+                                    '<a tabindex="0" class="btn btn-primary" role="button" data-toggle="popover" data-trigger="focus"  title=" "'+
+                                    'data-content="@Translation.InvoiceNo : ' + full.Invoice + '"><i class="fas fa-file-invoice-dollar"><i/></a>';
+
+                                //return Id + ' <i class="fas fa-file-invoice-dollar" style="color:#A24BDE;background-color:#fff" title="' + full.Invoice +'" data-toggle="popup"></i>';
+                            },
+                        },*@
+                        { "mData": "InvoiceNo", },
+                        { "mData": "SellerName", },
+                        { "mData": "SupplierName", },
+                        { "mData": "AddedDate", "orderable": false },
+                        { "mData": "InstallDate", "orderable": true },
+                        { "mData": "Quantity", },
+                        { "mData": "Location" },
+                        //{ "mData": "TotalAmount"},
+                        { "mData": "StatusText" }
+
+
+                    ],
+                    "order": [[1, "desc"]],
+                    "fnInitComplete": function (oSettings, json) {
+                    },
+                    "fnDrawCallback": function (oSettings) {
+                    },
+                    "language": {
+                        "paginate": {
+                            "previous": "«",
+                            "next": "»",
+                        },
+                        "info": "@Translation.Showing _START_ @Translation.to _END_ @Translation.of _TOTAL_ @Translation.entries",
+                        "infoEmpty": "@Translation.Showing 0 @Translation.to 0 @Translation.of 0 @Translation.entries",
+                        "emptyTable": false,
+                        "sEmptyTable": "@Translation.NoMatchingRecords",
+                    },
+                });
+            }
+
+        }
+
+        var Reset = function () {
+            $('#divSearch').find('input[type=text]').val('');
+            $('#divSearch').find('select').val('0');
+            BindDataTable();
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+           $.ajax({
+                url: "@Url.Action("GetOrderCount", "Home")",
+                type: 'GET',
+                dataType: 'json',
+               success: function (response) {
+                    if (response.StatusId > 0) {
+                       //Bind Menu
+                        if ($('#bd_All').length > 0) {
+                            var count = parseInt(response.Data.AllOrders);
+                            if (count > 0) {
+                                $('#bd_All').text(count);
+                                $('#bd_All').show();
+                            }
+                        }
+                        //if ($('#bd_Completed').length) {
+                        //    $('#bd_Completed').text(response.Data.Completed);
+                        //}
+                        //if ($('#bd_Archieve').length) {
+                        //    $('#bd_Archieve').text(response.Data.Archieve);
+                        //}
+                        //if ($('#bd_Finish').length) {
+                        //    $('#bd_Finish').text(response.Data.Finish);
+                        //}
+                        //if ($('#bd_Cancel').length) {
+                        //    $('#bd_Cancel').text(response.Data.Cancel);
+                        //}
+                        if ($('#bd_Complain').length) {
+                            var count = parseInt(response.Data.Complain);
+                            if (count > 0) {
+                                $('#bd_Complain').text(count);
+                                $('#bd_Complain').show();
+                            }
+
+                        }
+                        //if ($('#bd_Resolved').length) {
+                        //    $('#bd_Resolved').text(response.Data.Resolved);
+                        //}
+                    }
+                }
+            });
+        });
+    </script>
+    <script>
+        function Print() {
+            
+            var AjentId = (($("#AjentId").val() == undefined) ? '0' : $("#AjentId").val());
+            var url = "@Url.Action("GetSalesReportp", "Orders")?id=" + AjentId + "&SDate=" + $("#StartDate").val() + "&EDate=" + $("#EndDate").val() + "&CompanyId=" + $("#sCompany").val();
+            var win = window.open(url, '_blank');
+            win.focus();
+        }
+    </script>
+}

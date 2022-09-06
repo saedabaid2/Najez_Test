@@ -1,0 +1,208 @@
+﻿
+@model Almanea.Models.vm_ComplainResponse
+@using Almanea.BusinessLogic
+
+<div class="row">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <div class="form-group">
+            <label>@Translation.ComplainId</label>
+            @Html.TextBoxFor(m => m.ComplainId, new { @class = "form-control", @readonly = "readonly" })
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Category, new { @class = "bmd-label-floating" })
+            @Html.TextBoxFor(m => m.Category, new { @class = "form-control", @readonly = "readonly" })
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Comments, new { @class = "bmd-label-floating" })
+            @Html.TextAreaFor(m => m.Comments, new { @class = "form-control", @style = "resize:none;", @readonly = "readonly" })
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Status, new { @class = "bmd-label-floating" })
+            @Html.TextBoxFor(m => m.Status, new { @class = "form-control", @readonly = "readonly" })
+        </div>
+    </div>
+</div>
+@{
+    var userGroupType = Convert.ToInt32(Session[cls_Defaults.Session_UserGroupTypeId]);
+    var AccountType = Convert.ToInt32(Session[cls_Defaults.Session_AccountTypeId]);
+    <form id="frmUpdate">
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                @if (userGroupType == (int)enumGroupType.Provider && (AccountType == (int)enumProviderAcct.Admin || AccountType == (int)enumProviderAcct.Supervisor))
+                {
+
+
+                    if (Model.StatusId == (int)enumComplainStatus.New)
+                    {
+                        <label>@Translation.ComplainNewStatus</label>
+                        <select class="form-control" id="cmbStatus">
+
+                            <option value="0">@Translation.Select</option>
+                            @*<option value="@((int)enumComplainStatus.Verifying)">@Translation.AssignSp</option>*@
+                            <option value="@((int)enumComplainStatus.VerifyingbyAgent)">@Translation.VerifyingbyAgent</option>
+                            <option value="@((int)enumComplainStatus.RejectBySp)">@Translation.RejectBySp</option>
+                        </select>
+                    }
+                    else if (Model.StatusId == (int)enumComplainStatus.ResolvebyAgent || Model.StatusId == (int)enumComplainStatus.Verifying || Model.StatusId == (int)enumComplainStatus.VerifyingbyAgent)
+                    {
+                        <label>@Translation.ComplainNewStatus</label>
+                        <select class="form-control" id="cmbStatus">
+
+                            <option value="0">@Translation.Select</option>
+                            <option value="@((int)enumComplainStatus.ResolveBySp)">@Translation.ResolveBySp</option>
+                            <option value="@((int)enumComplainStatus.RejectBySp)">@Translation.RejectBySp</option>
+                        </select>
+                    }
+                }
+                else if (userGroupType == (int)enumGroupType.Provider && (AccountType == (int)enumProviderAcct.Agent))
+                {
+
+                    if (Model.StatusId == (int)enumComplainStatus.New)
+                    {
+                        <label>@Translation.ComplainNewStatus</label>
+                        <select class="form-control" id="cmbStatus">
+                            <option value="0">@Translation.Select</option>
+                            <option value="@((int)enumComplainStatus.Verifying)">@Translation.AssignSp</option>
+                        </select>
+                    }
+                    else if (Model.StatusId == (int)enumComplainStatus.Verifying || Model.StatusId == (int)enumComplainStatus.VerifyingbyAgent)
+                    {
+                        <label>@Translation.ComplainNewStatus</label>
+                        <select class="form-control" id="cmbStatus">
+                            <option value="0">@Translation.Select</option>
+                            <option value="@((int)enumComplainStatus.ResolvebyAgent)">@Translation.ResolvedbyAgent</option>
+                        </select>
+                    }
+                }
+            </div>
+        </div>
+        <div class="row">
+            @*@if (userGroupType == (int)enumGroupType.Admin)
+                {
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label class="bmd-label-floating required">@Translation.CommentTo @(Model.ComplainBy == 1 ? Translation.Customer : Translation.Supplier)</label>
+                            @Html.TextAreaFor(m => m.Response, new { @class = "form-control", @style = "resize:none;" })
+                        </div>
+                    </div>
+                }*@
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                @if (userGroupType == (int)enumGroupType.Provider && (AccountType == (int)enumProviderAcct.Admin || AccountType == (int)enumProviderAcct.Supervisor))
+                {
+                    if (Model.StatusId == (int)enumComplainStatus.New || Model.StatusId == (int)enumComplainStatus.VerifyingbyAgent || Model.StatusId == (int)enumComplainStatus.Verifying || Model.StatusId == (int)enumComplainStatus.ResolvebyAgent)
+                    {
+                        <div class="form-group" id="divComment">
+                            @*<label class="bmd-label-floating required">@Translation.CommentTo @(userGroupType == (int)enumGroupType.Admin ? Translation.ServiceProvider : Translation.SyanahTeam)</label>*@
+                            <label class="bmd-label-floating required">@Translation.Comments</label>
+                            @Html.TextAreaFor(m => m.Response2, new { @class = "form-control", @style = "resize:none;" })
+                        </div>
+                    }
+                }
+                else if (userGroupType == (int)enumGroupType.Provider && AccountType == (int)enumProviderAcct.Agent)
+                {
+                    if (Model.StatusId == (int)enumComplainStatus.New || Model.StatusId == (int)enumComplainStatus.Verifying || Model.StatusId == (int)enumComplainStatus.VerifyingbyAgent)
+                    {
+                        <div class="form-group" id="divComment">
+                            @*<label class="bmd-label-floating required">@Translation.CommentTo @(userGroupType == (int)enumGroupType.Admin ? Translation.ServiceProvider : Translation.SyanahTeam)</label>*@
+                            <label class="bmd-label-floating required">@Translation.Comments</label>
+                            @Html.TextAreaFor(m => m.Response2, new { @class = "form-control", @style = "resize:none;" })
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                @if (userGroupType == (int)enumGroupType.Provider && (AccountType == (int)enumProviderAcct.Admin || AccountType == (int)enumProviderAcct.Supervisor))
+                {
+                    if (Model.StatusId == (int)enumComplainStatus.New || Model.StatusId == (int)enumComplainStatus.VerifyingbyAgent || Model.StatusId == (int)enumComplainStatus.Verifying || Model.StatusId == (int)enumComplainStatus.ResolvebyAgent)
+                    {
+                        <input type="button" class="btn btn-primary pull-right" value="@Translation.Submit" onclick="SubmitComplain();" />
+
+                    }
+                }
+                else if (userGroupType == (int)enumGroupType.Provider && AccountType == (int)enumProviderAcct.Agent)
+                {
+                    if (Model.StatusId == (int)enumComplainStatus.New || Model.StatusId == (int)enumComplainStatus.Verifying || Model.StatusId == (int)enumComplainStatus.VerifyingbyAgent)
+                    {
+                        <input type="button" class="btn btn-primary pull-right" value="@Translation.Submit" onclick="SubmitComplain();" />
+                    }
+                }
+            </div>
+        </div>
+    </form>
+}
+
+@*<form id="frmUpdate">
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Response, new { @class = "bmd-label-floating required" })
+                    @Html.TextAreaFor(m => m.Response, new { @class = "form-control", @style = "resize:none;" })
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="form-group">
+                    <label class="bmd-label-floating required">@Translation.CommentTo @(userGroupType == (int)enumGroupType.Admin ? Translation.ServiceProvider : Translation.SyanahTeam)</label>
+                    @Html.TextAreaFor(m => m.Response2, new { @class = "form-control", @style = "resize:none;" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                @if (Model.StatusId == (int)enumComplainStatus.New)
+                {
+                    <input type="button" class="btn btn-primary pull-right" id="btnAssign" value="@Translation.AssignSp" onclick="SubmitComplain(@((int)enumComplainStatus.Verifying));" />
+                }
+                else if (Model.StatusId == (int)enumComplainStatus.Reject && userGroupType == (int)enumGroupType.Admin)
+                {
+                    <input type="button" class="btn btn-primary pull-right" id="btnAssign" value="@Translation.ReAssign" onclick="SubmitComplain(@((int)enumComplainStatus.Open));" />
+                }
+
+                @if (Model.StatusId != (int)enumComplainStatus.Resolve && Model.StatusId != (int)enumComplainStatus.Reject)
+                {
+                    <input type="button" class="btn btn-success pull-right" id="btnResolve" value="@Translation.Resolve" onclick="SubmitComplain(@((int)enumComplainStatus.Resolve));" />
+
+                    <input type="button" class="btn btn-danger pull-right" id="btnReject" value="@Translation.Reject" onclick="SubmitComplain(@((int)enumComplainStatus.Reject));" />
+                }
+                else if (userGroupType == (int)enumGroupType.Admin && (Model.StatusId == (int)enumComplainStatus.Reject || Model.StatusId == (int)enumComplainStatus.Resolve))
+                    {
+                        <input type="button" class="btn btn-primary pull-right" id="btnClose" value="@Translation.Close" onclick="SubmitComplain(5);" />
+                    }
+            </div>
+            @if (Model.StatusId != (int)enumComplainStatus.Resolve)
+            {
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <input type="button" class="btn btn-primary pull-right" id="btnReply" value="@Translation.Reply" onclick="SubmitComplain(0);" />
+
+                </div>
+            }
+        </div>
+        @Html.HiddenFor(m => m.ComplainId)
+
+    </form>*@
+
+<br />
+<div class="table-responsive" id="divHistory">
+    <table class="table align-items-center table-flush" id="dtHistory">
+        <thead class="thead-light">
+            <tr>
+                <th width="20%">@Translation.AddedOn</th>
+                <th width="20%">@Translation.AddedBy</th>
+                <th width="60%">@Translation.Comments</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+

@@ -1,0 +1,309 @@
+﻿@model Almanea.Models.vm_Settings
+@using Almanea.BusinessLogic;
+@using System.Globalization;
+@{
+    ViewBag.Title = Translation.Settings;
+    var UserGroupId = Convert.ToInt32(HttpContext.Current.Session[cls_Defaults.Session_UserGroupTypeId]);
+
+}
+<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+<style>
+    /* jQuery UI Datepicker moving pixels fix */
+    table.ui-datepicker-calendar {
+        border-collapse: separate;
+    }
+
+    .ui-datepicker-calendar td {
+        border: 1px solid transparent;
+    }
+
+    /* jQuery UI Datepicker hide datepicker helper */
+    #ui-datepicker-div {
+        display: none;
+    }
+
+    /* jQuery UI Datepicker emphasis on selected dates */
+    .ui-datepicker .ui-datepicker-calendar .ui-state-highlight a {
+        background: #743620 none;
+        color: white;
+    }
+</style>
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+
+            <div class="card-body">
+                @using (Ajax.BeginForm("Edit", "Setting", null,
+                     new AjaxOptions
+                     {
+                         HttpMethod = "POST",
+                         OnSuccess = "onSuccess",
+                         OnBegin = "onBegin",
+                         OnComplete = "onComplete",
+                     }, new { id = "frmAdd" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    if (UserGroupId == (int)enumGroupType.Admin || UserGroupId == (int)enumGroupType.SuperAdmin)
+                    {
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Vat, new { @class = "bmd-label-floating required" })
+                                    @Html.TextBoxFor(m => m.Vat, new { @class = "form-control currencyOnly" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Vat, "", new { @class = "valid-text" })
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.OrderDuration, new { @class = "bmd-label-floating required" })
+                                    @Html.TextBoxFor(m => m.OrderDuration, new { @class = "form-control numOnly" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.OrderDuration, "", new { @class = "valid-text" })
+                            </div>
+                            @if (UserGroupId == (int)enumGroupType.SuperAdmin)
+                            {
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.CompanyName, new { @class = "bmd-label-floating required" })
+                                        @Html.TextBoxFor(m => m.CompanyName, new { @class = "form-control" })
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.CompanyName, "", new { @class = "valid-text" })
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.CompanyPhone, new { @class = "bmd-label-floating required" })
+                                        @Html.TextBoxFor(m => m.CompanyPhone, new { @class = "form-control numOnly" })
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.CompanyPhone, "", new { @class = "valid-text" })
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.CompanyEmail, new { @class = "bmd-label-floating required" })
+                                        @Html.TextBoxFor(m => m.CompanyEmail, new { @class = "form-control" })
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.CompanyEmail, "", new { @class = "valid-text" })
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.CompanyWebsite, new { @class = "bmd-label-floating required" })
+                                        @Html.TextBoxFor(m => m.CompanyWebsite, new { @class = "form-control" })
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.CompanyWebsite, "", new { @class = "valid-text" })
+                                </div>
+                            }
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.OrderShow, new { @class = "bmd-label-floating required" })
+                                    @Html.TextBoxFor(m => m.OrderShow, new { @class = "form-control numOnly" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.OrderShow, "", new { @class = "valid-text" })
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <label>@Translation.ShowPreferInstall</label>
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" id="InstallAsap" class="custom-control-input" @(Model.PreferInstallAsap == true ? "checked" : "") />
+                                    <label for="InstallAsap" class="custom-control-label">@Translation.ASAP</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" hidden>
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.BlockDate, new { @class = "bmd-label-floating" })
+                                    @Html.TextBoxFor(m => m.BlockDate, new { @class = "form-control" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.BlockDate, "", new { @class = "valid-text" })
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.SessionTimeOut, new { @class = "bmd-label-floating required" })
+                                    @Html.TextBoxFor(m => m.SessionTimeOut, new { @class = "form-control" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.SessionTimeOut, "", new { @class = "valid-text" })
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.MinOrdersPerDay, new { @class = "bmd-label-floating required" })
+                                    @Html.TextBoxFor(m => m.MinOrdersPerDay, new { @class = "form-control" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.MinOrdersPerDay, "", new { @class = "valid-text" })
+                            </div>
+                            @if (UserGroupId == (int)enumGroupType.SuperAdmin)
+                            {
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <label>@Translation.IsProoduction</label>
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" id="Prooduction" class="custom-control-input" @((int)Model.IsProoduction == 1 ? "checked" : "Unchecked") />
+                                        <label for="Prooduction" class="custom-control-label"></label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    if (UserGroupId == (int)enumGroupType.Provider)
+                    {
+
+            <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" hidden>
+                    <div class="form-group">
+                        @*Updated the lable name only*@
+                        @Html.LabelFor(m => m.MaxOrdersPerDay, new { @class = "bmd-label-floating required" })
+                        @Html.TextBoxFor(m => m.MinOrdersPerDay, new { @class = "form-control" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.MinOrdersPerDay, "", new { @class = "valid-text" })
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" hidden>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Vat, new { @class = "bmd-label-floating required" })
+                        @Html.TextBoxFor(m => m.Vat, new { @class = "form-control currencyOnly" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Vat, "", new { @class = "valid-text" })
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                    <div class="form-group">
+                        @Html.Label(Translation.AddWorkingHours, htmlAttributes: new { @class = "bmd-label-floating required" })
+
+                        @if (ViewBag.ProviderWorkinHour != null)
+                        {
+
+                            <input type="number" name="WorkingHours" id="WorkingHours" value="@ViewBag.ProviderWorkinHour" class="form-control" min="1" max=16 placeholder="@Translation.EnterWorkingHours" required="required" title="@Translation.EnterWorkingHours">
+                        }
+                        else
+                        {
+                            @Html.Editor("WorkingHours", new { htmlAttributes = new { @class = "form-control", @max = 16, placeholder = Translation.EnterWorkingHours, required = "required", title = Translation.EnterWorkingHours } })
+
+                        }
+                        @Html.ValidationMessage("WorkingHours", "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.BlockDate, new { @class = "bmd-label-floating" })
+                        @*@Html.TextBoxFor(m => m.BlockDate, new { @class = "form-control" })*@
+                        <input type="text" id="BlockDate" name="BlockDate" class="form-control" placeholder="@Translation.SelectBlockDate" autocomplete="off" />
+
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+                    <div class="form-group">
+                        <label class="bmd-label-floating required">@Translation.TeamCapacity %</label>
+                        @if (ViewBag.TeamCapacityPercentage != null)
+                        {
+                            <input type="number" name="TeamCapacityPercentage" id="TeamCapacityPercentage" value="@ViewBag.TeamCapacityPercentage" class="form-control" placeholder="@Translation.EnterTeamCapacity" required="required" title="@Translation.EnterTeamCapacity">
+                        }
+                        else
+                        {
+                            <input type="number" name="TeamCapacityPercentage" id="TeamCapacityPercentage" class="form-control" placeholder="@Translation.EnterTeamCapacity" required="required" title="@Translation.EnterTeamCapacity">
+                        }
+
+                        @Html.ValidationMessage("TeamCapacityPercentage", "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+                    <div class="form-group">
+                        <div class="col-xs-12">
+                            <label class="bmd-label-floating">@Translation.Inventory</label>
+                        </div>
+                        @if (ViewBag.HasInventory == 1)
+                        {
+                            <input name="HasInventory" id="HasInventory" data-toggle="toggle" data-size="xs" type="checkbox" checked />
+                        }
+                        else
+                        {
+                            <input name="HasInventory" type="checkbox" />
+                        }
+
+                    </div>
+                </div>
+              
+            </div>
+                    }
+
+                    @Html.HiddenFor(m => m.PreferInstallAsap)
+
+                    @Html.HiddenFor(m => m.IsProoduction)
+                    @Html.HiddenFor(m => m.Autodispatch)
+
+
+                    <p class="mg-t-15">
+                        <input type="submit" class="btn btn-primary pull-right" value="@Translation.Submit" />
+                    </p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/jquery-ui.multidatespicker.js"></script>
+    <script>
+        $(document).ready(function () {
+            /* YOUR CODE HERE */
+               var mdate = $('#BlockDate').multiDatesPicker({
+                   dateFormat: "dd/mm/yy",
+                   minDate: 1,
+            //addDates: arrayDate,
+            showButtonPanel: true,
+            closeText: 'Clear',
+            onClose: function (dateText, obj) {
+                if ($(window.event.srcElement).hasClass('ui-datepicker-close'))
+                    $("#BlockDate").val('');
+            }
+        });
+
+        var array = '@ViewBag.BlockDate'.split(',');
+        var arrayDate = [];
+            if (array != "") {
+                for (var i = 0; i < array.length; i++) {
+                    arrayDate.push(array[i].trim());
+                };
+
+                mdate.multiDatesPicker({ addDates: arrayDate });
+            }
+            else {
+                mdate.multiDatesPicker({ addDates: arrayDate });
+            }
+
+        });
+
+
+        function onSuccess(response) {
+            if (response.StatusId > 0) {
+                successPopup("@Translation.success_UpdateInfo");
+            }
+            else if (response.Message != '') {
+                 warningPopup(response.Message);
+            }
+        }
+
+        $(document).ready(function () {
+            $('input[id="Autodispatch1"]').on('click', function () {
+                var status = $(this).prop('checked');
+                $('#Autodispatch').val(status);
+
+            });
+
+            $('input[id="InstallAsap"]').on('click', function () {
+                var status = $(this).prop('checked');
+                $('#PreferInstallAsap').val(status);
+
+            });
+
+            $('input[id="Prooduction"]').on('click', function () {
+                var status = $(this).prop('checked');
+                if (status==true) {
+                    $('#IsProoduction').val(1);
+                }
+                else {
+                    $('#IsProoduction').val(0);
+                }
+            });
+        });
+    </script>
+}

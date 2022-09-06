@@ -1,0 +1,126 @@
+﻿@{
+    Layout = null;
+}
+
+
+@model Almanea.Models.vm_ComplainDetail
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <!-- ============================================ -->
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <!-- Google Fonts
+        ============================================ -->
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    @{
+        var culture = System.Threading.Thread.CurrentThread.CurrentUICulture.Name.ToLowerInvariant();
+
+        //Arabic
+        if (culture.Equals("ar"))
+        {
+            <link href="~/vendor/bootstrap/css/rtl/bootstrap.css" rel="stylesheet" type="text/css">
+            <link href="/vendor/ruang-admin.css" rel="stylesheet">
+            <link href="~/Content/Site-rtl.css" rel="stylesheet" />
+        }
+        else
+        {
+            <link href="~/vendor/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css">
+            <link href="/vendor/ruang-admin.css" rel="stylesheet">
+            <link href="~/Content/Site.css" rel="stylesheet" />
+        }
+    }
+</head>
+<body class="bg-gradient-login">
+    <div id="container-login">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-12 col-md-9">
+                <div class="card shadow-sm my-5">
+                    <div class="card-body p-0">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 ml-4 mt-5">
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <h4>@Translation.ComplainDetails</h4>
+                                        <a class="float-right" href="@Url.Action("Complain")/@ViewBag.OrderId"><h6>@Translation.BackToComplain</h6> </a>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <div class="form-group">
+                                            <label class="bmd-label-floating">@Translation.Status</label>
+                                            @Html.TextBoxFor(m => m.Status, new { @class = "form-control", @readonly = "readonly" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <div class="form-group">
+                                            <label class="bmd-label-floating">@Translation.ComplainCategory</label>
+                                            @Html.TextBoxFor(m => m.Category, new { @class = "form-control", @readonly = "readonly" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <div class="form-group">
+                                            <label class="bmd-label-floating">@Translation.ComplainId</label>
+                                            @Html.TextBoxFor(m => m.ComplainId, new { @class = "form-control", @readonly = "readonly" })
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <div class="form-group">
+                                            <label class="bmd-label-floating">@Translation.InvoiceNo</label>
+                                            @Html.TextBoxFor(m => m.InvoiceNo, new { @class = "form-control", @readonly = "readonly" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <div class="form-group">
+                                            <label class="bmd-label-floating">@Translation.SubmissionDate</label>
+                                            @Html.TextBoxFor(m => m.SubmissioinDate, new { @class = "form-control", @readonly = "readonly" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+
+                                        <div class="form-group">
+                                            <label class="bmd-label-floating">@Translation.CloseDate</label>
+                                            @Html.TextBoxFor(m => m.CloseDate, new { @class = "form-control", @readonly = "readonly" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <div class="form-group">
+                                            <label class="bmd-label-floating">@Translation.Comments</label>
+                                            @Html.TextAreaFor(m => m.Comments, new { @class = "form-control", @style = "resize:none;", @readonly = "readonly" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <div class="form-group">
+                                            <label class="bmd-label-floating">@Translation.Response</label>
+                                            @Html.TextAreaFor(m => m.Feedback, new { @class = "form-control", @style = "resize:none;", @readonly = "readonly" })
+                                        </div>
+                                    </div>
+                                  
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/unobtrusiveajax")
+
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/ruang-admin.js"></script>
+
+    <script src="~/Scripts/Custom.js"></script>
+
+</body>
+</html>
